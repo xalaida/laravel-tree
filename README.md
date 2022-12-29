@@ -1,4 +1,6 @@
 # To Do List
+- [ ] cover with tests
+- [ ] prepare for release and publish on packagist
 - [ ] feature descendants relation
 - [ ] feature ancestors relation
 - [ ] add `Tree` iterable class that has `NodeCollection` nodes on each level
