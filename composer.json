@@ -1,0 +1,36 @@
+{
+    "name": "nevadskiy/laravel-tree",
+    "description": "The package provides materialized path for a Laravel application.",
+    "license": "MIT",
+    "keywords": ["tree", "hierarchy", "materialized path", "path", "ltree", "laravel"],
+    "authors": [
+        {
+            "name": "Nevadskiy",
+            "email": "nevadskiy@gmail.com"
+        }
+    ],
+    "require": {
+        "php": "^7.2|^8.0",
+        "laravel/framework": "^6.0|^7.0|^8.0|^9.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Nevadskiy\\Tree\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Nevadskiy\\Tree\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Nevadskiy\\Tree\\TreeServiceProvider"
+            ]
+        }
+    }
+}
