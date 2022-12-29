@@ -1,5 +1,7 @@
 # To Do List
 
+- [ ] feature descendants relation
+- [ ] feature ancestors relation
 - [ ] add `Tree` iterable class that has `NodeCollection` nodes on each level
 - [ ] add `siblings` read-only relation.
 - [ ] add `MySQL` driver support (based on `LIKE` operator).
