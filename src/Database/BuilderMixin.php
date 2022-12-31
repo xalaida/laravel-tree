@@ -48,7 +48,7 @@ class BuilderMixin
             return $this->whereAncestor(
                 $model->newQuery()->qualifyColumn($model->getPathColumn()),
                 $model->getPath(),
-                $boolean,
+                $boolean
             );
         };
     }
@@ -92,7 +92,7 @@ class BuilderMixin
             return $this->whereDescendant(
                 $model->newQuery()->qualifyColumn($model->getPathColumn()),
                 $model->getPath(),
-                $boolean,
+                $boolean
             );
         };
     }
