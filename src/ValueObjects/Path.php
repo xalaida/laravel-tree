@@ -3,9 +3,8 @@
 namespace Nevadskiy\Tree\ValueObjects;
 
 use Nevadskiy\Tree\SegmentProcessors\UuidPostgresLtreeSegmentProcessor;
-use Stringable;
 
-class Path implements Stringable
+class Path
 {
     /**
      * The path's separator.
@@ -14,17 +13,19 @@ class Path implements Stringable
 
     /**
      * The path's value.
+     *
+     * @var string
      */
-    private string $value;
+    private $value;
 
     /**
      * Build a path from the given segments.
      */
-    public static function concat(Path|string ...$segments): Path
+    public static function concat(...$segments): Path
     {
         return new static(
             collect($segments)
-                ->map(function (Path|string $segment) {
+                ->map(function ($segment) {
                     if ($segment instanceof Path) {
                         return $segment->getValue();
                     }

@@ -4,7 +4,7 @@ namespace Nevadskiy\Tree;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Query\Expression;
 use Nevadskiy\Tree\Casts\AsPath;
@@ -220,10 +220,11 @@ trait AsTree
      */
     protected function buildPath(): Path
     {
-        return Path::concat(...array_filter([
-            $this->parent?->getPath(),
-            $this->getPathSource()
-        ]));
+        if ($this->parent) {
+            return Path::concat($this->parent->getPath(), $this->getPathSource());
+        }
+
+        return Path::concat($this->getPathSource());
     }
 
     /**
