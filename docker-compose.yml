@@ -5,6 +5,8 @@ services:
     build:
       context: ./
       dockerfile: ./.docker/${DOCKER_APP_RUNTIME:-php7.0}/Dockerfile
+    env_file:
+      - .env
     volumes:
       - ./:/app
     links:
