@@ -31,8 +31,6 @@ class Ancestors extends Relation
      */
     public function addEagerConstraints(array $models): void
     {
-        // @todo rework with splitting path and retrieve unique identifiers and then simple whereIn.
-
         $this->getRelationQuery()
             ->where(function (Builder $query) use ($models) {
                 foreach ($models as $model) {
@@ -59,10 +57,9 @@ class Ancestors extends Relation
     public function match(array $models, Collection $results, $relation): array
     {
         foreach ($models as $model) {
-            $ancestors = collect($model->getPath()->ancestors());
-
-            $model->setRelation($relation, $results->filter(function (Model $model) use ($ancestors) {
-                return $ancestors->contains($model->getPathSource());
+            $model->setRelation($relation, $results->filter(function (Model $result) use ($model) {
+                return collect($model->getPath()->segments())->contains($result->getPathSource())
+                    && $model->isNot($result);
             }));
         }
 
