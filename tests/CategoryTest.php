@@ -143,6 +143,22 @@ class CategoryTest extends TestCase
     /**
      * @test
      */
+    public function it_can_be_filtered_by_root(): void
+    {
+        $category = CategoryFactory::new()
+            ->withAncestors(2)
+            ->create();
+
+        $categories = Category::query()->whereRoot()->get();
+
+        self::assertCount(1, $categories);
+        self::assertTrue($categories->first()->is($category->parent->parent));
+        self::assertEquals(1, $categories->first()->getPath()->getDepth());
+    }
+
+    /**
+     * @test
+     */
     public function it_joins_ancestors_to_node_collection(): void
     {
         $category = CategoryFactory::new()

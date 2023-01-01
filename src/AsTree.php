@@ -138,7 +138,7 @@ trait AsTree
     /**
      * Get the root items.
      */
-    public function scopeWhereIsRoot(Builder $query): void
+    public function scopeWhereRoot(Builder $query): void
     {
         $query->whereNull($this->getParentKeyName());
     }
