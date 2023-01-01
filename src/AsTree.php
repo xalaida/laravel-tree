@@ -198,7 +198,7 @@ trait AsTree
     }
 
     /**
-     * Assign the model's materialized path to the model if it is missing.
+     * Assign the model's path to the model if it is missing.
      */
     public function assignPathIfMissing(): void
     {
@@ -208,7 +208,7 @@ trait AsTree
     }
 
     /**
-     * Assign the model's materialized path to the model.
+     * Assign the model's path to the model.
      */
     public function assignPath(): void
     {
