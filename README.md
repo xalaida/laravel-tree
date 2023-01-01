@@ -1,7 +1,6 @@
 # To Do List
 - [ ] fix `whereHas` method for descendants relation.
 - [ ] fix `whereHas` method for ancestors relation.
-- [ ] fix left todo items.
 - [ ] prepare for release and publish on packagist.
 - [ ] add documentation.
 - [ ] add github actions.
