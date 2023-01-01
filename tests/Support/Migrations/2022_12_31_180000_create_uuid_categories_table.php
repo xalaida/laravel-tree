@@ -11,19 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('categories', function (Blueprint $table) {
-            $table->id();
+        Schema::create('uuid_categories', function (Blueprint $table) {
+            $table->uuid('id')->primary();
             $table->string('name')->index();
-            $table->ltree('path')->nullable()->spatialIndex();
+            $table->ltree('path')->spatialIndex();
             $table->timestamps();
         });
 
-        Schema::table('categories', function (Blueprint $table) {
-            $table->foreignId('parent_id')
+        Schema::table('uuid_categories', function (Blueprint $table) {
+            $table->foreignUuid('parent_id')
                 ->after('name')
                 ->nullable()
                 ->index()
-                ->constrained('categories')
+                ->constrained('uuid_categories')
                 ->cascadeOnDelete();
         });
     }
@@ -33,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('categories');
+        Schema::dropIfExists('uuid_categories');
     }
 };
