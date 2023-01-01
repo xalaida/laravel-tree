@@ -1,5 +1,5 @@
 # Install the app.
-install: env build vendor
+install: env build composer.install
 
 # Start docker containers.
 up:
