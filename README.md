@@ -1,11 +1,11 @@
 # To Do List
-- [ ] cover with tests
-- [ ] prepare for release and publish on packagist
-- [ ] add documentation
-- [ ] add github actions
-- [ ] feature descendants relation
-- [ ] feature ancestors relation
-- [ ] add `Tree` iterable class that has `NodeCollection` nodes on each level
+- [ ] feature descendants relation.
+- [ ] feature ancestors relation.
+- [ ] fix left todo items.
+- [ ] prepare for release and publish on packagist.
+- [ ] add documentation.
+- [ ] add github actions.
+- [ ] add `Tree` iterable class that has `NodeCollection` nodes on each level.
 - [ ] add `siblings` read-only relation.
 - [ ] add `MySQL` driver support (based on `LIKE` operator) and determine by checkout model connection.
 - [ ] add possibility to generate a whole tree using model factory. develop API to specify how many nodes should be created per a depth level / make it dynamic using callable syntax. probably use sequences.
