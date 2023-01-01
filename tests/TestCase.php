@@ -2,13 +2,16 @@
 
 namespace Nevadskiy\Tree\Tests;
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Nevadskiy\Tree\TreeServiceProvider;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 
 class TestCase extends OrchestraTestCase
 {
+    use RefreshDatabase;
+
     /**
-     * Setup the test environment.
+     * @inheritdoc
      */
     protected function setUp(): void
     {
@@ -20,7 +23,7 @@ class TestCase extends OrchestraTestCase
     }
 
     /**
-     * Get package providers.
+     * @inheritdoc
      */
     protected function getPackageProviders(): array
     {
