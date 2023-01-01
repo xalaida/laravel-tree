@@ -73,18 +73,6 @@ class Path
     }
 
     /**
-     * Get the path ancestor segments.
-     */
-    public function ancestors(): Collection
-    {
-        $segments = $this->segments();
-
-        $segments->pop();
-
-        return $segments;
-    }
-
-    /**
      * Get the depth level of the path.
      */
     public function getDepth(): int
