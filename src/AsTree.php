@@ -25,7 +25,9 @@ trait AsTree
     protected static function bootAsTree(): void
     {
         static::registerModelEvent($event = static::assignPathOnEvent(), static function (self $model) use ($event) {
-            $model->assignPathIfMissing();
+            if ($model->shouldAssignPath()) {
+                $model->assignPath();
+            }
 
             if ($event === 'created') {
                 $model->saveQuietly(['timestamps' => false]);
@@ -198,13 +200,11 @@ trait AsTree
     }
 
     /**
-     * Assign the model's path to the model if it is missing.
+     * Determine whether the path attribute should be assigned.
      */
-    public function assignPathIfMissing(): void
+    protected function shouldAssignPath(): bool
     {
-        if (is_null($this->getAttribute($this->getPathColumn()))) {
-            $this->assignPath();
-        }
+        return ! array_key_exists($this->getPathColumn(), $this->getAttributes());
     }
 
     /**
