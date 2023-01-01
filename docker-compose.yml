@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: ./
+      dockerfile: ./.docker/${DOCKER_APP_RUNTIME:-php7.0}/Dockerfile
+    volumes:
+      - ./:/app
+    links:
+      - postgres
+
+  postgres:
+    image: postgres:14.2-alpine
+    environment:
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
