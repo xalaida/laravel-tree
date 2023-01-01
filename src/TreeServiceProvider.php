@@ -36,13 +36,7 @@ class TreeServiceProvider extends ServiceProvider
     private function registerLtreeType(): void
     {
         Grammar::macro('typeLtree', function () {
-            $driver = DB::connection()->getDriverName();
-
-            if ($driver === 'pgsql') {
-                return 'ltree';
-            }
-
-            throw new RuntimeException(sprintf('Driver "%s" does not support "Ltree" extension.', $driver));
+            return 'ltree';
         });
     }
 
