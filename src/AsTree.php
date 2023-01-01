@@ -296,7 +296,7 @@ trait AsTree
             return false;
         }
 
-        return collect($this->parent->getPath()->segments())->contains($this->getPathSource());
+        return $this->parent->getPath()->segments()->contains($this->getPathSource());
     }
 
     /**

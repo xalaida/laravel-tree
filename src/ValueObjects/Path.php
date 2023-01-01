@@ -2,6 +2,7 @@
 
 namespace Nevadskiy\Tree\ValueObjects;
 
+use Illuminate\Support\Collection;
 use Nevadskiy\Tree\SegmentProcessors\UuidPostgresLtreeSegmentProcessor;
 
 class Path
@@ -59,7 +60,7 @@ class Path
     /**
      * Get segments of the path.
      */
-    public function segments(): array
+    public function segments(): Collection
     {
         return collect($this->explode())
             ->map(function (string $segment) {
@@ -68,18 +69,17 @@ class Path
                 }
 
                 return $segment;
-            })
-            ->all();
+            });
     }
 
     /**
      * Get the path ancestor segments.
      */
-    public function ancestors(): array
+    public function ancestors(): Collection
     {
         $segments = $this->segments();
 
-        array_pop($segments);
+        $segments->pop();
 
         return $segments;
     }

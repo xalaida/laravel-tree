@@ -58,7 +58,7 @@ class Ancestors extends Relation
     {
         foreach ($models as $model) {
             $model->setRelation($relation, $results->filter(function (Model $result) use ($model) {
-                return collect($model->getPath()->segments())->contains($result->getPathSource())
+                return $model->getPath()->segments()->contains($result->getPathSource())
                     && $model->isNot($result);
             }));
         }
