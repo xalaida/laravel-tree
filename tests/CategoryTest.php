@@ -43,6 +43,21 @@ class CategoryTest extends TestCase
     /**
      * @test
      */
+    public function it_has_path_attribute(): void
+    {
+        $category = CategoryFactory::new()
+            ->withAncestors(2)
+            ->create();
+
+        self::assertEquals(3, $category->getPath()->getDepth());
+        self::assertEquals($category->parent->parent->getPathSource(), $category->getPath()->segments()[0]);
+        self::assertEquals($category->parent->getPathSource(), $category->getPath()->segments()[1]);
+        self::assertEquals($category->getPathSource(), $category->getPath()->segments()[2]);
+    }
+
+    /**
+     * @test
+     */
     public function it_has_relation_with_ancestor_categories(): void
     {
         $category = CategoryFactory::new()
