@@ -25,7 +25,7 @@ class TestCase extends OrchestraTestCase
     /**
      * @inheritdoc
      */
-    protected function getPackageProviders(): array
+    protected function getPackageProviders($app): array
     {
         return [
             TreeServiceProvider::class,
