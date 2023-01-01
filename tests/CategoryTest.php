@@ -1,11 +1,10 @@
 <?php
 
-namespace Nevadskiy\Tree\Tests\Unit\Models;
+namespace Nevadskiy\Tree\Tests;
 
 use Nevadskiy\Tree\Exceptions\CircularReferenceException;
-use Nevadskiy\Tree\Tests\Support\Models\Category;
 use Nevadskiy\Tree\Tests\Support\Factories\CategoryFactory;
-use Nevadskiy\Tree\Tests\TestCase;
+use Nevadskiy\Tree\Tests\Support\Models\Category;
 
 class CategoryTest extends TestCase
 {
