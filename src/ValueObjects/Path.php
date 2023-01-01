@@ -98,8 +98,6 @@ class Path
 
     /**
      * The segment processor list.
-     *
-     * @todo consider setting this to static prop from service provider when app has configured at least single postgres database connection.
      */
     protected static function segmentProcessors(): array
     {
