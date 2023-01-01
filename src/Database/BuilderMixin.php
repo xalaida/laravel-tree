@@ -59,7 +59,9 @@ class BuilderMixin
     public function orWhereAncestorOf(): callable
     {
         return function (Model $model) {
-            return $this->whereAncestorOf($model, 'or');
+            return $this->orWhereAncestor(
+                $model->newQuery()->qualifyColumn($model->getPathColumn()), $model->getPath(),
+            );
         };
     }
 
@@ -103,7 +105,9 @@ class BuilderMixin
     public function orWhereDescendantOf(): callable
     {
         return function (Model $model) {
-            return $this->whereDescendantOf($model, 'or');
+            return $this->orWhereDescendant(
+                $model->newQuery()->qualifyColumn($model->getPathColumn()), $model->getPath(),
+            );
         };
     }
 }
