@@ -2,7 +2,9 @@
 
 namespace Nevadskiy\Tree\Relations;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Nevadskiy\Tree\AsTree;
 
@@ -29,14 +31,12 @@ class Descendants extends Relation
      */
     public function addEagerConstraints(array $models): void
     {
-        // @todo rework with splitting path and retrieve unique identifiers and then simple whereIn.
-
-        // $this->getRelationQuery()
-        //     ->where(function (Builder $query) use ($models) {
-        //         foreach ($models as $model) {
-        //             $query->orWhereAncestorOf($model);
-        //         }
-        //     });
+        $this->getRelationQuery()
+             ->where(function (Builder $query) use ($models) {
+                 foreach ($models as $model) {
+                     $query->orWhereDescendantOf($model);
+                 }
+             });
     }
 
     /**
@@ -56,13 +56,12 @@ class Descendants extends Relation
      */
     public function match(array $models, Collection $results, $relation): array
     {
-        // foreach ($models as $model) {
-        //     $ancestors = collect($model->getPath()->ancestors());
-        //
-        //     $model->setRelation($relation, $results->filter(function (Model $model) use ($ancestors) {
-        //         return $ancestors->contains($model->getPathSource());
-        //     }));
-        // }
+        foreach ($models as $model) {
+             $model->setRelation($relation, $results->filter(function (Model $result) use ($model) {
+                 return collect($result->getPath()->segments())->contains($model->getPathSource())
+                     && $model->isNot($result);
+             }));
+        }
 
         return $models;
     }

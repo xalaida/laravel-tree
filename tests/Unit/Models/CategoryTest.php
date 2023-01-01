@@ -169,6 +169,29 @@ class CategoryTest extends TestCase
     /**
      * @test
      */
+    public function it_eager_loads_category_with_descendants(): void
+    {
+        CategoryFactory::new()
+            ->withAncestors(2)
+            ->create();
+
+        Category::query()->getConnection()->enableQueryLog();
+
+        $categories = Category::query()
+            ->with('descendants')
+            ->orderByDepth()
+            ->get();
+
+        self::assertCount(3, $categories);
+        self::assertCount(2, $categories[0]->descendants);
+        self::assertCount(1, $categories[1]->descendants);
+        self::assertCount(0, $categories[2]->descendants);
+        self::assertCount(2, Category::query()->getConnection()->getQueryLog());
+    }
+
+    /**
+     * @test
+     */
     public function it_updates_path_of_subtree_when_parent_category_is_changed(): void
     {
         $category = CategoryFactory::new()
