@@ -5,6 +5,7 @@ namespace Nevadskiy\Tree\Tests;
 use Nevadskiy\Tree\Exceptions\CircularReferenceException;
 use Nevadskiy\Tree\Tests\Support\Factories\CategoryFactory;
 use Nevadskiy\Tree\Tests\Support\Models\Category;
+use RuntimeException;
 
 class CategoryTest extends TestCase
 {
@@ -21,6 +22,17 @@ class CategoryTest extends TestCase
         self::assertEquals($category->parent->parent->getPathSource(), $category->getPath()->segments()[0]);
         self::assertEquals($category->parent->getPathSource(), $category->getPath()->segments()[1]);
         self::assertEquals($category->getPathSource(), $category->getPath()->segments()[2]);
+    }
+
+    /**
+     * @test
+     */
+    public function it_throws_exception_when_path_attribute_is_not_a_path_instance(): void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('The "path" is not a Path instance.');
+
+        CategoryFactory::new()->create(['path' => '1.2.3']);
     }
 
     /**
