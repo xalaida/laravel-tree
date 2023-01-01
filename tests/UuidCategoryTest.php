@@ -6,7 +6,7 @@ use Nevadskiy\Tree\Exceptions\CircularReferenceException;
 use Nevadskiy\Tree\Tests\Support\Factories\CategoryFactory;
 use Nevadskiy\Tree\Tests\Support\Models\Category;
 
-class CategoryTest extends TestCase
+class UuidCategoryTest extends TestCase
 {
     /**
      * @test
