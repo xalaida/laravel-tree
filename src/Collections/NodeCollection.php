@@ -10,11 +10,11 @@ class NodeCollection extends Collection
     /**
      * Sort the collection by the depth level.
      */
-    public function sortByDepth(): NodeCollection
+    public function sortByDepth(bool $descending = false): NodeCollection
     {
         return $this->sortBy(function (Model $model) {
             return $model->getPath()->getDepth();
-        });
+        }, SORT_REGULAR, $descending);
     }
 
     /**
@@ -22,8 +22,6 @@ class NodeCollection extends Collection
      */
     public function sortByDepthDesc(): NodeCollection
     {
-        return $this->sortByDesc(function (Model $model) {
-            return $model->getPath()->getDepth();
-        });
+        return $this->sortByDepth(true);
     }
 }
