@@ -1,6 +1,6 @@
 # To Do List
-- [ ] feature descendants relation.
-- [ ] feature ancestors relation.
+- [ ] fix `whereHas` method for descendants relation.
+- [ ] fix `whereHas` method for ancestors relation.
 - [ ] fix left todo items.
 - [ ] prepare for release and publish on packagist.
 - [ ] add documentation.
