@@ -33,4 +33,8 @@ class HasManyDeepTest extends TestCase
         self::assertTrue($parent->products->contains($childProduct));
         self::assertFalse($parent->products->contains($anotherProduct));
     }
+
+    // @todo test eager loading...
+
+    // @todo test whereHas method...
 }
