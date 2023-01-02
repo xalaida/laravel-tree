@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Nevadskiy\Tree\AsTree;
+use Nevadskiy\Tree\Database\BuilderMixin;
 
 /**
  * @property AsTree $related
@@ -75,52 +76,28 @@ class Ancestors extends Relation
             ? $this->query->get()
             : $this->related->newCollection();
     }
-//
-// @todo finish other methods
-//
-//    /**
-//     * Add the constraints for a relationship query.
-//     *
-//     * @param  \Illuminate\Database\Eloquent\Builder  $query
-//     * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
-//     * @param  array|mixed  $columns
-//     * @return \Illuminate\Database\Eloquent\Builder
-//     */
-//    public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*'])
-//    {
-//        if ($query->getQuery()->from == $parentQuery->getQuery()->from) {
-//            return $this->getRelationExistenceQueryForSelfRelation($query, $parentQuery, $columns);
-//        }
-//
-//        return parent::getRelationExistenceQuery($query, $parentQuery, $columns);
-//    }
-//
-//    /**
-//     * Add the constraints for a relationship query on the same table.
-//     *
-//     * @param  \Illuminate\Database\Eloquent\Builder  $query
-//     * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
-//     * @param  array|mixed  $columns
-//     * @return \Illuminate\Database\Eloquent\Builder
-//     */
-//    public function getRelationExistenceQueryForSelfRelation(Builder $query, Builder $parentQuery, $columns = ['*'])
-//    {
-//        $query->from($query->getModel()->getTable().' as '.$hash = $this->getRelationCountHash());
-//
-//        $query->getModel()->setTable($hash);
-//
-//        return $query->select($columns)->whereColumn(
-//            $this->getQualifiedParentKeyName(), '=', $hash.'.'.$this->getForeignKeyName()
-//        );
-//    }
-//
-//    /**
-//     * Get the key for comparing against the parent key in "has" query.
-//     *
-//     * @return string
-//     */
-//    public function getExistenceCompareKey()
-//    {
-//        return $this->getQualifiedForeignKeyName();
-//    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*']): Builder
+    {
+        $subQueryTable = $this->getRelationCountHash();
+
+        $query->select($columns)->from("{$query->getModel()->getTable()} as {$subQueryTable}");
+
+        $query->whereColumn(
+            "{$subQueryTable}.{$this->related->getPathColumn()}",
+            BuilderMixin::ANCESTOR,
+            $this->related->qualifyColumn($this->related->getPathColumn())
+        );
+
+        $query->whereColumn(
+            "{$subQueryTable}.{$this->related->getKeyName()}",
+            '!=',
+            $this->related->getQualifiedKeyName()
+        );
+
+        return $query;
+    }
 }

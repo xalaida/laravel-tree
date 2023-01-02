@@ -1,7 +1,9 @@
 # To Do List
+- [ ] add docker postgres healthcheck.
 - [ ] fix `whereHas` method for descendants relation.
 - [ ] fix `whereHas` method for ancestors relation.
 - [ ] prepare for release and publish on packagist.
+- [ ] add possibility to add relation that contains all items of it and its descendants. consider name like descendantProducts / relatedProducts / allProducts...
 - [ ] add documentation.
 - [ ] add github actions.
 - [ ] consider adding `wherePath` method that allow to use raw ltree queries (https://www.postgresql.org/docs/current/ltree.html).

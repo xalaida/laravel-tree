@@ -2,6 +2,7 @@
 
 namespace Nevadskiy\Tree\Tests;
 
+use Illuminate\Database\Eloquent\Builder;
 use Nevadskiy\Tree\Exceptions\CircularReferenceException;
 use Nevadskiy\Tree\Tests\Support\Factories\CategoryFactory;
 use Nevadskiy\Tree\Tests\Support\Models\Category;
@@ -347,5 +348,34 @@ class CategoryTest extends TestCase
         $anotherCategory->save();
 
         self::assertFalse($anotherCategory->isMoving());
+    }
+
+    /**
+     * @test
+     */
+    public function it_can_filter_ancestors_using_where_has_method(): void
+    {
+        $grandParent = CategoryFactory::new()->create(['name' => 'Goods']);
+
+        $parent = CategoryFactory::new()
+            ->forParent($grandParent)
+            ->create([
+                'name' => 'Gold goods',
+            ]);
+
+        $category = CategoryFactory::new()
+            ->forParent($parent)
+            ->create();
+
+        $categories = Category::query()
+            ->whereHas('ancestors', function (Builder $query) {
+                $query->where('name', 'ILIKE', 'goods');
+            })
+            ->get();
+
+        self::assertCount(2, $categories);
+        self::assertTrue($categories->contains($category));
+        self::assertTrue($categories->contains($parent));
+        self::assertFalse($categories->contains($grandParent));
     }
 }
