@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('uuid_categories', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('name')->index();
+            $table->string('name');
             $table->ltree('path')->spatialIndex();
             $table->timestamps();
         });
