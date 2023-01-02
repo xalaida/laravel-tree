@@ -55,9 +55,7 @@ class HasManyDeep extends HasMany
 
             $this->query->whereDescendantOf($this->parent);
 
-            if (! $this->query->getQuery()->columns) {
-                $this->query->select($this->related->qualifyColumn('*'));
-            }
+            $this->query->select($this->related->qualifyColumn('*'));
         }
     }
 
@@ -96,8 +94,7 @@ class HasManyDeep extends HasMany
     {
         foreach ($models as $model) {
             $model->setRelation($relation, $results->filter(function (Model $result) use ($model) {
-                return $result->getAttribute(self::HASH_PATH_COLUMN)->segments()->contains($model->getPathSource())
-                    && $result->isNot($model);
+                return $result->getAttribute(self::HASH_PATH_COLUMN)->segments()->contains($model->getPathSource());
             }));
         }
 
