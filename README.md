@@ -1,8 +1,9 @@
 # To Do List
+- [ ] add support for existence queries for `HasManyDeep` relation.
+- [ ] test query relation without constraint (for example on `avg` methods)
 - [ ] prepare for release and publish on packagist.
 - [ ] add documentation.
 - [ ] add github actions.
-- [ ] test query relation without constraint (for example on `avg` methods)
 - [ ] add possibility to use non-primary key column as source.
 - [ ] consider adding `wherePath` method that allow to use raw ltree queries (https://www.postgresql.org/docs/current/ltree.html).
 - [ ] add `Tree` iterable class that has `NodeCollection` nodes on each level.
