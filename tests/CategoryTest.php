@@ -353,29 +353,54 @@ class CategoryTest extends TestCase
     /**
      * @test
      */
-    public function it_can_filter_ancestors_using_where_has_method(): void
+    public function it_can_filter_items_by_ancestors_using_where_has_method(): void
     {
-        $grandParent = CategoryFactory::new()->create(['name' => 'Goods']);
+        $clothing = CategoryFactory::new()->create(['name' => 'Clothing']);
 
-        $parent = CategoryFactory::new()
-            ->forParent($grandParent)
-            ->create([
-                'name' => 'Gold goods',
-            ]);
+        $accessories = CategoryFactory::new()
+            ->forParent($clothing)
+            ->create(['name' => 'Accessories']);
 
-        $category = CategoryFactory::new()
-            ->forParent($parent)
-            ->create();
+        $belts = CategoryFactory::new()
+            ->forParent($accessories)
+            ->create(['name' => 'Belts']);
 
         $categories = Category::query()
             ->whereHas('ancestors', function (Builder $query) {
-                $query->where('name', 'ILIKE', 'goods');
+                $query->where('name', 'LIKE', 'Clo%');
             })
             ->get();
 
         self::assertCount(2, $categories);
-        self::assertTrue($categories->contains($category));
-        self::assertTrue($categories->contains($parent));
-        self::assertFalse($categories->contains($grandParent));
+        self::assertTrue($categories->contains($belts));
+        self::assertTrue($categories->contains($accessories));
+        self::assertFalse($categories->contains($clothing));
+    }
+
+    /**
+     * @test
+     */
+    public function it_can_filter_items_by_descendants_using_where_has_method(): void
+    {
+        $clothing = CategoryFactory::new()->create(['name' => 'Clothing']);
+
+        $accessories = CategoryFactory::new()
+            ->forParent($clothing)
+            ->create(['name' => 'Accessories']);
+
+        $belts = CategoryFactory::new()
+            ->forParent($accessories)
+            ->create(['name' => 'Belts']);
+
+        $categories = Category::query()
+            ->whereHas('descendants', function (Builder $query) {
+                $query->where('name', 'LIKE', 'Bel%');
+            })
+            ->get();
+
+        self::assertCount(2, $categories);
+        self::assertTrue($categories->contains($clothing));
+        self::assertTrue($categories->contains($accessories));
+        self::assertFalse($categories->contains($belts));
     }
 }
