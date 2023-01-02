@@ -4,6 +4,7 @@ namespace Nevadskiy\Tree\Relations;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Query\JoinClause;
 
 class HasManyDeep extends HasMany
 {
@@ -32,5 +33,23 @@ class HasManyDeep extends HasMany
                 $related->setConnection($parent->getConnectionName());
             }
         });
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function addConstraints(): void
+    {
+        if (static::$constraints) {
+            $query = $this->getRelationQuery();
+
+            $query->join($this->parent->getTable(), function (JoinClause $join) {
+                $join->on($this->getQualifiedForeignKeyName(), $this->getQualifiedParentKeyName());
+            });
+
+            $query->whereDescendantOf($this->parent);
+
+            $query->whereNotNull($this->foreignKey);
+        }
     }
 }
