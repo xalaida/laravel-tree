@@ -20,6 +20,6 @@ services:
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "${DB_USERNAME}", "-d", "${DB_PASSWORD}"]
+      test: ["CMD", "pg_isready", "-U", "${DB_USERNAME}", "-d", "${DB_DATABASE}"]
       interval: 3s
       timeout: 5s
