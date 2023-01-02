@@ -4,6 +4,7 @@
 - [ ] prepare for release and publish on packagist.
 - [ ] add documentation.
 - [ ] add github actions.
+- [ ] consider adding `wherePath` method that allow to use raw ltree queries (https://www.postgresql.org/docs/current/ltree.html).
 - [ ] add `Tree` iterable class that has `NodeCollection` nodes on each level.
 - [ ] add `siblings` read-only relation.
 - [ ] add `MySQL` driver support (based on `LIKE` operator) and determine by checkout model connection.
