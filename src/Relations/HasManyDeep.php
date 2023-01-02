@@ -54,6 +54,10 @@ class HasManyDeep extends HasMany
             });
 
             $this->query->whereDescendantOf($this->parent);
+
+            if (! $this->query->getQuery()->columns) {
+                $this->query->select($this->related->qualifyColumn('*'));
+            }
         }
     }
 

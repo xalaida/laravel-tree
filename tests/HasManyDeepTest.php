@@ -38,6 +38,20 @@ class HasManyDeepTest extends TestCase
     /**
      * @test
      */
+    public function it_does_not_override_props(): void
+    {
+        $category = CategoryFactory::new()->create(['name' => 'Video Games']);
+
+        ProductFactory::new()
+            ->forCategory($category)
+            ->create(['name' => 'Sony PlayStation 5']);
+
+        self::assertEquals('Sony PlayStation 5', $category->products->first()->name);
+    }
+
+    /**
+     * @test
+     */
     public function it_can_eager_load_products_using_deep_strategy(): void
     {
         $parent = CategoryFactory::new()->create();

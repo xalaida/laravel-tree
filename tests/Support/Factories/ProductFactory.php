@@ -19,6 +19,7 @@ class ProductFactory extends Factory
     public function definition(): array
     {
         return [
+            'name' => $this->faker->words(),
             'category_id' => CategoryFactory::new(),
         ];
     }
