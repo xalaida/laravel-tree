@@ -5,10 +5,8 @@ namespace Nevadskiy\Tree;
 use Illuminate\Database\Grammar;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
 use Nevadskiy\Tree\Database\BuilderMixin;
-use RuntimeException;
 
 class TreeServiceProvider extends ServiceProvider
 {
