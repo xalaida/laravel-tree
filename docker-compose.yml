@@ -9,8 +9,9 @@ services:
       - .env
     volumes:
       - ./:/app
-    links:
-      - postgres
+    depends_on:
+      postgres:
+        condition: service_healthy
 
   postgres:
     image: postgres:14.2-alpine
@@ -18,3 +19,7 @@ services:
       POSTGRES_DB: ${DB_DATABASE}
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${DB_USERNAME}", "-d", "${DB_PASSWORD}"]
+      interval: 3s
+      timeout: 5s
