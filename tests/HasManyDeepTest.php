@@ -83,5 +83,23 @@ class HasManyDeepTest extends TestCase
         self::assertCount(2, Category::query()->getConnection()->getQueryLog());
     }
 
+    /**
+     * @test
+     */
+    public function it_does_not_override_props_with_eager_loading(): void
+    {
+        $category = CategoryFactory::new()->create(['name' => 'Video Games']);
+
+        ProductFactory::new()
+            ->forCategory($category)
+            ->create(['name' => 'Sony PlayStation 5']);
+
+        $categories = Category::query()
+            ->with('products')
+            ->get();
+
+        self::assertEquals('Sony PlayStation 5', $categories->first()->products->first()->name);
+    }
+
     // @todo test whereHas method...
 }

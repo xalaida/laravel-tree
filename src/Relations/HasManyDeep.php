@@ -73,18 +73,28 @@ class HasManyDeep extends HasMany
                 $query->orWhereDescendantOf($model);
             }
         });
+    }
 
-        if (! $this->query->getQuery()->columns) {
-            $this->query->select($this->related->qualifyColumn('*'));
+    /**
+     * Execute the query as a "select" statement.
+     *
+     * @param array $columns
+     */
+    public function get($columns = ['*']): Collection
+    {
+        if ($columns === ['*']) {
+            $columns = ["{$this->related->getTable()}.*"];
         }
 
-        $this->query->addSelect([
+        $columns = array_merge($columns, [
             sprintf("{$this->parent->getTable()}.{$this->parent->getPathColumn()} as %s", self::HASH_PATH_COLUMN)
         ]);
 
         $this->query->withCasts([
             self::HASH_PATH_COLUMN => AsPath::class,
         ]);
+
+        return $this->query->get($columns);
     }
 
     /**
