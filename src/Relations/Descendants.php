@@ -60,7 +60,7 @@ class Descendants extends Relation
         foreach ($models as $model) {
              $model->setRelation($relation, $results->filter(function (Model $result) use ($model) {
                  return $result->getPath()->segments()->contains($model->getPathSource())
-                     && $model->isNot($result);
+                     && $result->isNot($model);
              }));
         }
 
