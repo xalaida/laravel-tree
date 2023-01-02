@@ -13,26 +13,26 @@ class HasManyDeepTest extends TestCase
      */
     public function it_returns_products_using_deep_strategy(): void
     {
-        $parent = CategoryFactory::new()->create();
+        $parentCategory = CategoryFactory::new()->create();
 
-        $child = CategoryFactory::new()
-            ->forParent($parent)
+        $childCategory = CategoryFactory::new()
+            ->forParent($parentCategory)
             ->create();
 
         $parentProduct = ProductFactory::new()
-            ->forCategory($parent)
+            ->forCategory($parentCategory)
             ->create();
 
         $childProduct = ProductFactory::new()
-            ->forCategory($child)
+            ->forCategory($childCategory)
             ->create();
 
         $anotherProduct = ProductFactory::new()->create();
 
-        self::assertCount(2, $parent->products);
-        self::assertTrue($parent->products->contains($parentProduct));
-        self::assertTrue($parent->products->contains($childProduct));
-        self::assertFalse($parent->products->contains($anotherProduct));
+        self::assertCount(2, $parentCategory->products);
+        self::assertTrue($parentCategory->products->contains($parentProduct));
+        self::assertTrue($parentCategory->products->contains($childProduct));
+        self::assertFalse($parentCategory->products->contains($anotherProduct));
     }
 
     /**
@@ -54,18 +54,18 @@ class HasManyDeepTest extends TestCase
      */
     public function it_can_eager_load_products_using_deep_strategy(): void
     {
-        $parent = CategoryFactory::new()->create();
+        $parentCategory = CategoryFactory::new()->create();
 
-        $child = CategoryFactory::new()
-            ->forParent($parent)
+        $childCategory = CategoryFactory::new()
+            ->forParent($parentCategory)
             ->create();
 
         $parentProduct = ProductFactory::new()
-            ->forCategory($parent)
+            ->forCategory($parentCategory)
             ->create();
 
         $childProduct = ProductFactory::new()
-            ->forCategory($child)
+            ->forCategory($childCategory)
             ->create();
 
         Category::query()->getConnection()->enableQueryLog();
