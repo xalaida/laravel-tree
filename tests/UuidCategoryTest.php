@@ -4,7 +4,7 @@ namespace Nevadskiy\Tree\Tests;
 
 use Illuminate\Database\Eloquent\Model;
 use Nevadskiy\Tree\AsTree;
-use Nevadskiy\Tree\Tests\Support\Factories\CategoryFactory as BaseCategoryFactory;
+use Nevadskiy\Tree\Tests\Support\Factories\CategoryFactory;
 use Nevadskiy\Tree\Tests\Support\Traits\Uuid;
 
 class UuidCategoryTest extends TestCase
@@ -14,7 +14,7 @@ class UuidCategoryTest extends TestCase
      */
     public function it_has_path_attribute(): void
     {
-        $category = CategoryFactory::new()
+        $category = UuidCategoryFactory::new()
             ->withAncestors(2)
             ->create();
 
@@ -25,21 +25,21 @@ class UuidCategoryTest extends TestCase
     }
 }
 
-class Category extends Model
+class UuidCategory extends Model
 {
     use Uuid; // "Uuid" has to be included before "AsTree" trait.
     use AsTree; // "AsTree" has to be included after "Uuid" trait.
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected $table = 'uuid_categories';
 }
 
-class CategoryFactory extends BaseCategoryFactory
+class UuidCategoryFactory extends CategoryFactory
 {
     /**
      * {@inheritdoc}
      */
-    protected $model = Category::class;
+    protected $model = UuidCategory::class;
 }
