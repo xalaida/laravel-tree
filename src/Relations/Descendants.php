@@ -80,9 +80,11 @@ class Descendants extends Relation
      */
     public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*']): Builder
     {
+        $query->select($columns);
+
         $subQueryTable = $this->getRelationCountHash();
 
-        $query->select($columns)->from("{$query->getModel()->getTable()} as {$subQueryTable}");
+        $query->from("{$query->getModel()->getTable()} as {$subQueryTable}");
 
         $query->whereColumn(
             "{$subQueryTable}.{$this->related->getPathColumn()}",
