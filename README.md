@@ -1,5 +1,4 @@
 # To Do List
-- [ ] add docker postgres healthcheck.
 - [ ] prepare for release and publish on packagist.
 - [ ] add possibility to add relation that contains all items of it and its descendants. consider name like descendantProducts / relatedProducts / allProducts...
 - [ ] add documentation.
