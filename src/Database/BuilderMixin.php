@@ -44,11 +44,11 @@ class BuilderMixin
      */
     public function whereAncestorOf(): callable
     {
-        return function (Model $model, string $boolean = 'and') {
+        return function (Model $model, string $column = null, string $boolean = 'and') {
             return $this->whereAncestor(
-                $model->newQuery()->qualifyColumn($model->getPathColumn()),
+                $column ?: $model->newQuery()->qualifyColumn($model->getPathColumn()),
                 $model->getPath(),
-                $boolean,
+                $boolean
             );
         };
     }
@@ -58,8 +58,11 @@ class BuilderMixin
      */
     public function orWhereAncestorOf(): callable
     {
-        return function (Model $model) {
-            return $this->whereAncestorOf($model, 'or');
+        return function (Model $model, string $column = null) {
+            return $this->orWhereAncestor(
+                $column ?: $model->newQuery()->qualifyColumn($model->getPathColumn()),
+                $model->getPath(),
+            );
         };
     }
 
@@ -88,11 +91,11 @@ class BuilderMixin
      */
     public function whereDescendantOf(): callable
     {
-        return function (Model $model, string $boolean = 'and') {
+        return function (Model $model, string $column = null, string $boolean = 'and') {
             return $this->whereDescendant(
-                $model->newQuery()->qualifyColumn($model->getPathColumn()),
+                $column ?: $model->newQuery()->qualifyColumn($model->getPathColumn()),
                 $model->getPath(),
-                $boolean,
+                $boolean
             );
         };
     }
@@ -102,8 +105,11 @@ class BuilderMixin
      */
     public function orWhereDescendantOf(): callable
     {
-        return function (Model $model) {
-            return $this->whereDescendantOf($model, 'or');
+        return function (Model $model, string $column = null) {
+            return $this->orWhereDescendant(
+                $column ?: $model->newQuery()->qualifyColumn($model->getPathColumn()),
+                $model->getPath(),
+            );
         };
     }
 }

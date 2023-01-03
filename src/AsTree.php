@@ -4,7 +4,7 @@ namespace Nevadskiy\Tree;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Query\Expression;
 use Nevadskiy\Tree\Casts\AsPath;
@@ -25,7 +25,9 @@ trait AsTree
     protected static function bootAsTree(): void
     {
         static::registerModelEvent($event = static::assignPathOnEvent(), static function (self $model) use ($event) {
-            $model->assignPathIfMissing();
+            if ($model->shouldAssignPath()) {
+                $model->assignPath();
+            }
 
             if ($event === 'created') {
                 $model->saveQuietly(['timestamps' => false]);
@@ -138,7 +140,7 @@ trait AsTree
     /**
      * Get the root items.
      */
-    public function scopeWhereIsRoot(Builder $query): void
+    public function scopeWhereRoot(Builder $query): void
     {
         $query->whereNull($this->getParentKeyName());
     }
@@ -198,17 +200,15 @@ trait AsTree
     }
 
     /**
-     * Assign the model's materialized path to the model if it is missing.
+     * Determine whether the path attribute should be assigned.
      */
-    public function assignPathIfMissing(): void
+    protected function shouldAssignPath(): bool
     {
-        if (is_null($this->getAttribute($this->getPathColumn()))) {
-            $this->assignPath();
-        }
+        return ! array_key_exists($this->getPathColumn(), $this->getAttributes());
     }
 
     /**
-     * Assign the model's materialized path to the model.
+     * Assign the model's path to the model.
      */
     public function assignPath(): void
     {
@@ -220,10 +220,11 @@ trait AsTree
      */
     protected function buildPath(): Path
     {
-        return Path::concat(...array_filter([
-            $this->parent?->getPath(),
-            $this->getPathSource()
-        ]));
+        if ($this->parent) {
+            return Path::concat($this->parent->getPath(), $this->getPathSource());
+        }
+
+        return Path::concat($this->getPathSource());
     }
 
     /**
@@ -295,7 +296,7 @@ trait AsTree
             return false;
         }
 
-        return collect($this->parent->getPath()->segments())->contains($this->getPathSource());
+        return $this->parent->getPath()->segments()->contains($this->getPathSource());
     }
 
     /**

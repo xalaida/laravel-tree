@@ -2,10 +2,10 @@
 
 namespace Nevadskiy\Tree\ValueObjects;
 
+use Illuminate\Support\Collection;
 use Nevadskiy\Tree\SegmentProcessors\UuidPostgresLtreeSegmentProcessor;
-use Stringable;
 
-class Path implements Stringable
+class Path
 {
     /**
      * The path's separator.
@@ -14,17 +14,19 @@ class Path implements Stringable
 
     /**
      * The path's value.
+     *
+     * @var string
      */
-    private string $value;
+    private $value;
 
     /**
      * Build a path from the given segments.
      */
-    public static function concat(Path|string ...$segments): Path
+    public static function concat(...$segments): Path
     {
         return new static(
             collect($segments)
-                ->map(function (Path|string $segment) {
+                ->map(function ($segment) {
                     if ($segment instanceof Path) {
                         return $segment->getValue();
                     }
@@ -58,7 +60,7 @@ class Path implements Stringable
     /**
      * Get segments of the path.
      */
-    public function segments(): array
+    public function segments(): Collection
     {
         return collect($this->explode())
             ->map(function (string $segment) {
@@ -67,20 +69,7 @@ class Path implements Stringable
                 }
 
                 return $segment;
-            })
-            ->all();
-    }
-
-    /**
-     * Get the path ancestor segments.
-     */
-    public function ancestors(): array
-    {
-        $segments = $this->segments();
-
-        array_pop($segments);
-
-        return $segments;
+            });
     }
 
     /**
@@ -109,8 +98,6 @@ class Path implements Stringable
 
     /**
      * The segment processor list.
-     *
-     * @todo consider setting this to static prop from service provider when app has configured at least single postgres database connection.
      */
     protected static function segmentProcessors(): array
     {
