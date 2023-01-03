@@ -20,7 +20,12 @@ class HasManyDeep extends HasMany
     /**
      * Make a new class instance.
      */
-    public static function between(Model $parent, string $related, string $foreignKey = null, string $localKey = null): HasManyDeep
+    public static function between(
+        Model $parent,
+        string $related,
+        string $foreignKey = null,
+        string $localKey = null
+    ): HasManyDeep
     {
         $relatedInstance = self::newRelatedInstance($related, $parent);
 
