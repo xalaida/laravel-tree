@@ -25,7 +25,7 @@ class HasManyDeep extends HasMany
         string $related,
         string $foreignKey = null,
         string $localKey = null
-    ): HasManyDeep
+    ): self
     {
         $relatedInstance = self::newRelatedInstance($related, $parent);
 
@@ -54,7 +54,7 @@ class HasManyDeep extends HasMany
      */
     public function addConstraints(): void
     {
-        if (static::$constraints) {
+        if (static::$constraints && $this->getParentKey()) {
             $this->query->join($this->parent->getTable(), function (JoinClause $join) {
                 $join->on($this->getQualifiedForeignKeyName(), $this->getQualifiedParentKeyName());
             });
@@ -115,14 +115,6 @@ class HasManyDeep extends HasMany
         }
 
         return $models;
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getResults(): Collection
-    {
-        return $this->query->get();
     }
 
     /**
