@@ -1,6 +1,6 @@
 # To Do List
-- [ ] add support for existence queries for `HasManyDeep` relation.
 - [ ] test query relation without constraint (for example on `avg` methods)
+- [ ] think about using same relation as Descendants and HasManyDeep. Just check if it uses same model or different.
 - [ ] prepare for release and publish on packagist.
 - [ ] add documentation.
 - [ ] add github actions.

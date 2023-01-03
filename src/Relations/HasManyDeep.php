@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Query\JoinClause;
 use Nevadskiy\Tree\Casts\AsPath;
+use Nevadskiy\Tree\Database\BuilderMixin;
 
 class HasManyDeep extends HasMany
 {
@@ -117,5 +118,27 @@ class HasManyDeep extends HasMany
     public function getResults(): Collection
     {
         return $this->query->get();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*']): Builder
+    {
+        $query->select($columns);
+
+        $hash = $this->getRelationCountHash();
+
+        $query->join("{$this->parent->getTable()} AS {$hash}", function (JoinClause $join) use ($hash) {
+            $join->on($this->getQualifiedParentKeyName(), "{$hash}.{$this->getLocalKeyName()}");
+        });
+
+        $query->whereColumn(
+            $this->parent->qualifyColumn($this->parent->getPathColumn()),
+            BuilderMixin::ANCESTOR,
+            "{$hash}.{$this->parent->getPathColumn()}"
+        );
+
+        return $query;
     }
 }

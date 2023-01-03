@@ -2,6 +2,7 @@
 
 namespace Nevadskiy\Tree\Tests;
 
+use Illuminate\Database\Eloquent\Builder;
 use Nevadskiy\Tree\Tests\Support\Factories\CategoryFactory;
 use Nevadskiy\Tree\Tests\Support\Factories\ProductFactory;
 use Nevadskiy\Tree\Tests\Support\Models\Category;
@@ -101,5 +102,37 @@ class HasManyDeepTest extends TestCase
         self::assertEquals('Sony PlayStation 5', $categories->first()->products->first()->name);
     }
 
-    // @todo test whereHas method...
+    /**
+     * @test
+     */
+    public function it_filters_nodes_using_where_has_method(): void
+    {
+        $parentCategory = CategoryFactory::new()->create(['name' => 'Watches']);
+
+        $childCategory = CategoryFactory::new()
+            ->forParent($parentCategory)
+            ->create(['name' => 'Gold watches']);
+
+        ProductFactory::new()
+            ->forCategory($parentCategory)
+            ->create(['name' => 'Watch']);
+
+        ProductFactory::new()
+            ->forCategory($childCategory)
+            ->create(['name' => 'Gold watch']);
+
+        ProductFactory::new()
+            ->forCategory($childCategory)
+            ->create(['name' => 'Day-Date 36']);
+
+        $categories = Category::query()
+            ->whereHas('products', function (Builder $query) {
+                $query->where('products.name', 'LIKE', '%watch');
+            })
+            ->get();
+
+        self::assertCount(2, $categories);
+        self::assertTrue($categories->contains($parentCategory));
+        self::assertTrue($categories->contains($childCategory));
+    }
 }
