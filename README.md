@@ -1,3 +1,23 @@
+# Querying category products
+
+```php
+Product::query()
+    ->when($category, function (Builder $query, Category $category) {
+        // 1st way (faster, harder)
+        $query->joinRelation('category');
+        $query->whereDescendantOf($category);
+
+        // 2nd way (slower, simpler)
+        $query->whereHas('category', function (Builder $query) use ($category) {
+            $query->whereDescendantOf($category);
+        });
+    })
+    ->paginate(25, [
+        Product::query()->qualifyColumn('*') // Required for the 1st way
+    ]);
+```
+
+
 # To Do List
 - [ ] refactor AsPath cast according to native casts that supports nullable attribute (see AsCollection cast class)
 - [ ] test query relation without constraint (for example on `avg` methods)
