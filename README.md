@@ -1,8 +1,10 @@
 # To Do List
+- [ ] test query relation without constraint (for example on `avg` methods)
+- [ ] think about using same relation as Descendants and HasManyDeep. Just check if it uses same model or different.
 - [ ] prepare for release and publish on packagist.
-- [ ] add possibility to add relation that contains all items of it and its descendants. consider name like descendantProducts / relatedProducts / allProducts...
 - [ ] add documentation.
 - [ ] add github actions.
+- [ ] add possibility to use non-primary key column as source.
 - [ ] consider adding `wherePath` method that allow to use raw ltree queries (https://www.postgresql.org/docs/current/ltree.html).
 - [ ] add `Tree` iterable class that has `NodeCollection` nodes on each level.
 - [ ] add `siblings` read-only relation.
