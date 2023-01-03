@@ -135,4 +135,17 @@ class HasManyDeepTest extends TestCase
         self::assertTrue($categories->contains($parentCategory));
         self::assertTrue($categories->contains($childCategory));
     }
+
+    /**
+     * @test
+     */
+    public function it_does_not_fail_when_interacting_with_nonexistent_model(): void
+    {
+        $category = new Category();
+
+        Category::query()->getConnection()->enableQueryLog();
+
+        self::assertEmpty($category->products);
+        self::assertEmpty(Category::query()->getConnection()->getQueryLog());
+    }
 }
