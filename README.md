@@ -1,5 +1,6 @@
 # Querying category products
 
+[//]: # (TODO: split into 2 separate code blocks)
 ```php
 Product::query()
     ->when($category, function (Builder $query, Category $category) {
