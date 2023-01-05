@@ -403,4 +403,23 @@ class CategoryTest extends TestCase
         self::assertTrue($categories->contains($accessories));
         self::assertFalse($categories->contains($belts));
     }
+
+    /**
+     * @test
+     */
+    public function it_filters_root_nodes(): void
+    {
+        $parent = CategoryFactory::new()->create();
+
+        CategoryFactory::new()
+            ->forParent($parent)
+            ->create();
+
+        $categories = Category::query()
+            ->get()
+            ->root();
+
+        self::assertCount(1, $categories);
+        self::assertTrue($categories->contains($parent));
+    }
 }
