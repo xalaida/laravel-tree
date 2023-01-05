@@ -1,7 +1,27 @@
+# Querying category products
+
+[//]: # (TODO: split into 2 separate code blocks)
+```php
+Product::query()
+    ->when($category, function (Builder $query, Category $category) {
+        // 1st way (faster, harder)
+        $query->joinRelation('category');
+        $query->whereDescendantOf($category);
+
+        // 2nd way (slower, simpler)
+        $query->whereHas('category', function (Builder $query) use ($category) {
+            $query->whereDescendantOf($category);
+        });
+    })
+    ->paginate(25, [
+        Product::query()->qualifyColumn('*') // Required for the 1st way
+    ]);
+```
+
+
 # To Do List
 - [ ] refactor AsPath cast according to native casts that supports nullable attribute (see AsCollection cast class)
 - [ ] test query relation without constraint (for example on `avg` methods)
-- [ ] think about using same relation as Descendants and HasManyDeep. Just check if it uses same model or different.
 - [ ] prepare for release and publish on packagist.
 - [ ] add documentation.
 - [ ] add github actions.
