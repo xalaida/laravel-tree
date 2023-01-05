@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class NodeCollection extends Collection
 {
     /**
-     * Get node collection as a tree.
+     * Get a node collection as a tree.
      */
     public function tree(): NodeCollection
     {
@@ -38,7 +38,7 @@ class NodeCollection extends Collection
     }
 
     /**
-     * Get the root nodes of the collection.
+     * Get root nodes of the collection.
      */
     public function root(): NodeCollection
     {
@@ -48,7 +48,7 @@ class NodeCollection extends Collection
     }
 
     /**
-     * Sort the collection by the depth level.
+     * Sort the collection by a depth level.
      */
     public function sortByDepth(bool $descending = false): NodeCollection
     {
@@ -58,7 +58,7 @@ class NodeCollection extends Collection
     }
 
     /**
-     * Sort the collection in descending order by the depth level.
+     * Sort the collection in descending order by a depth level.
      */
     public function sortByDepthDesc(): NodeCollection
     {
