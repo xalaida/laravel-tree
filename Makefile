@@ -55,12 +55,12 @@ test.coverage.text:
 test.coverage: test.coverage.text
 
 # Fix the code style
-fix:
-	docker compose run --rm php-cs-fixer
+cs.fix:
+	docker compose run --rm php-cs-fixer fix
 
 # Check the code style
-check:
-	docker compose run --rm php-cs-fixer --dry-run --diff-format udiff
+cs.check:
+	docker compose run --rm php-cs-fixer fix --dry-run
 
 # Remove installation files
 uninstall: composer.uninstall

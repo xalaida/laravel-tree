@@ -41,4 +41,4 @@ services:
       dockerfile: .docker/php${PHP_VERSION:-7.3}/Dockerfile
     volumes:
       - ./:/app
-    entrypoint: vendor/bin/php-cs-fixer fix
+    entrypoint: vendor/bin/php-cs-fixer

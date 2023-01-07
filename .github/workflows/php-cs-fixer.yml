@@ -1,0 +1,25 @@
+name: PHP CS Fixer
+
+on: [ push, pull_request ]
+
+jobs:
+  test:
+    name: Run PHP CS Fixer
+
+    runs-on: ubuntu-latest
+
+    env:
+      PHP_VERSION: 7.3
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build containers
+        run: docker compose build composer php-cs-fixer
+
+      - name: Install Composer dependencies
+        run: docker compose run composer install --no-interaction --no-progress
+
+      - name: Run PHP CS Fixer
+        run: docker compose run php-cs-fixer fix --dry-run
