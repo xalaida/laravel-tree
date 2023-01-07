@@ -1,8 +1,8 @@
 {
     "name": "nevadskiy/laravel-tree",
-    "description": "The package adds support for a tree hierarchy structure for Eloquent models.",
+    "description": "Hierarchy structure for Eloquent models.",
     "license": "MIT",
-    "keywords": ["tree", "hierarchy", "materialized path", "path", "ltree", "laravel"],
+    "keywords": ["tree", "hierarchy", "materialized path", "path", "ltree", "laravel", "eloquent"],
     "authors": [
         {
             "name": "Nevadskiy",
