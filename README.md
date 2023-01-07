@@ -2,6 +2,7 @@
 
 # Laravel Tree
 
+[//]: # (TODO: add other badges)
 [![PHPUnit](https://img.shields.io/github/actions/workflow/status/nevadskiy/downloader/phpunit.yml?branch=master)](https://packagist.org/packages/nevadskiy/laravel-tree)
 
 🌳 Hierarchy structure for Eloquent models.
@@ -18,6 +19,29 @@ Install the package via composer.
 ```bash
 composer require nevadskiy/laravel-tree
 ````
+
+## 🔨 Introduction
+
+To store the hierarchical data structures in our application we can simply use the `parent_id` column, and it will work fine in most cases.
+However, when you have to make queries for such data, things get more complicated.
+
+There is a simple solution to add an extra column to the table to save the node path in the hierarchy from the root. It's called a "materialized path" pattern and allows to query data more easily.
+
+Here is a simple example how it works: 1st category "Books" is a parent of 2nd category "Science". The database table in this scenario will look like this:
+
+| id  | name    | path |
+|-----|---------|------|
+| 1   | Books   | 1    |
+| 2   | Science | 1.2  |
+
+
+The PostgreSQL has a specific column type for that purpose called "ltree".
+
+In combination with GiST index that allows to execute lightweight and performant queries across an entire tree.
+
+Also, PostgreSQL has useful operators to select descendants of the node, ancestors, and a lot more.
+
+More about the "ltree" extension: https://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree
 
 ## 🔨 Configuration
 
@@ -89,18 +113,6 @@ class Category extends Model
 
 The `path` attribute implements the "materialized path" pattern and stores the path of the node in the tree.
 
-For example: 1st category "Books" is a parent of 2nd category "Science". The database table in this scenario will look like this:
-
-| id  | name    | path |
-|-----|---------|------|
-| 1   | Books   | 1    |
-| 2   | Science | 1.2  |
-
-In combination with GiST database index that allows to execute lightweight and performant queries on hierarchical data structures like in our example above.
-
-Also, PostgreSQL has useful operators to select node descendants, ancestors, and execute more advanced queries. 
-
-More about the "ltree" extension: https://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree
 
 [//]: # (TODO: show example of stored `path` value)
 
@@ -185,6 +197,7 @@ Product::query()
 # To Do List
 - [ ] configure code coverage workflow & badge generation.
 - [ ] configure cs fixer workflow.
+- [ ] find better example for the doc introduction.
 - [ ] configure changelog action (see: https://github.com/spatie/laravel-medialibrary/blob/main/.github/workflows/update-changelog.yml).
 - [ ] test query relation without constraint (for example on `avg` methods).
 - [ ] prepare for release and publish on packagist.
