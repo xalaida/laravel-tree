@@ -28,7 +28,7 @@ jobs:
         run: docker compose build
 
       - name: Install Composer dependencies
-        run: docker compose run composer install
+        run: docker compose run composer install --no-interaction --no-progress
 
       - name: Run PHPUnit
         run: docker compose run phpunit
