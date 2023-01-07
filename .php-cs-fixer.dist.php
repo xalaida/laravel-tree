@@ -19,6 +19,10 @@ $config->setRules([
 
 $config->setRiskyAllowed(true);
 
-return $config->setFinder(
+$config->setCacheFile(__DIR__.'/.cache/.php-cs-fixer.cache');
+
+$config->setFinder(
     PhpCsFixer\Finder::create()->in(__DIR__)
 );
+
+return $config;

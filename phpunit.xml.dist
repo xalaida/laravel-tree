@@ -11,6 +11,7 @@
         convertWarningsToExceptions="true"
         processIsolation="false"
         stopOnFailure="false"
+        cacheResultFile=".cache/.phpunit.result.cache"
         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
 >
     <coverage>
