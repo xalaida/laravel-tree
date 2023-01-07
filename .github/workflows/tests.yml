@@ -1,0 +1,31 @@
+name: Tests
+
+on: [ push, pull_request ]
+
+jobs:
+  tests:
+    name: Testing using OS ${{ matrix.os }}, PHP ${{ matrix.php }}
+
+    strategy:
+      matrix:
+        os: [ ubuntu-latest ]
+        php: [ '7.3', '7.4', '8.0', '8.1' ]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: fileinfo
+          coverage: none
+
+      - name: Install dependencies
+        run: composer update --no-interaction --no-progress
+
+      - name: Execute tests
+        run: vendor/bin/phpunit
