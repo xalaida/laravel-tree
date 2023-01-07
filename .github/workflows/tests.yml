@@ -4,7 +4,7 @@ on: [ push, pull_request ]
 
 jobs:
   tests:
-    name: Testing using OS ${{ matrix.os }}, PHP ${{ matrix.php }}
+    name: Tests on PHP ${{ matrix.php }}
 
     strategy:
       matrix:
