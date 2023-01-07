@@ -25,8 +25,7 @@ class HasManyDeep extends HasMany
         string $related,
         string $foreignKey = null,
         string $localKey = null
-    ): self
-    {
+    ): self {
         $relatedInstance = self::newRelatedInstance($related, $parent);
 
         return new static(
@@ -42,7 +41,7 @@ class HasManyDeep extends HasMany
      */
     protected static function newRelatedInstance(string $class, Model $parent)
     {
-        return tap(new $class, static function ($related) use ($parent) {
+        return tap(new $class(), static function ($related) use ($parent) {
             if (! $related->getConnectionName()) {
                 $related->setConnection($parent->getConnectionName());
             }

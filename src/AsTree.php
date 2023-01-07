@@ -190,7 +190,7 @@ trait AsTree
      */
     protected static function assignPathOnEvent(): string
     {
-        $model = new static;
+        $model = new static();
 
         if ($model->getIncrementing() && $model->getPathSourceColumn() === $model->getKeyName()) {
             return 'created';
