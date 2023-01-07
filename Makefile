@@ -49,7 +49,7 @@ test.coverage.html:
 
 # Run the testsuite with a coverage analysis using plain test output
 test.coverage.text:
-	docker compose run --rm test vendor/bin/phpunit --coverage-text
+	docker compose run --rm test --coverage-text
 
 # Run the testsuite with a coverage analysis
 test.coverage: test.coverage.text
