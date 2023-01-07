@@ -28,6 +28,10 @@ class NodeCollection extends Collection
      */
     public function link(): NodeCollection
     {
+        if ($this->isEmpty()) {
+            return $this;
+        }
+
         $parents = $this->groupBy($this->first()->getParentKeyName());
 
         $this->each(function (Model $node) use ($parents) {
