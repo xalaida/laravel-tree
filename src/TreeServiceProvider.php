@@ -29,7 +29,15 @@ class TreeServiceProvider extends ServiceProvider
     }
 
     /**
-     * Register the ltree type for database.
+     * Register the query builder mixin.
+     */
+    private function registerBuilderMixin(): void
+    {
+        Builder::mixin(new BuilderMixin());
+    }
+
+    /**
+     * Register the "ltree" column type for database.
      */
     private function registerLtreeType(): void
     {
@@ -39,21 +47,13 @@ class TreeServiceProvider extends ServiceProvider
     }
 
     /**
-     * Register the ltree column on the blueprint.
+     * Register the "ltree" column on the blueprint.
      */
     private function registerLtreeColumn(): void
     {
         Blueprint::macro('ltree', function (string $name) {
             return $this->addColumn('ltree', $name);
         });
-    }
-
-    /**
-     * Register the query builder mixin.
-     */
-    private function registerBuilderMixin(): void
-    {
-        Builder::mixin(new BuilderMixin());
     }
 
     /**
