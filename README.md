@@ -4,11 +4,12 @@
 
 [![PHPUnit](https://img.shields.io/github/actions/workflow/status/nevadskiy/downloader/phpunit.yml?branch=master)](https://packagist.org/packages/nevadskiy/laravel-tree)
 
-[//]: # (TODO: add description)
+🌳 Hierarchy structure for Eloquent models.
 
 ## ✅ Requirements
 
-- PHP 7.3 or newer
+- Laravel 8+
+- PostgreSQL and with "ltree" extension
 
 ## 🔌 Installation
 
@@ -18,9 +19,134 @@ Install the package via composer.
 composer require nevadskiy/laravel-tree
 ````
 
-## 🔨 Usage
+## 🔨 Configuration
 
-[//]: # (TODO: update documentation)
+Let's configure package for nested categories.
+
+Create a migration for `categories` table:
+
+```php
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class () extends Migration {
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('categories', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->ltree('path')->nullable()->spatialIndex();
+            $table->timestamps();
+        });
+
+        Schema::table('categories', function (Blueprint $table) {
+            $table->foreignId('parent_id')
+                ->after('name')
+                ->nullable()
+                ->index()
+                ->constrained('categories')
+                ->cascadeOnDelete();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('categories');
+    }
+};
+```
+
+As you can see, we use a PostgreSQL `ltree` type for the `path` column.
+
+Now, create the `Category` model.
+
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Nevadskiy\Tree\AsTree;
+
+class Category extends Model
+{
+    use AsTree;
+}
+```
+
+## 🚊 Usage
+
+### Path attribute
+
+The `path` attribute implements the "materialized path" pattern and stores the path of the node in the tree.
+
+For example: 1st category "Books" is a parent of 2nd category "Science". The database table in this scenario will look like this:
+
+| id  | name    | path |
+|-----|---------|------|
+| 1   | Books   | 1    |
+| 2   | Science | 1.2  |
+
+In combination with GiST database index that allows to execute lightweight and performant queries on hierarchical data structures like in our example above.
+
+Also, PostgreSQL has useful operators to select node descendants, ancestors, and execute more advanced queries. 
+
+More about the "ltree" extension: https://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree
+
+[//]: # (TODO: show example of stored `path` value)
+
+### Inserting models
+
+A root node can be saved to database very easy without extra effort:
+
+```php
+$root = new Category();
+$root->name = 'Books';
+$root->save();
+```
+
+To insert a child model, you only need to assign `parent_id` attribute or use the `parent` relation like this:
+
+```php
+$child = new Category;
+$child->name = 'Science';
+$child->parent()->associate($root);
+$child->save();
+```
+
+The `path` attribute is **automatically** handled by the package, so you do not need to manually set it. 
+
+As you can see, it works as default Eloquent models.
+
+### Relations
+
+The `AsTree` trait provides the following relations:
+
+- parent
+- children
+- ancestors
+- descendants
+
+The `parent` and `children` relations use default Laravel's BelongsTo and HasMany relations. 
+
+The `ancestors` and `descendants` can be used only in the "read" mode (method like `make`, `create` are not available).
+
+### Querying
+
+To select root nodes, use the `root` query scope:
+
+```php
+$roots = Category::query()->root()->get(); 
+```
 
 ## ☕ Contributing
 
@@ -54,6 +180,8 @@ Product::query()
 ```
 
 
+
+
 # To Do List
 - [ ] configure code coverage workflow & badge generation.
 - [ ] configure cs fixer workflow.
@@ -76,5 +204,5 @@ Product::query()
 - https://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree
 - https://patshaughnessy.net/2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension
 - https://github.com/lazychaser/laravel-nestedset
-- https://github.com/vicklr/materialized-model/blob/main/src/Traits/HasMaterializedPaths.php
 - https://github.com/staudenmeir/laravel-adjacency-list
+  https://github.com/vicklr/materialized-model
