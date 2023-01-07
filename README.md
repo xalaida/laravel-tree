@@ -20,7 +20,7 @@ Install the package via composer.
 composer require nevadskiy/laravel-tree
 ````
 
-## 🔨 Introduction
+## ✨ Introduction
 
 To store the hierarchical data structures in our application we can simply use the `parent_id` column, and it will work fine in most cases.
 However, when you have to make queries for such data, things get more complicated.
@@ -65,10 +65,12 @@ return new class () extends Migration {
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->ltree('path')->nullable()->spatialIndex();
+            $table->ltree('path')->nullable()->spatialIndex(); // Create a "path" column with the "ltree" type and GiST index.
             $table->timestamps();
         });
 
+        // Also add a self-referenced "parent_id" column.
+        // Requires a separate database query to create with a "foreign key" constraint.
         Schema::table('categories', function (Blueprint $table) {
             $table->foreignId('parent_id')
                 ->after('name')
