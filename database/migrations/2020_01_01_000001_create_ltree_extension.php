@@ -10,7 +10,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        DB::statement('CREATE EXTENSION IF NOT EXISTS LTREE');
+        DB::statement('create extension if not exists ltree');
     }
 
     /**
@@ -18,6 +18,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        DB::statement('DROP EXTENSION IF EXISTS LTREE');
+        DB::statement('drop extension if exists ltree');
     }
 };
