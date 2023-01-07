@@ -7,7 +7,7 @@ up:
 
 # Stop docker containers
 down:
-	docker compose down
+	docker compose down --remove-orphans
 
 # Build docker containers
 build:
@@ -41,26 +41,26 @@ composer.uninstall:
 
 # Run the testsuite
 test:
-	docker compose run --rm test
+	docker compose run --rm phpunit
 
 # Run the testsuite with a coverage analysis using HTML output
 test.coverage.html:
-	docker compose run --rm test --coverage-html tests/.coverage
+	docker compose run --rm phpunit --coverage-html tests/.coverage
 
 # Run the testsuite with a coverage analysis using plain test output
 test.coverage.text:
-	docker compose run --rm test --coverage-text
+	docker compose run --rm phpunit --coverage-text
 
 # Run the testsuite with a coverage analysis
 test.coverage: test.coverage.text
 
 # Fix the code style
 fix:
-	docker compose run --rm test vendor/bin/php-cs-fixer fix
+	docker compose run --rm php-cs-fixer
 
 # Check the code style
 check:
-	docker compose run --rm test vendor/bin/php-cs-fixer fix --dry-run --diff-format udiff
+	docker compose run --rm php-cs-fixer --dry-run --diff-format udiff
 
 # Remove installation files
 uninstall: composer.uninstall

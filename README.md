@@ -2,7 +2,7 @@
 
 # Laravel Tree
 
-[![Test](https://img.shields.io/github/actions/workflow/status/nevadskiy/downloader/test.yml?branch=master)](https://packagist.org/packages/nevadskiy/laravel-tree)
+[![PHPUnit](https://img.shields.io/github/actions/workflow/status/nevadskiy/downloader/phpunit.yml?branch=master)](https://packagist.org/packages/nevadskiy/laravel-tree)
 
 [//]: # (TODO: add description)
 
@@ -57,6 +57,7 @@ Product::query()
 # To Do List
 - [ ] configure code coverage workflow & badge generation.
 - [ ] configure cs fixer workflow.
+- [ ] configure changelog action (see: https://github.com/spatie/laravel-medialibrary/blob/main/.github/workflows/update-changelog.yml).
 - [ ] test query relation without constraint (for example on `avg` methods).
 - [ ] prepare for release and publish on packagist.
 - [ ] add documentation.

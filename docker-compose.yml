@@ -11,7 +11,7 @@ services:
       - ./:/app
     entrypoint: composer
 
-  test:
+  phpunit:
     build:
       context: ./
       dockerfile: .docker/php${PHP_VERSION:-7.3}/Dockerfile
@@ -31,6 +31,14 @@ services:
       POSTGRES_USER: ${DB_USERNAME}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "${DB_USERNAME}", "-d", "${DB_DATABASE}"]
+      test: [ "CMD", "pg_isready", "-U", "${DB_USERNAME}", "-d", "${DB_DATABASE}" ]
       interval: 3s
       timeout: 5s
+
+  php-cs-fixer:
+    build:
+      context: ./
+      dockerfile: .docker/php${PHP_VERSION:-7.3}/Dockerfile
+    volumes:
+      - ./:/app
+    entrypoint: vendor/bin/php-cs-fixer fix
