@@ -12,7 +12,7 @@ class NodeCollection extends Collection
      */
     public function tree(): NodeCollection
     {
-        $this->link();
+        $this->associate();
 
         $depth = $this->min(function (Model $node) {
             return $node->getPath()->getDepth();
@@ -24,9 +24,9 @@ class NodeCollection extends Collection
     }
 
     /**
-     * Link nodes using the "children" relation.
+     * Associate nodes using the "children" relation.
      */
-    public function link(): NodeCollection
+    public function associate(): NodeCollection
     {
         if ($this->isEmpty()) {
             return $this;
