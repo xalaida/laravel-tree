@@ -29,3 +29,27 @@ jobs:
 
       - name: Run PHPUnit
         run: docker compose run phpunit
+
+  coverage:
+    name: Analyze code coverage
+
+    runs-on: ubuntu-latest
+
+    env:
+      PHP_VERSION: 7.3
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build containers
+        run: docker compose build
+
+      - name: Install Composer dependencies
+        run: docker compose run composer install --no-interaction --no-progress
+
+      - name: Run PHPUnit with a coverage analysis
+        run: docker compose run phpunit --coverage-clover coverage.xml
+
+      - name: Upload the coverage report
+      - uses: codecov/codecov-action@v3

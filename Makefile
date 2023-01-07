@@ -37,11 +37,15 @@ test:
 
 # Run PHPUnit with a coverage analysis using an HTML output
 phpunit.coverage.html:
-	docker compose run --rm phpunit --coverage-html tests/.coverage
+	docker compose run --rm phpunit --coverage-html tests/.report
 
 # Run PHPUnit with a coverage analysis using a plain text output
 phpunit.coverage.text:
 	docker compose run --rm phpunit --coverage-text
+
+# Run PHPUnit with a coverage analysis using a Clover's XML output
+phpunit.coverage.clover:
+	docker compose run --rm phpunit --coverage-clover tests/.report/clover.xml
 
 # Run PHPUnit with a coverage analysis
 phpunit.coverage: phpunit.coverage.text
