@@ -1,5 +1,5 @@
 # Install the app.
-install: env build composer.install
+install: .env build composer.install
 
 # Start docker containers.
 up:
@@ -14,7 +14,7 @@ build:
 	docker compose build
 
 # Make a file with environment variables.
-env:
+.env:
 	cp .env.example .env
 
 # Install composer dependencies.
