@@ -2,5 +2,7 @@
 /vendor
 /tests/.coverage
 .env
-phpunit.xml
 .phpunit.result.cache
+.php-cs-fixer.php
+composer.lock
+phpunit.xml
