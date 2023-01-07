@@ -14,14 +14,22 @@
         cacheResultFile=".cache/.phpunit.result.cache"
         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
 >
-    <coverage>
-        <include>
-            <directory suffix=".php">src/</directory>
-        </include>
-    </coverage>
     <testsuites>
         <testsuite name="Package Test Suite">
             <directory>tests/</directory>
         </testsuite>
     </testsuites>
+    <coverage>
+        <include>
+            <directory suffix=".php">src/</directory>
+        </include>
+    </coverage>
+    <php>
+        <env name="DB_CONNECTION" value="pgsql"/>
+        <env name="DB_HOST" value="postgres"/>
+        <env name="DB_PORT" value="5432"/>
+        <env name="DB_DATABASE" value="app"/>
+        <env name="DB_USERNAME" value="app"/>
+        <env name="DB_PASSWORD" value="app"/>
+    </php>
 </phpunit>
