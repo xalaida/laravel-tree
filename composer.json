@@ -1,6 +1,6 @@
 {
     "name": "nevadskiy/laravel-tree",
-    "description": "Hierarchy structure for Eloquent models.",
+    "description": "Tree-like structure for Eloquent models.",
     "license": "MIT",
     "keywords": ["tree", "hierarchy", "materialized path", "path", "ltree", "laravel", "eloquent"],
     "authors": [

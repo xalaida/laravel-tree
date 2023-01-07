@@ -5,7 +5,7 @@
 [//]: # (TODO: add other badges)
 [![PHPUnit](https://img.shields.io/github/actions/workflow/status/nevadskiy/downloader/phpunit.yml?branch=master)](https://packagist.org/packages/nevadskiy/laravel-tree)
 
-🌳 Hierarchy structure for Eloquent models.
+🌳 Tree-like structure for Eloquent models.
 
 ## ✅ Requirements
 
