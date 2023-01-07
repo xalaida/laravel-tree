@@ -1,10 +1,10 @@
-name: Tests
+name: Test
 
 on: [ push, pull_request ]
 
 jobs:
-  tests:
-    name: Tests on PHP ${{ matrix.php }}
+  test:
+    name: Run tests on PHP ${{ matrix.php }}
 
     strategy:
       fail-fast: false
@@ -28,7 +28,7 @@ jobs:
         run: docker compose build
 
       - name: Install Composer dependencies
-        run: docker compose run --rm app composer install
+        run: docker compose run composer install
 
-      - name: Execute tests
-        run: docker compose run --rm app vendor/bin/phpunit
+      - name: Run tests
+        run: docker compose run test

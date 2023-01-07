@@ -1,3 +1,4 @@
+/.cache
 /.idea
 /vendor
 /tests/.coverage
