@@ -98,6 +98,18 @@ class TreeTest extends TestCase
     /**
      * @test
      */
+    public function it_returns_empty_collection_when_no_nodes(): void
+    {
+        $categories = Category::query()
+            ->get()
+            ->tree();
+
+        self::assertEmpty($categories);
+    }
+
+    /**
+     * @test
+     */
     public function it_converts_to_tree_when_no_root_nodes(): void
     {
         $grandParent = CategoryFactory::new()->create();
