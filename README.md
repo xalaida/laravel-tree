@@ -20,7 +20,6 @@ Product::query()
 
 
 # To Do List
-- [ ] refactor AsPath cast according to native casts that supports nullable attribute (see AsCollection cast class)
 - [ ] test query relation without constraint (for example on `avg` methods)
 - [ ] prepare for release and publish on packagist.
 - [ ] add documentation.

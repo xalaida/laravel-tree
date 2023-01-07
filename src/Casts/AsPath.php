@@ -11,8 +11,12 @@ class AsPath implements CastsAttributes
     /**
      * @inheritdoc
      */
-    public function get($model, string $key, $value, array $attributes): Path
+    public function get($model, string $key, $value, array $attributes): ?Path
     {
+        if (! isset($attributes[$key])) {
+            return null;
+        }
+
         return new Path($value);
     }
 
@@ -21,6 +25,10 @@ class AsPath implements CastsAttributes
      */
     public function set($model, string $key, $value, array $attributes): ?string
     {
+        if (is_null($value)) {
+            return null;
+        }
+
         if ($value instanceof Path) {
             return $value->getValue();
         }
