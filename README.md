@@ -1,3 +1,38 @@
+[![Stand With Ukraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/banner-direct-single.svg)](https://stand-with-ukraine.pp.ua)
+
+# Laravel Tree
+
+[![Test](https://img.shields.io/github/actions/workflow/status/nevadskiy/downloader/test.yml?branch=master)](https://packagist.org/packages/nevadskiy/laravel-tree)
+
+[//]: # (TODO: add description)
+
+## ✅ Requirements
+
+- PHP 7.3 or newer
+
+## 🔌 Installation
+
+Install the package via composer.
+
+```bash
+composer require nevadskiy/laravel-tree
+````
+
+## 🔨 Usage
+
+[//]: # (TODO: update documentation)
+
+## ☕ Contributing
+
+[//]: # (TODO: add contributing.md file)
+
+Thank you for considering contributing. Please see [CONTRIBUTING](CONTRIBUTING.md) for more information.
+
+## 📜 License
+
+The MIT License (MIT). Please see [LICENSE](LICENSE.md) for more information.
+
+
 # Querying category products
 
 [//]: # (TODO: split into 2 separate code blocks)
@@ -25,7 +60,6 @@ Product::query()
 - [ ] test query relation without constraint (for example on `avg` methods).
 - [ ] prepare for release and publish on packagist.
 - [ ] add documentation.
-- [ ] add github actions.
 - [ ] add possibility to use non-primary key column as source.
 - [ ] consider adding `wherePath` method that allow to use raw ltree queries (https://www.postgresql.org/docs/current/ltree.html).
 - [ ] add `Tree` iterable class that has `NodeCollection` nodes on each level.
