@@ -20,7 +20,9 @@ Product::query()
 
 
 # To Do List
-- [ ] test query relation without constraint (for example on `avg` methods)
+- [ ] configure code coverage workflow & badge generation.
+- [ ] configure cs fixer workflow.
+- [ ] test query relation without constraint (for example on `avg` methods).
 - [ ] prepare for release and publish on packagist.
 - [ ] add documentation.
 - [ ] add github actions.
