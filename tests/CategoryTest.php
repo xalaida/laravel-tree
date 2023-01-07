@@ -39,6 +39,16 @@ class CategoryTest extends TestCase
     /**
      * @test
      */
+    public function it_sets_null_as_path_correctly(): void
+    {
+        $category = CategoryFactory::new()->create(['path' => null]);
+
+        self::assertNull($category->path);
+    }
+
+    /**
+     * @test
+     */
     public function it_has_relation_with_parent_category(): void
     {
         $parent = CategoryFactory::new()->create();

@@ -58,10 +58,10 @@ class Descendants extends Relation
     public function match(array $models, Collection $results, $relation): array
     {
         foreach ($models as $model) {
-             $model->setRelation($relation, $results->filter(function (Model $result) use ($model) {
-                 return $result->getPath()->segments()->contains($model->getPathSource())
+            $model->setRelation($relation, $results->filter(function (Model $result) use ($model) {
+                return $result->getPath()->segments()->contains($model->getPathSource())
                      && $result->isNot($model);
-             }));
+            }));
         }
 
         return $models;

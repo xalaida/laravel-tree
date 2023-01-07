@@ -20,7 +20,6 @@ Product::query()
 
 
 # To Do List
-- [ ] refactor AsPath cast according to native casts that supports nullable attribute (see AsCollection cast class)
 - [ ] test query relation without constraint (for example on `avg` methods)
 - [ ] prepare for release and publish on packagist.
 - [ ] add documentation.
@@ -33,7 +32,7 @@ Product::query()
 - [ ] add possibility to generate a whole tree using model factory. develop API to specify how many nodes should be created per a depth level / make it dynamic using callable syntax. probably use sequences.
 - [ ] add possibility to restrict max depth level.
 - [ ] add docs about `read-only` relations (descendants and ancestors). use `parent` and `children` for saving nodes.
-- [ ] integrate position package behaviour for sorting.
+- [ ] check integration with position package.
 - [ ] add missing methods and helpers.
 
 # Links
