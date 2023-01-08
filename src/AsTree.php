@@ -186,6 +186,15 @@ trait AsTree
     }
 
     /**
+     * Determine if the current node is an ancestor of the given node.
+     */
+    public function isAncestorOf(self $that): bool
+    {
+        return $this->getPath()->segments()->contains($that->getPathSource())
+            && $this->isNot($that);
+    }
+
+    /**
      * Get the event when to assign the model's path.
      */
     protected static function assignPathOnEvent(): string
