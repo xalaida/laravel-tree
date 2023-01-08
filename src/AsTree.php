@@ -195,6 +195,14 @@ trait AsTree
     }
 
     /**
+     * Determine if the current node is a descendant of the given node.
+     */
+    public function isDescendantOf(self $that): bool
+    {
+        return $that->isAncestorOf($this);
+    }
+
+    /**
      * Get the event when to assign the model's path.
      */
     protected static function assignPathOnEvent(): string
