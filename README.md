@@ -195,7 +195,6 @@ $hierarchy = $category->joinAncestors();
 Building breadcrumbs:
 
 ```php
-collect()->join()
 echo $category->ancestors()
     ->orderByDepthDesc()
     ->get()
