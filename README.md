@@ -144,14 +144,13 @@ The `AsTree` trait provides the following relations:
 
 The `parent` and `children` relations use default Laravel relations BelongsTo and HasMany.
 
-The `ancestors` and `descendants` can be used only in the "read" mode, which means methods like `make` or `create` are not available, so to save related nodes you need to use `parent` and `children` relations.
+The `ancestors` and `descendants` can be used only in the "read" mode, which means methods like `make` or `create` are not available. 
+So to save related nodes you need to use the `parent` or `children` relation.
 
 #### Parent
 
 The `parent` relation uses the default Eloquent BelongsTo relation that needs the `parent_id` column as a foreign key.
 It allows getting a parent of the node.
-
-##### Example
 
 ```php
 echo $category->parent->name;
@@ -161,8 +160,6 @@ echo $category->parent->name;
 
 The `children` relation uses a default Eloquent HasMany relation and is a reverse relation to the `parent`.
 It allows getting all children of the node.
-
-##### Example
 
 ```php
 foreach ($category->children as $child) {
@@ -174,8 +171,6 @@ foreach ($category->children as $child) {
 
 The `ancestors` relation is a custom relation that works only in "read" mode. 
 It allows getting all ancestors of the node.
-
-##### Example
 
 Using the attribute:
 
@@ -212,8 +207,6 @@ echo $category->ancestors()
 
 The `descendants` relation is a custom relation that works only in "read" mode.
 It allows getting all descendants of the node.
-
-##### Example
 
 Using the attribute:
 
