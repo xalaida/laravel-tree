@@ -9,7 +9,6 @@
 /.gitignore export-ignore
 /.php-cs-fixer.dist.php export-ignore
 /CHANGELOG.md export-ignore
-/CONTRIBUTING.md export-ignore
 /docker-compose.yml export-ignore
 /Makefile export-ignore
 /phpunit.xml.dist export-ignore
