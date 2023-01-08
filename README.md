@@ -261,9 +261,43 @@ $categories = Category::query()->orderByDepth()->get();
 $categories = Category::query()->orderByDepthDesc()->get();
 ```
 
+### HasManyDeep
+
+The package provides the `HasManyDeep` relation that can be used to link, for example, a `Category` model that uses the `AsTree` trait with a `Product` model.
+
+That allows to get products of a category and each of its descendants.
+
+Here is the code example on how to use the `HasManyDeep` relation:
+
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Nevadskiy\Tree\AsTree;
+use Nevadskiy\Tree\Relations\HasManyDeep;
+
+class Category extends Model
+{
+    use AsTree;
+
+    public function products(): HasManyDeep
+    {
+        return HasManyDeep::between($this, Product::class);
+    }
+}
+```
+
+Now you can get products:
+
+```
+$products = $category->products()->paginate(20);
+```
+
 ### Querying category products
 
-You can easily get the products of a category and each of its descendants.
+You can easily get the products of a category and each of its descendants using a query builder.
 
 1st way:
 
@@ -303,6 +337,10 @@ $science = Category::query()->where('name', 'Science')->firstOrFail();
 $science->parent()->associate($books);
 $science->save();
 ```
+
+### Building a tree
+
+[//]: # (TODO)
 
 ## ☕ Contributing
 
