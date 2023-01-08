@@ -2,8 +2,11 @@
 
 # Laravel Tree
 
-[//]: # (TODO: add other badges)
-[![PHPUnit](https://img.shields.io/github/actions/workflow/status/nevadskiy/downloader/phpunit.yml?branch=master)](https://packagist.org/packages/nevadskiy/laravel-tree)
+[![PHPUnit](https://img.shields.io/github/actions/workflow/status/nevadskiy/laravel-tree/phpunit.yml?branch=master)](https://packagist.org/packages/nevadskiy/laravel-tree) 
+[![Code Coverage](https://img.shields.io/codecov/c/github/nevadskiy/laravel-tree?token=9X6AQQYCPA)](https://packagist.org/packages/nevadskiy/laravel-tree)
+[![Latest Stable Version](http://poser.pugx.org/nevadskiy/laravel-tree/v)](https://packagist.org/packages/nevadskiy/laravel-tree)  
+[![PHP Version Require](http://poser.pugx.org/nevadskiy/laravel-tree/require/php)](https://packagist.org/packages/nevadskiy/laravel-tree)
+[![License](http://poser.pugx.org/nevadskiy/laravel-tree/license)](https://packagist.org/packages/nevadskiy/laravel-tree)
 
 🌳 Tree-like structure for Eloquent models.
 
