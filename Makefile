@@ -32,8 +32,7 @@ phpunit:
 	docker compose run --rm phpunit
 
 # Alias to run PHPUnit
-test:
-	docker compose run --rm phpunit
+test: phpunit
 
 # Run PHPUnit with a coverage analysis using an HTML output
 phpunit.coverage.html:
