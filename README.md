@@ -346,6 +346,12 @@ $tree = Category::query()
     ->tree();
 ```
 
+## 📚 Useful links
+
+- https://www.postgresql.org/docs/current/ltree.html
+- https://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree
+- https://patshaughnessy.net/2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension
+
 ## ☕ Contributing
 
 Thank you for considering contributing. Please see [CONTRIBUTING](.github/CONTRIBUTING.md) for more information.
@@ -353,9 +359,3 @@ Thank you for considering contributing. Please see [CONTRIBUTING](.github/CONTRI
 ## 📜 License
 
 The MIT License (MIT). Please see [LICENSE](LICENSE.md) for more information.
-
-## 📚 Useful links
-
-- https://www.postgresql.org/docs/current/ltree.html
-- https://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree
-- https://patshaughnessy.net/2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension
