@@ -340,7 +340,16 @@ $science->save();
 
 ### Building a tree
 
-[//]: # (TODO)
+To build a tree, we need to call the `tree` method on the `NodeCollection`.
+This method associates nodes using the `children` relation and returns only root nodes.
+
+```php
+$tree = Category::query()
+    ->orderByDepth()
+    ->orderBy('name')
+    ->get()
+    ->tree();
+```
 
 ## ☕ Contributing
 
