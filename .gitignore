@@ -1,10 +1,7 @@
 /.cache
 /.idea
 /vendor
-/tests/.coverage
-.env
-.php-cs-fixer.cache
-.phpunit.result.cache
+/tests/.report
 .php-cs-fixer.php
 composer.lock
 phpunit.xml

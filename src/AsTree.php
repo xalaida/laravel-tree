@@ -58,7 +58,7 @@ trait AsTree
     }
 
     /**
-     * Get the materialized path's column name.
+     * Get the path's column name.
      */
     public function getPathColumn(): string
     {
@@ -66,7 +66,7 @@ trait AsTree
     }
 
     /**
-     * Get the materialized path of the model.
+     * Get the path of the model.
      */
     public function getPath(): Path
     {

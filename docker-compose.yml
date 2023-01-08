@@ -11,12 +11,10 @@ services:
       - ./:/app
     entrypoint: composer
 
-  test:
+  phpunit:
     build:
       context: ./
       dockerfile: .docker/php${PHP_VERSION:-7.3}/Dockerfile
-    env_file:
-      - .env
     volumes:
       - ./:/app
     depends_on:
@@ -27,10 +25,18 @@ services:
   postgres:
     image: postgres:14.2-alpine
     environment:
-      POSTGRES_DB: ${DB_DATABASE}
-      POSTGRES_USER: ${DB_USERNAME}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: app
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "${DB_USERNAME}", "-d", "${DB_DATABASE}"]
+      test: [ "CMD", "pg_isready", "-U", "app", "-d", "app" ]
       interval: 3s
       timeout: 5s
+
+  php-cs-fixer:
+    build:
+      context: ./
+      dockerfile: .docker/php${PHP_VERSION:-7.3}/Dockerfile
+    volumes:
+      - ./:/app
+    entrypoint: vendor/bin/php-cs-fixer
