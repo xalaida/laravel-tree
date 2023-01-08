@@ -35,12 +35,10 @@ The database table in this scenario will look like this:
 | 1   | Books   | 1    |
 | 2   | Science | 1.2  |
 
-
 The PostgreSQL has a specific column type for that purpose called "ltree".
 In combination with GiST index that allows to execute lightweight and performant queries across an entire tree.
-Also, PostgreSQL has useful operators to select descendants of the node, ancestors, and a lot more.
 
-Read more about the "ltree" extension: https://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree
+Also, PostgreSQL provides extensive facilities for searching through label trees.
 
 ## 🔨 Configuration
 
@@ -65,7 +63,7 @@ return new class extends Migration
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->ltree('path')->nullable()->spatialIndex(); // Create a "path" column with the "ltree" type and GiST index.
+            $table->ltree('path')->nullable()->spatialIndex(); // Create a "path" column with a "ltree" type and a GiST index.
             $table->timestamps();
         });
 
@@ -107,7 +105,11 @@ class Category extends Model
 
 ## 🚊 Usage
 
-The `path` attribute is handled **automatically** by the package, so you do not need to manually set it.
+### Path attribute
+
+The "path" attribute is assigned to all models that use the `AsTree` trait **automatically**, so you do not need to manually set it.
+
+[//]: # (TODO: add info that path of whole subtree is updated when node is moved)
 
 ### Inserting models
 
@@ -128,35 +130,7 @@ $child->parent()->associate($root);
 $child->save();
 ```
 
-As you can see, it works as default Eloquent models.
-
-### Querying models
-
-Select root nodes:
-
-```php
-$roots = Category::query()->root()->get(); 
-```
-
-Get ancestors of the node:
-
-```php
-$ancestor = $category->ancestors
-$ancestor = $category->ancestors()->get();
-```
-
-Get ancestors of the node (including the node):
-
-```php
-$ancestors = $category->joinAncestors();
-```
-
-Get descendants of the node:
-
-```php
-$descendants = $category->descendants;
-$descendants = $category->descendants()->get();
-```
+As you can see, it works as with regular Eloquent models.
 
 ### Relations
 
@@ -164,32 +138,155 @@ The `AsTree` trait provides the following relations:
 
 - `parent`
 - `children`
-- `ancestors`
-- `descendants`
+- `ancestors` (read-only)
+- `descendants` (read-only)
 
-The `parent` and `children` relations use default Laravel's BelongsTo and HasMany relations.
+The `parent` and `children` relations use default Laravel relations BelongsTo and HasMany.
 
-The `ancestors` and `descendants` can be used only in the "read" mode (method like `make`, `create` are not available).
+The `ancestors` and `descendants` can be used only in the "read" mode, which means methods like `make`, `create` are not available, so to save related nodes you need to use `parent` and `children` relations.
 
+#### Parent
 
-# Querying category products
+The `parent` relation uses default Eloquent BelongsTo relation that needs the `parent_id` column as foreign key.
+It allows to get a parent of the node.
 
-[//]: # (TODO: split into 2 separate code blocks)
+##### Example
+
 ```php
-Product::query()
-    ->when($category, function (Builder $query, Category $category) {
-        // 1st way (faster, harder)
-        $query->joinRelation('category');
-        $query->whereDescendantOf($category);
+echo $category->parent->name; // 'Books'
+```
 
-        // 2nd way (slower, simpler)
-        $query->whereHas('category', function (Builder $query) use ($category) {
-            $query->whereDescendantOf($category);
-        });
+#### Children
+
+The `children` relation uses a default Eloquent HasMany relation and is a reverse relation to the `parent`.
+It allows to get all children of the node.
+
+##### Example
+
+```php
+foreach ($category->children as $child) {
+    echo $child->name;
+}
+```
+
+#### Ancestors
+
+The `ancestors` relation is a custom relation that works only in "read" mode. 
+It allows to get all ancestors of the node.
+
+##### Example
+
+Using the attribute:
+
+```php
+foreach ($category->ancestors as $ancestor) {
+    echo $ancestor->name;
+}
+```
+
+Using the query builder:
+
+```php
+$ancestors = $category->ancestors()->get();
+```
+
+Getting a collection with the current node and its ancestors:
+
+```php
+$hierarchy = $category->joinAncestors();
+```
+
+Building breadcrumbs:
+
+```php
+collect()->join()
+echo $category->ancestors()
+    ->orderByDepthDesc()
+    ->get()
+    ->push($category)
+    ->implode('name', ' > ');
+```
+
+#### Descendants
+
+The `descendants` relation is a custom relation that works only in "read" mode.
+It allows to get all descendants of the node.
+
+##### Example
+
+Using the attribute:
+
+```php
+foreach ($category->descendants as $descendant) {
+    echo $descendant->name;
+}
+```
+
+Using the query builder:
+
+```php
+$ancestors = $category->descendants()->get();
+```
+
+### Querying models
+
+Getting root nodes:
+
+```php
+$roots = Category::query()->root()->get(); 
+```
+
+Getting nodes by the depth level:
+
+```php
+$categories = Category::query()->whereDepth(3)->get(); 
+```
+
+Getting ancestors of the node:
+
+```php
+$ancestors = Category::query()->whereAncestorOf($category)->get();
+```
+
+Getting descendants of the node:
+
+```php
+$ancestors = Category::query()->whereDescendantOf($category)->get();
+```
+
+Ordering nodes by depth:
+
+```php
+$categories = Category::query()->orderByDepth()->get();
+$categories = Category::query()->orderByDepthDesc()->get();
+```
+
+### Querying category products
+
+You can easily get the products of a category and each of its descendants.
+
+1st way:
+
+```php
+$products = Product::query()
+    ->whereHas('category', function (Builder $query) use ($category) {
+        $query->whereDescendantOf($category);
     })
-    ->paginate(25, [
-        Product::query()->qualifyColumn('*') // Required for the 1st way
-    ]);
+    ->paginate(25);
+```
+
+2nd way (faster, but requires an extra join):
+
+```php
+$products = Product::query()
+    ->join('categories', function (JoinClause $join) {
+        $join->on(
+            Product::query()->qualifyColumn('category_id'),
+            Category::query()->qualifyColumn('id')
+        );
+    })
+    ->whereDescendantOf($category);
+    ->paginate(25, [Product::query()->qualifyColumn('*')]);
 ```
 
 ## ☕ Contributing
@@ -202,13 +299,15 @@ Thank you for considering contributing. Please see [CONTRIBUTING](CONTRIBUTING.m
 
 The MIT License (MIT). Please see [LICENSE](LICENSE.md) for more information.
 
-# To Do List
-- [ ] configure code coverage workflow & badge generation.
-- [ ] configure cs fixer workflow.
-- [ ] find better example for the doc introduction.
+## Useful links
+
+- https://www.postgresql.org/docs/current/ltree.html
+- https://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree
+- https://patshaughnessy.net/2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension
+
+## To Do List
 - [ ] configure changelog action (see: https://github.com/spatie/laravel-medialibrary/blob/main/.github/workflows/update-changelog.yml).
 - [ ] test query relation without constraint (for example on `avg` methods).
-- [ ] prepare for release and publish on packagist.
 - [ ] add possibility to use non-primary key column as source.
 - [ ] add `read-only` relation to `root` node.
 - [ ] add `read-only` relation to `leaves` nodes.
