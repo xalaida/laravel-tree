@@ -289,6 +289,21 @@ $products = Product::query()
     ->paginate(25, [Product::query()->qualifyColumn('*')]);
 ```
 
+### Moving nodes
+
+When you move a node, the `path` column of the node and each of its descendant has to be updated as well.
+Luckily the package does this automatically using a single query, when it detects that the `parent_id` column has been updated.
+
+So basically to move a whole subtree you need to update the `parent` of the root node of the subtree:
+
+```php
+$books = Category::query()->where('name', 'Books')->firstOrFail();
+$science = Category::query()->where('name', 'Science')->firstOrFail();
+
+$science->parent()->associate($books);
+$science->save();
+```
+
 ## ☕ Contributing
 
 [//]: # (TODO: add contributing.md file)
@@ -304,26 +319,3 @@ The MIT License (MIT). Please see [LICENSE](LICENSE.md) for more information.
 - https://www.postgresql.org/docs/current/ltree.html
 - https://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree
 - https://patshaughnessy.net/2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension
-
-## To Do List
-- [ ] configure changelog action (see: https://github.com/spatie/laravel-medialibrary/blob/main/.github/workflows/update-changelog.yml).
-- [ ] test query relation without constraint (for example on `avg` methods).
-- [ ] add possibility to use non-primary key column as source.
-- [ ] add `read-only` relation to `root` node.
-- [ ] add `read-only` relation to `leaves` nodes.
-- [ ] add `read-only` relation to `siblings` nodes.
-- [ ] add `Tree` iterable class that has `NodeCollection` nodes on each level.
-- [ ] add `MySQL` driver support (based on `LIKE` operator) and determine by checkout model connection.
-- [ ] add possibility to generate a whole tree using model factory. develop API to specify how many nodes should be created per a depth level / make it dynamic using callable syntax. probably use sequences.
-- [ ] add possibility to restrict max depth level.
-- [ ] add `deleteSubtree` method to the node.
-- [ ] add docs about `read-only` relations (descendants and ancestors). use `parent` and `children` for saving nodes.
-- [ ] check integration with position package.
-- [ ] add missing methods and helpers.
-
-# Links
-- https://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree
-- https://patshaughnessy.net/2017/12/14/manipulating-trees-using-sql-and-the-postgres-ltree-extension
-- https://github.com/lazychaser/laravel-nestedset
-- https://github.com/staudenmeir/laravel-adjacency-list
-  https://github.com/vicklr/materialized-model
