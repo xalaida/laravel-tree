@@ -59,6 +59,7 @@ class Descendants extends Relation
     {
         foreach ($models as $model) {
             $model->setRelation($relation, $results->filter(function (Model $result) use ($model) {
+                // @todo: refactor using isAncestorOf method.
                 return $result->getPath()->segments()->contains($model->getPathSource())
                      && $result->isNot($model);
             }));
