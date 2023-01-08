@@ -22,12 +22,18 @@ composer require nevadskiy/laravel-tree
 
 ## ✨ Introduction
 
-To store the hierarchical data structures in our application we can simply use the `parent_id` column, and it will work fine in most cases.
+To store hierarchical data structures in our application we can simply use the self-referencing `parent_id` column, and it will work fine in most cases.
 However, when you have to make queries for such data, things get more complicated.
-There is a simple solution to add an extra column to the table to keep the path of the node in the tree-like hierarchy. 
-It's called a "materialized path" pattern and allows to query data more easily and efficient.
+There is a simple solution to add an extra column to the table to save the path of the node in the hierarchy.
+It's called a "materialized path" pattern and allows querying records more easily and efficiently.
 
-Here is a simple example how it works: 1st category "Books" is a parent of 2nd category "Science". 
+The PostgreSQL has a specific column type for that purpose called "ltree".
+In combination with GiST index that allows to execute lightweight and performant queries across an entire tree.
+
+Also, PostgreSQL provides extensive facilities for searching through label trees.
+
+Here is a simple example how it works: 1st category "Books" is a parent of 2nd category "Science".
+
 The database table in this scenario will look like this:
 
 | id  | name    | path |
@@ -35,16 +41,11 @@ The database table in this scenario will look like this:
 | 1   | Books   | 1    |
 | 2   | Science | 1.2  |
 
-The PostgreSQL has a specific column type for that purpose called "ltree".
-In combination with GiST index that allows to execute lightweight and performant queries across an entire tree.
-
-Also, PostgreSQL provides extensive facilities for searching through label trees.
-
 ## 🔨 Configuration
 
 Let's configure package for nested categories.
 
-Create a migration for `categories` table:
+Create a migration for the `categories` table:
 
 ```php
 <?php
@@ -67,7 +68,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // Add a self-referenced "parent_id" column with a "foreign key" constraint using a separate database query.
+        // Add a self-referencing "parent_id" column with a "foreign key" constraint using a separate database query.
         Schema::table('categories', function (Blueprint $table) {
             $table->foreignId('parent_id')
                 ->nullable()
@@ -87,7 +88,7 @@ return new class extends Migration
 };
 ```
 
-Now, create the `Category` model.
+Now create the `Category` model.
 
 ```php
 <?php
@@ -103,17 +104,17 @@ class Category extends Model
 }
 ```
 
+> Note that the Category model uses the `AsTree` trait.
+
 ## 🚊 Usage
 
 ### Path attribute
 
-The "path" attribute is assigned to all models that use the `AsTree` trait **automatically**, so you do not need to manually set it.
-
-[//]: # (TODO: add info that path of whole subtree is updated when node is moved)
+The `path` attribute is assigned to all models that use the `AsTree` trait **automatically**, so you do not need to manually set it.
 
 ### Inserting models
 
-A root node can be saved to database very easy without extra effort:
+A root node can be saved to the database very easily without extra effort:
 
 ```php
 $root = new Category();
