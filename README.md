@@ -323,7 +323,7 @@ $products = Product::query()
 When you move a node, the `path` column of the node and each of its descendants have to be updated as well.
 Luckily the package does this automatically using a single query when it detects that the `parent_id` column has been updated.
 
-So basically to move a whole subtree you need to update the `parent` of the root node of the subtree:
+So basically to move a node with its subtree you need to update the `parent` node of the current node:
 
 ```php
 $books = Category::query()->where('name', 'Books')->firstOrFail();
