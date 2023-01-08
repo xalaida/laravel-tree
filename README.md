@@ -137,10 +137,10 @@ As you can see, it works as with regular Eloquent models.
 
 The `AsTree` trait provides the following relations:
 
-- `parent`
-- `children`
-- `ancestors` (read-only)
-- `descendants` (read-only)
+- [`parent`](#parent)
+- [`children`](#children)
+- [`ancestors`](#ancestors) (read-only)
+- [`descendants`](#descendants) (read-only)
 
 The `parent` and `children` relations use default Laravel relations BelongsTo and HasMany.
 
@@ -348,15 +348,13 @@ $tree = Category::query()
 
 ## ☕ Contributing
 
-[//]: # (TODO: add contributing.md file)
-
-Thank you for considering contributing. Please see [CONTRIBUTING](CONTRIBUTING.md) for more information.
+Thank you for considering contributing. Please see [CONTRIBUTING](.github/CONTRIBUTING.md) for more information.
 
 ## 📜 License
 
 The MIT License (MIT). Please see [LICENSE](LICENSE.md) for more information.
 
-## Useful links
+## 📚 Useful links
 
 - https://www.postgresql.org/docs/current/ltree.html
 - https://patshaughnessy.net/2017/12/13/saving-a-tree-in-postgres-using-ltree
