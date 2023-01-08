@@ -284,7 +284,7 @@ class Category extends Model
 
 Now you can get products:
 
-```
+```php
 $products = $category->products()->paginate(20);
 ```
 
@@ -313,7 +313,9 @@ $products = Product::query()
         );
     })
     ->whereDescendantOf($category);
-    ->paginate(25, [Product::query()->qualifyColumn('*')]);
+    ->paginate(25, [
+        Product::query()->qualifyColumn('*')
+    ]);
 ```
 
 ### Moving nodes
