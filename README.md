@@ -27,12 +27,12 @@ However, when you have to make queries for such data, things get more complicate
 There is a simple solution to add an extra column to the table to save the path of the node in the hierarchy.
 It's called a "materialized path" pattern and allows querying records more easily and efficiently.
 
-The PostgreSQL has a specific column type for that purpose called "ltree".
-In combination with GiST index that allows to execute lightweight and performant queries across an entire tree.
+PostgreSQL has a specific column type for that purpose called "ltree".
+In combination with GiST index that allows executing lightweight and performant queries across an entire tree.
 
 Also, PostgreSQL provides extensive facilities for searching through label trees.
 
-Here is a simple example how it works: 1st category "Books" is a parent of 2nd category "Science".
+Here is a simple example of how it works: 1st category "Books" is a parent of 2nd category "Science".
 
 The database table in this scenario will look like this:
 
@@ -43,7 +43,7 @@ The database table in this scenario will look like this:
 
 ## 🔨 Configuration
 
-Let's configure package for nested categories.
+Let's configure the package for nested categories.
 
 Create a migration for the `categories` table:
 
@@ -122,7 +122,7 @@ $root->name = 'Books';
 $root->save();
 ```
 
-To insert a child model, you only need to assign `parent_id` attribute or use the `parent` relation like this:
+To insert a child model, you only need to assign the `parent_id` attribute or use the `parent` relation like this:
 
 ```php
 $child = new Category;
@@ -144,23 +144,23 @@ The `AsTree` trait provides the following relations:
 
 The `parent` and `children` relations use default Laravel relations BelongsTo and HasMany.
 
-The `ancestors` and `descendants` can be used only in the "read" mode, which means methods like `make`, `create` are not available, so to save related nodes you need to use `parent` and `children` relations.
+The `ancestors` and `descendants` can be used only in the "read" mode, which means methods like `make` or `create` are not available, so to save related nodes you need to use `parent` and `children` relations.
 
 #### Parent
 
-The `parent` relation uses default Eloquent BelongsTo relation that needs the `parent_id` column as foreign key.
-It allows to get a parent of the node.
+The `parent` relation uses the default Eloquent BelongsTo relation that needs the `parent_id` column as a foreign key.
+It allows getting a parent of the node.
 
 ##### Example
 
 ```php
-echo $category->parent->name; // 'Books'
+echo $category->parent->name;
 ```
 
 #### Children
 
 The `children` relation uses a default Eloquent HasMany relation and is a reverse relation to the `parent`.
-It allows to get all children of the node.
+It allows getting all children of the node.
 
 ##### Example
 
@@ -173,7 +173,7 @@ foreach ($category->children as $child) {
 #### Ancestors
 
 The `ancestors` relation is a custom relation that works only in "read" mode. 
-It allows to get all ancestors of the node.
+It allows getting all ancestors of the node.
 
 ##### Example
 
@@ -211,7 +211,7 @@ echo $category->ancestors()
 #### Descendants
 
 The `descendants` relation is a custom relation that works only in "read" mode.
-It allows to get all descendants of the node.
+It allows getting all descendants of the node.
 
 ##### Example
 
@@ -266,7 +266,7 @@ $categories = Category::query()->orderByDepthDesc()->get();
 
 The package provides the `HasManyDeep` relation that can be used to link, for example, a `Category` model that uses the `AsTree` trait with a `Product` model.
 
-That allows to get products of a category and each of its descendants.
+That allows us to get products of a category and each of its descendants.
 
 Here is the code example on how to use the `HasManyDeep` relation:
 
@@ -326,8 +326,8 @@ $products = Product::query()
 
 ### Moving nodes
 
-When you move a node, the `path` column of the node and each of its descendant has to be updated as well.
-Luckily the package does this automatically using a single query, when it detects that the `parent_id` column has been updated.
+When you move a node, the `path` column of the node and each of its descendants have to be updated as well.
+Luckily the package does this automatically using a single query when it detects that the `parent_id` column has been updated.
 
 So basically to move a whole subtree you need to update the `parent` of the root node of the subtree:
 
