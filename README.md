@@ -16,11 +16,17 @@
 
 ## 🔌 Installation
 
-Install the package via composer.
+Install the package via composer:
 
 ```bash
 composer require nevadskiy/laravel-tree
 ````
+
+Publish package migrations to create "ltree" extension (optional):
+
+```bash
+php artisan vendor:publish --tag=tree-migrations
+```
 
 ## ✨ Introduction
 

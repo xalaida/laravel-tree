@@ -25,7 +25,7 @@ class TreeServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        $this->bootMigrations();
+        $this->publishMigrations();
     }
 
     /**
@@ -57,10 +57,10 @@ class TreeServiceProvider extends ServiceProvider
     }
 
     /**
-     * Boot any package migrations.
+     * Publish any package migrations.
      */
-    private function bootMigrations(): void
+    private function publishMigrations(): void
     {
-        $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
+        $this->publishes([__DIR__.'/../database/migrations/' => database_path('migrations')], 'tree-migrations');
     }
 }
