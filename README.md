@@ -32,12 +32,12 @@ php artisan vendor:publish --tag=tree-migrations
 
 To store hierarchical data structures in our application we can simply use the self-referencing `parent_id` column, and it will work fine in most cases.
 However, when you have to make queries for such data, things get more complicated.
+
 There is a simple solution to add an extra column to the table to save the path of the node in the hierarchy.
 It's called a "materialized path" pattern and allows querying records more easily and efficiently.
 
 PostgreSQL has a specific column type for that purpose called "ltree".
 In combination with GiST index that allows executing lightweight and performant queries across an entire tree.
-
 Also, PostgreSQL provides extensive facilities for searching through label trees.
 
 Here is a simple example of how it works: 1st category "Books" is a parent of 2nd category "Science".
