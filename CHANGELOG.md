@@ -7,8 +7,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## 0.2.0 - 2023-01-09
 
-### [0.2.0] - 2023-01-10
-
 #### Added
 
 - Added possibility to use custom column as path source
@@ -17,7 +15,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Now migrations can be published
 
-## [0.1.1] - 2023-01-09
+## 0.1.1 - 2023-01-09
 
 ### Added
 
@@ -28,7 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Refactored relations
 
-## [0.1.0] - 2022-01-08
+## 0.1.0 - 2023-01-08
 
 ### Added
 
