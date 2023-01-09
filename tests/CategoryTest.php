@@ -166,6 +166,22 @@ class CategoryTest extends TestCase
     /**
      * @test
      */
+    public function it_can_be_filtered_by_depth_using_custom_operator(): void
+    {
+        $category = CategoryFactory::new()
+            ->withAncestors(2)
+            ->create();
+
+        $categories = Category::query()->whereDepth(2, '>=')->get();
+
+        self::assertCount(2, $categories);
+        self::assertTrue($categories[0]->is($category->parent));
+        self::assertTrue($categories[1]->is($category));
+    }
+
+    /**
+     * @test
+     */
     public function it_can_be_filtered_by_root(): void
     {
         $category = CategoryFactory::new()
