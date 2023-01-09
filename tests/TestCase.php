@@ -2,24 +2,20 @@
 
 namespace Nevadskiy\Tree\Tests;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Nevadskiy\Tree\TreeServiceProvider;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 
 class TestCase extends OrchestraTestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     /**
      * @inheritdoc
      */
-    protected function setUp(): void
+    protected function defineDatabaseMigrations(): void
     {
-        parent::setUp();
-
-        $this->loadMigrationsFrom(__DIR__.'/Support/Migrations');
-
-        $this->artisan('migrate')->run();
+        $this->loadMigrationsFrom(__DIR__.'/Support/migrations');
     }
 
     /**

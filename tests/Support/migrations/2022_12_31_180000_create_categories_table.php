@@ -19,7 +19,6 @@ return new class () extends Migration {
 
         Schema::table('categories', function (Blueprint $table) {
             $table->foreignId('parent_id')
-                ->after('name')
                 ->nullable()
                 ->index()
                 ->constrained('categories')

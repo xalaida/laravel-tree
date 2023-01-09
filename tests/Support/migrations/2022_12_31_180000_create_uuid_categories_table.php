@@ -19,7 +19,6 @@ return new class () extends Migration {
 
         Schema::table('uuid_categories', function (Blueprint $table) {
             $table->foreignUuid('parent_id')
-                ->after('name')
                 ->nullable()
                 ->index()
                 ->constrained('uuid_categories')
