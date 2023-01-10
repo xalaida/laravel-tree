@@ -44,10 +44,10 @@ Here is a simple example of how it works: 1st category "Books" is a parent of 2n
 
 The database table in this scenario will look like this:
 
-| id  | name    | path |
-|-----|---------|------|
-| 1   | Books   | 1    |
-| 2   | Science | 1.2  |
+| id   | name     | parent_id | path |
+|:-----|:---------|----------:|-----:|
+| 1    | Books    |      null |    1 |
+| 2    | Science  |         1 |  1.2 |
 
 ## 🔨 Configuration
 
@@ -112,7 +112,7 @@ class Category extends Model
 
 ### Path attribute
 
-The `path` attribute is assigned to all models that use the `AsTree` trait **automatically**, so you do not need to manually set it.
+The `path` attribute is assigned to all models that use the `AsTree` trait **automatically** based on the `parent`, so you do not need to manually set it.
 
 ### Inserting models
 
