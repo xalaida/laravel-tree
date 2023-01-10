@@ -156,9 +156,9 @@ trait AsTree
     /**
      * Get items by the given depth level.
      */
-    public function scopeWhereDepth(Builder $query, int $depth): void
+    public function scopeWhereDepth(Builder $query, int $depth, string $operator = '='): void
     {
-        $query->whereRaw(sprintf('nlevel(%s) = ?', $this->getPathColumn()), [$depth]);
+        $query->whereRaw(sprintf('nlevel(%s) %s ?', $this->getPathColumn(), $operator), [$depth]);
     }
 
     /**
