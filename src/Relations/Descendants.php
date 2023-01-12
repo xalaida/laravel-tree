@@ -32,12 +32,11 @@ class Descendants extends Relation
      */
     public function addEagerConstraints(array $models): void
     {
-        $this->getRelationQuery()
-             ->where(function (Builder $query) use ($models) {
-                 foreach ($models as $model) {
-                     $query->orWhereDescendantOf($model);
-                 }
-             });
+        $this->query->where(function (Builder $query) use ($models) {
+            foreach ($models as $model) {
+                $query->orWhereDescendantOf($model);
+            }
+        });
     }
 
     /**
@@ -81,18 +80,16 @@ class Descendants extends Relation
     {
         $query->select($columns);
 
-        $subQueryTable = $this->getRelationCountHash();
-
-        $query->from("{$query->getModel()->getTable()} as {$subQueryTable}");
+        $query->from("{$query->getModel()->getTable()} as descendants");
 
         $query->whereColumn(
-            "{$subQueryTable}.{$this->related->getPathColumn()}",
+            "descendants.{$this->related->getPathColumn()}",
             BuilderMixin::DESCENDANT,
             $this->related->qualifyColumn($this->related->getPathColumn())
         );
 
         $query->whereColumn(
-            "{$subQueryTable}.{$this->related->getKeyName()}",
+            "descendants.{$this->related->getKeyName()}",
             '!=',
             $this->related->getQualifiedKeyName()
         );

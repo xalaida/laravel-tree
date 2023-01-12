@@ -21,6 +21,10 @@ composer.install:
 composer.update:
 	docker compose run --rm composer update
 
+# Downgrade composer dependencies to lowest versions
+composer.lowest:
+	docker compose run --rm composer update --prefer-lowest --prefer-stable
+
 # Uninstall composer dependencies
 composer.uninstall:
 	sudo rm -rf vendor
@@ -29,7 +33,7 @@ composer.uninstall:
 
 # Run PHPUnit
 phpunit:
-	docker compose run --rm phpunit
+	docker compose run --rm phpunit --stop-on-failure
 
 # Alias to run PHPUnit
 test: phpunit

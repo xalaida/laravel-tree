@@ -87,7 +87,7 @@ class TreeTest extends TestCase
             ->create();
 
         $categories = Category::query()
-            ->whereKeyNot($parent)
+            ->whereKeyNot($parent->getKey())
             ->get()
             ->tree();
 
@@ -123,7 +123,7 @@ class TreeTest extends TestCase
             ->create();
 
         $categories = Category::query()
-            ->whereKeyNot($grandParent)
+            ->whereKeyNot($grandParent->getKey())
             ->get()
             ->tree();
 

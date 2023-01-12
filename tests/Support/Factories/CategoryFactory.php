@@ -2,6 +2,7 @@
 
 namespace Nevadskiy\Tree\Tests\Support\Factories;
 
+use Illuminate\Database\Eloquent\Model;
 use Nevadskiy\Tree\Tests\Support\Models\Category;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -29,6 +30,12 @@ class CategoryFactory extends Factory
      */
     public function forParent($category): self
     {
+        if ($category instanceof Model) {
+            return $this->state([
+                'parent_id' => $category->getKey(),
+            ]);
+        }
+
         return $this->for($category, 'parent');
     }
 
