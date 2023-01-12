@@ -32,12 +32,11 @@ class Ancestors extends Relation
      */
     public function addEagerConstraints(array $models): void
     {
-        $this->getRelationQuery()
-            ->where(function (Builder $query) use ($models) {
-                foreach ($models as $model) {
-                    $query->orWhereAncestorOf($model);
-                }
-            });
+        $this->query->where(function (Builder $query) use ($models) {
+            foreach ($models as $model) {
+                $query->orWhereAncestorOf($model);
+            }
+        });
     }
 
     /**
@@ -83,18 +82,16 @@ class Ancestors extends Relation
     {
         $query->select($columns);
 
-        $subQueryTable = $this->getRelationCountHash();
-
-        $query->from("{$query->getModel()->getTable()} as {$subQueryTable}");
+        $query->from("{$query->getModel()->getTable()} as ancestors");
 
         $query->whereColumn(
-            "{$subQueryTable}.{$this->related->getPathColumn()}",
+            "ancestors.{$this->related->getPathColumn()}",
             BuilderMixin::ANCESTOR,
             $this->related->qualifyColumn($this->related->getPathColumn())
         );
 
         $query->whereColumn(
-            "{$subQueryTable}.{$this->related->getKeyName()}",
+            "ancestors.{$this->related->getKeyName()}",
             '!=',
             $this->related->getQualifiedKeyName()
         );

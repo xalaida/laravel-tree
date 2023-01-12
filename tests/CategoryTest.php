@@ -87,7 +87,7 @@ class CategoryTest extends TestCase
             ->withAncestors(3)
             ->create();
 
-        $this->assertDatabaseCount(Category::class, 4);
+        $this->assertDatabaseCount('categories', 4);
 
         self::assertCount(3, $category->ancestors);
         self::assertNotContains($category, $category->ancestors);
@@ -289,7 +289,7 @@ class CategoryTest extends TestCase
             ->withAncestors(2)
             ->create();
 
-        $category->parent->parent()->disassociate();
+        $category->parent->parent()->associate(null);
         $category->parent->save();
 
         $category->refresh();
@@ -346,7 +346,7 @@ class CategoryTest extends TestCase
 
         self::assertFalse($anotherCategory->fresh()->wasMoved());
 
-        $anotherCategory->parent()->disassociate();
+        $anotherCategory->parent()->associate(null);
         $anotherCategory->save();
 
         self::assertTrue($anotherCategory->wasMoved());
@@ -367,7 +367,7 @@ class CategoryTest extends TestCase
 
         self::assertFalse($anotherCategory->isMoving());
 
-        $anotherCategory->parent()->disassociate();
+        $anotherCategory->parent()->associate(null);
 
         self::assertTrue($anotherCategory->isMoving());
 

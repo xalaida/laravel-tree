@@ -10,11 +10,10 @@ class TestCase extends OrchestraTestCase
 {
     use DatabaseTransactions;
 
-    /**
-     * @inheritdoc
-     */
-    protected function defineDatabaseMigrations(): void
+    protected function setUp(): void
     {
+        parent::setUp();
+
         $this->loadMigrationsFrom(__DIR__.'/Support/migrations');
     }
 
