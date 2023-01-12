@@ -4,21 +4,15 @@ on: [ push, pull_request ]
 
 jobs:
   test:
-    name: Run PHPUnit [PHP ${{ matrix.php }}, Laravel ${{ matrix.laravel }}, ${{ matrix.dependencies }}]
+    name: Run PHPUnit [PHP ${{ matrix.php }}, ${{ matrix.dependencies }}]
+
+    runs-on: ubuntu-latest
 
     strategy:
       fail-fast: false
       matrix:
         php: [ '7.3', '7.4', '8.0', '8.1', '8.2' ]
-        laravel: [ '8.*', '9.*' ]
         dependencies: [ lowest, highest ]
-        exclude:
-          - laravel: '9.*'
-            php: '7.3'
-          - laravel: '9.*'
-            php: '7.4'
-
-    runs-on: ubuntu-latest
 
     env:
       PHP_VERSION: ${{ matrix.php }}
@@ -30,16 +24,13 @@ jobs:
       - name: Build containers
         run: docker compose build
 
-      - name: Install Laravel using Composer
-        run: docker compose run composer require laravel/framework:${{ matrix.laravel }} --no-interaction --no-progress --no-update
-
-      - name: Install Composer dependencies
+      - name: Install Composer dependencies with highest versions
         if: ${{ matrix.dependencies }} == highest
         run: docker compose run composer update --no-interaction --no-progress
 
-      - name: Install lowest Composer dependencies
+      - name: Install Composer dependencies with lowest versions
         if: ${{ matrix.dependencies }} == lowest
-        run: docker compose run composer update --prefer-lowest --prefer-stable --no-interaction --no-progress
+        run: docker compose run composer update --no-interaction --no-progress --prefer-lowest --prefer-stable
 
       - name: Run PHPUnit
         run: docker compose run phpunit
