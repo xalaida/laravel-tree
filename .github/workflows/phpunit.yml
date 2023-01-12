@@ -31,7 +31,7 @@ jobs:
         run: docker compose build
 
       - name: Install Laravel using Composer
-        run: docker compose run composer require laravel/framework:^${{ matrix.laravel }} --no-interaction --no-progress --no-update
+        run: docker compose run composer require laravel/framework:${{ matrix.laravel }} --no-interaction --no-progress --no-update
 
       - name: Install Composer dependencies
         if: ${{ matrix.dependencies }} == highest
