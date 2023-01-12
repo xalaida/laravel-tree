@@ -10,6 +10,9 @@ class TestCase extends OrchestraTestCase
 {
     use DatabaseTransactions;
 
+    /**
+     * @inheritdoc
+     */
     protected function setUp(): void
     {
         parent::setUp();
