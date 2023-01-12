@@ -24,10 +24,11 @@ jobs:
       - name: Build containers
         run: docker compose build
 
-      - name: Install Composer dependencies
-        run: |
-          docker compose run composer require laravel/framework:${{ matrix.laravel }} --no-interaction --no-progress --no-update
-          docker compose run composer update --no-interaction --no-progress
+      - name: Install Laravel using Composer
+        run: docker compose run composer require laravel/framework:${{ matrix.laravel }} --no-interaction --no-progress --no-update
+
+      - name: Update Composer dependencies
+        run: docker compose run composer update --no-interaction --no-progress
 
       - name: Run PHPUnit
         run: docker compose run phpunit
