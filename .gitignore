@@ -2,6 +2,7 @@
 /.idea
 /vendor
 /tests/.report
+.env
 .php-cs-fixer.php
 composer.lock
 phpunit.xml
