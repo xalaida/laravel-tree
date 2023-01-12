@@ -10,11 +10,11 @@ jobs:
       fail-fast: false
       matrix:
         php: [ '7.3', '7.4', '8.0', '8.1', '8.2' ]
-        laravel: [ '^8.0', '^9.0' ]
+        laravel: [ '8.0', '9.0' ]
         exclude:
-          - laravel: '^9.0'
+          - laravel: '9.0'
             php: '7.3'
-          - laravel: '^9.0'
+          - laravel: '9.0'
             php: '7.4'
 
     runs-on: ubuntu-latest
@@ -30,7 +30,7 @@ jobs:
         run: docker compose build
 
       - name: Install Laravel using Composer
-        run: docker compose run composer require laravel/framework:${{ matrix.laravel }} --no-interaction --no-progress --no-update
+        run: docker compose run composer require laravel/framework:^${{ matrix.laravel }} --no-interaction --no-progress --no-update
 
       - name: Update Composer dependencies
         run: docker compose run composer update --no-interaction --no-progress
