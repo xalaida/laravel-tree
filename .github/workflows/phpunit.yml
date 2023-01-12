@@ -4,7 +4,7 @@ on: [ push, pull_request ]
 
 jobs:
   test:
-    name: Run PHPUnit [PHP ${{ matrix.php }}, ${{ matrix.dependencies }}]
+    name: Run PHPUnit on PHP ${{ matrix.php }} with ${{ matrix.dependencies }} dependencies
 
     runs-on: ubuntu-latest
 
@@ -24,11 +24,11 @@ jobs:
       - name: Build containers
         run: docker compose build
 
-      - name: Install Composer dependencies with highest versions
+      - name: Install Composer dependencies with the highest version
         if: ${{ matrix.dependencies }} == highest
         run: docker compose run composer update --no-interaction --no-progress
 
-      - name: Install Composer dependencies with lowest versions
+      - name: Install Composer dependencies with the lowest stable version
         if: ${{ matrix.dependencies }} == lowest
         run: docker compose run composer update --no-interaction --no-progress --prefer-lowest --prefer-stable
 
@@ -51,7 +51,7 @@ jobs:
         run: docker compose build
 
       - name: Install Composer dependencies
-        run: docker compose run composer install --no-interaction --no-progress
+        run: docker compose run composer update --no-interaction --no-progress
 
       - name: Run PHPUnit with a coverage analysis
         run: docker compose run phpunit --coverage-clover coverage.xml
