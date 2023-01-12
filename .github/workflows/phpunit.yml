@@ -13,9 +13,9 @@ jobs:
       matrix:
         php: [ '7.3', '7.4', '8.0', '8.1', '8.2' ]
         dependencies: [ 'lowest', 'highest' ]
-      exclude:
-        - php: '8.2'
-          dependencies: 'lowest'
+        exclude:
+          - php: '8.2'
+            dependencies: 'lowest'
 
     env:
       PHP_VERSION: ${{ matrix.php }}
