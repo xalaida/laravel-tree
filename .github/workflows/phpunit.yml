@@ -4,13 +4,13 @@ on: [ push, pull_request ]
 
 jobs:
   test:
-    name: Run PHPUnit on PHP ${{ matrix.php }}
+    name: Run PHPUnit on PHP ${{ matrix.php }} and Laravel ${{ matrix.laravel }}
 
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu-latest ]
         php: [ '7.3', '7.4', '8.0', '8.1', '8.2' ]
+        laravel: [ 8, 9 ]
 
     runs-on: ${{ matrix.os }}
 
@@ -25,7 +25,9 @@ jobs:
         run: docker compose build
 
       - name: Install Composer dependencies
-        run: docker compose run composer install --no-interaction --no-progress
+        run: |
+          docker compose run composer require laravel/framework:${{ matrix.laravel }} --no-interaction --no-progress --no-update
+          docker compose run composer update --no-interaction --no-progress
 
       - name: Run PHPUnit
         run: docker compose run phpunit
