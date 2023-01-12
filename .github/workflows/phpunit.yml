@@ -4,13 +4,14 @@ on: [ push, pull_request ]
 
 jobs:
   test:
-    name: Run PHPUnit on PHP ${{ matrix.php }} and Laravel ${{ matrix.laravel }}
+    name: Run PHPUnit [PHP ${{ matrix.php }}, Laravel ${{ matrix.laravel }}, ${{ matrix.dependencies }}]
 
     strategy:
       fail-fast: false
       matrix:
         php: [ '7.3', '7.4', '8.0', '8.1', '8.2' ]
         laravel: [ '8.0', '9.0' ]
+        dependencies: [ '--prefer-lowest,' '' ]
         exclude:
           - laravel: '9.0'
             php: '7.3'
@@ -33,7 +34,7 @@ jobs:
         run: docker compose run composer require laravel/framework:^${{ matrix.laravel }} --no-interaction --no-progress --no-update
 
       - name: Update Composer dependencies
-        run: docker compose run composer update --no-interaction --no-progress
+        run: docker compose run composer update ${{ matrix.dependencies }} --no-interaction --no-progress
 
       - name: Run PHPUnit
         run: docker compose run phpunit
