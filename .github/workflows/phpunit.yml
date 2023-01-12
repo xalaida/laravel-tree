@@ -11,7 +11,7 @@ jobs:
       matrix:
         php: [ '7.3', '7.4', '8.0', '8.1', '8.2' ]
         laravel: [ '8.0', '9.0' ]
-        dependencies: [ '--prefer-lowest', '' ]
+        dependencies: [ lowest, 'highest' ]
         exclude:
           - laravel: '9.0'
             php: '7.3'
@@ -34,7 +34,12 @@ jobs:
         run: docker compose run composer require laravel/framework:^${{ matrix.laravel }} --no-interaction --no-progress --no-update
 
       - name: Update Composer dependencies
-        run: docker compose run composer update ${{ matrix.dependencies }} --no-interaction --no-progress
+        if: ${{ matrix.dependencies }} == highest
+        run: docker compose run composer update --no-interaction --no-progress
+
+      - name: Update Composer dependencies to the lowest versions
+        if: ${{ matrix.dependencies }} == lowest
+        run: docker compose run composer update --prefer-lowest --prefer-stable --no-interaction --no-progress
 
       - name: Run PHPUnit
         run: docker compose run phpunit
