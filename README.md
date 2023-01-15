@@ -172,7 +172,7 @@ foreach ($category->children as $child) {
 #### Ancestors
 
 The `ancestors` relation is a custom relation that works only in "read" mode. 
-It allows getting all ancestors of the node.
+It allows getting all ancestors of the node (without the current node).
 
 Using the attribute:
 
@@ -207,7 +207,7 @@ echo $category->ancestors()
 #### Descendants
 
 The `descendants` relation is a custom relation that works only in "read" mode.
-It allows getting all descendants of the node.
+It allows getting all descendants of the node (without the current node).
 
 Using the attribute:
 
@@ -237,13 +237,13 @@ Getting nodes by the depth level:
 $categories = Category::query()->whereDepth(3)->get(); 
 ```
 
-Getting ancestors of the node:
+Getting ancestors of the node (including the current node):
 
 ```php
 $ancestors = Category::query()->whereAncestorOf($category)->get();
 ```
 
-Getting descendants of the node:
+Getting descendants of the node (including the current node):
 
 ```php
 $ancestors = Category::query()->whereDescendantOf($category)->get();
