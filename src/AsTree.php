@@ -273,7 +273,7 @@ trait AsTree
      */
     protected function updatePathOfSubtree(): void
     {
-        $this->newQuery()->whereDescendantOf($this)->update([
+        $this->newQuery()->whereSelfOrDescendantOf($this)->update([
             $this->getPathColumn() => $this->parent
                 ? new Expression(vsprintf("'%s' || subpath(%s, %d)", [
                     $this->parent->getPath()->getValue(),

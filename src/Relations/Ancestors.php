@@ -29,7 +29,7 @@ class Ancestors extends Relation
     {
         if (static::$constraints) {
             $this->query->where(function () {
-                $this->query->whereAncestorOf($this->related);
+                $this->query->whereSelfOrAncestorOf($this->related);
                 $this->query->whereKeyNot($this->related->getKey());
             });
         }
@@ -42,7 +42,7 @@ class Ancestors extends Relation
     {
         $this->query->where(function (Builder $query) use ($models) {
             foreach ($models as $model) {
-                $query->orWhereAncestorOf($model);
+                $query->orWhereSelfOrAncestorOf($model);
             }
         });
     }

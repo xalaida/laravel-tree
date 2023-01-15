@@ -29,7 +29,7 @@ class Descendants extends Relation
     {
         if (static::$constraints) {
             $this->query->where(function () {
-                $this->query->whereDescendantOf($this->related);
+                $this->query->whereSelfOrDescendantOf($this->related);
                 $this->query->whereKeyNot($this->related->getKey());
             });
         }
@@ -42,7 +42,7 @@ class Descendants extends Relation
     {
         $this->query->where(function (Builder $query) use ($models) {
             foreach ($models as $model) {
-                $query->orWhereDescendantOf($model);
+                $query->orWhereSelfOrDescendantOf($model);
             }
         });
     }

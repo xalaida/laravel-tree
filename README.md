@@ -230,13 +230,13 @@ $categories = Category::query()->whereDepth(3)->get();
 Getting ancestors of the node (including the current node):
 
 ```php
-$ancestors = Category::query()->whereAncestorOf($category)->get();
+$ancestors = Category::query()->whereSelfOrAncestorOf($category)->get();
 ```
 
 Getting descendants of the node (including the current node):
 
 ```php
-$ancestors = Category::query()->whereDescendantOf($category)->get();
+$ancestors = Category::query()->whereSelfOrDescendantOf($category)->get();
 ```
 
 Ordering nodes by depth:
@@ -289,7 +289,7 @@ You can easily get the products of a category and each of its descendants using 
 ```php
 $products = Product::query()
     ->whereHas('category', function (Builder $query) use ($category) {
-        $query->whereDescendantOf($category);
+        $query->whereSelfOrDescendantOf($category);
     })
     ->paginate(25);
 ```
@@ -304,7 +304,7 @@ $products = Product::query()
             Category::query()->qualifyColumn('id')
         );
     })
-    ->whereDescendantOf($category);
+    ->whereSelfOrDescendantOf($category);
     ->paginate(25, [
         Product::query()->qualifyColumn('*')
     ]);
@@ -353,7 +353,7 @@ echo $category->joinAncestors()
 Delete the current node and all its descendants:
 
 ```php
-$category->newQuery()->whereDescendantOf($category)->delete();
+$category->newQuery()->whereSelfOrDescendantOf($category)->delete();
 ```
 
 ## 📚 Useful links

@@ -58,7 +58,7 @@ class HasManyDeep extends HasMany
                 $join->on($this->getQualifiedForeignKeyName(), $this->getQualifiedParentKeyName());
             });
 
-            $this->query->whereDescendantOf($this->parent);
+            $this->query->whereSelfOrDescendantOf($this->parent);
 
             $this->query->select($this->related->qualifyColumn('*'));
         }
@@ -75,7 +75,7 @@ class HasManyDeep extends HasMany
 
         $this->query->where(function (Builder $query) use ($models) {
             foreach ($models as $model) {
-                $query->orWhereDescendantOf($model);
+                $query->orWhereSelfOrDescendantOf($model);
             }
         });
     }

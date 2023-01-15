@@ -22,7 +22,7 @@ class BuilderMixin
     /**
      * Add an ancestor where clause to the query.
      */
-    public function whereAncestor(): callable
+    public function whereSelfOrAncestor(): callable
     {
         return function (string $column, string $path, string $boolean = 'and') {
             return $this->where($column, BuilderMixin::ANCESTOR, $path, $boolean);
@@ -32,20 +32,20 @@ class BuilderMixin
     /**
      * Add an ancestor "or where" clause to the query.
      */
-    public function orWhereAncestor(): callable
+    public function orWhereSelfOrAncestor(): callable
     {
         return function (string $column, string $path) {
-            return $this->whereAncestor($column, $path, 'or');
+            return $this->whereSelfOrAncestor($column, $path, 'or');
         };
     }
 
     /**
      * Add an ancestor where clause to the query from the given model.
      */
-    public function whereAncestorOf(): callable
+    public function whereSelfOrAncestorOf(): callable
     {
         return function (Model $model, string $column = null, string $boolean = 'and') {
-            return $this->whereAncestor(
+            return $this->whereSelfOrAncestor(
                 $column ?: $model->newQuery()->qualifyColumn($model->getPathColumn()),
                 $model->getPath(),
                 $boolean
@@ -56,10 +56,10 @@ class BuilderMixin
     /**
      * Add an ancestor "or where" clause to the query from the given model.
      */
-    public function orWhereAncestorOf(): callable
+    public function orWhereSelfOrAncestorOf(): callable
     {
         return function (Model $model, string $column = null) {
-            return $this->orWhereAncestor(
+            return $this->orWhereSelfOrAncestor(
                 $column ?: $model->newQuery()->qualifyColumn($model->getPathColumn()),
                 $model->getPath(),
             );
@@ -69,7 +69,7 @@ class BuilderMixin
     /**
      * Add a descendant where clause to the query.
      */
-    public function whereDescendant(): callable
+    public function whereSelfOrDescendant(): callable
     {
         return function (string $column, string $path, string $boolean = 'and') {
             return $this->where($column, BuilderMixin::DESCENDANT, $path, $boolean);
@@ -79,20 +79,20 @@ class BuilderMixin
     /**
      * Add a descendant "or where" clause to the query.
      */
-    public function orWhereDescendant(): callable
+    public function orWhereSelfOrDescendant(): callable
     {
         return function (string $column, string $path) {
-            return $this->whereDescendant($column, $path, 'or');
+            return $this->whereSelfOrDescendant($column, $path, 'or');
         };
     }
 
     /**
      * Add a descendant where clause to the query from the given model.
      */
-    public function whereDescendantOf(): callable
+    public function whereSelfOrDescendantOf(): callable
     {
         return function (Model $model, string $column = null, string $boolean = 'and') {
-            return $this->whereDescendant(
+            return $this->whereSelfOrDescendant(
                 $column ?: $model->newQuery()->qualifyColumn($model->getPathColumn()),
                 $model->getPath(),
                 $boolean
@@ -103,10 +103,10 @@ class BuilderMixin
     /**
      * Add a descendant "or where" clause to the query from the given model.
      */
-    public function orWhereDescendantOf(): callable
+    public function orWhereSelfOrDescendantOf(): callable
     {
         return function (Model $model, string $column = null) {
-            return $this->orWhereDescendant(
+            return $this->orWhereSelfOrDescendant(
                 $column ?: $model->newQuery()->qualifyColumn($model->getPathColumn()),
                 $model->getPath(),
             );
