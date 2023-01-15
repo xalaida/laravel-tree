@@ -118,7 +118,7 @@ trait AsTree
      */
     public function ancestors(): Ancestors
     {
-        return new Ancestors($this->newQuery(), $this);
+        return Ancestors::of($this);
     }
 
     /**
@@ -126,7 +126,7 @@ trait AsTree
      */
     public function descendants(): Descendants
     {
-        return new Descendants($this->newQuery(), $this);
+        return Descendants::of($this);
     }
 
     /**

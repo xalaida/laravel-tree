@@ -15,6 +15,14 @@ use Nevadskiy\Tree\Database\BuilderMixin;
 class Ancestors extends Relation
 {
     /**
+     * Make a new relation instance for the given model.
+     */
+    public static function of(Model $model): self
+    {
+        return new static($model->newQuery(), $model);
+    }
+
+    /**
      * @inheritdoc
      */
     public function addConstraints(): void
