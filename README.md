@@ -198,7 +198,7 @@ Building breadcrumbs:
 
 ```php
 echo $category->ancestors()
-    ->orderByDepthDesc()
+    ->orderByDepth()
     ->get()
     ->push($category)
     ->implode('name', ' > ');
@@ -342,7 +342,6 @@ This method associates nodes using the `children` relation and returns only root
 
 ```php
 $tree = Category::query()
-    ->orderByDepth()
     ->orderBy('name')
     ->get()
     ->tree();
