@@ -36,7 +36,7 @@ However, when you have to make queries for such data, things get more complicate
 There is a simple solution to add an extra column to the table to save the path of the node in the hierarchy.
 It's called a "materialized path" pattern and allows querying records more easily and efficiently.
 
-PostgreSQL has a specific column type for that purpose called "ltree".
+PostgreSQL has a specific column type for that purpose called [ltree](https://www.postgresql.org/docs/current/ltree.html).
 In combination with GiST index that allows executing lightweight and performant queries across an entire tree.
 Also, PostgreSQL provides extensive facilities for searching through label trees.
 
