@@ -191,7 +191,7 @@ trait AsTree
     public function isAncestorOf(self $that): bool
     {
         return $this->getPath()->segments()->contains($that->getPathSource())
-            && $this->isNot($that);
+            && ! $this->is($that);
     }
 
     /**
