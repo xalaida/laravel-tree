@@ -343,10 +343,8 @@ This method associates nodes using the `children` relation and returns only root
 #### Building breadcrumbs
 
 ```php
-echo $category->ancestors()
-    ->orderByDepth()
-    ->get()
-    ->push($category)
+echo $category->joinAncestors()
+    ->reverse()
     ->implode('name', ' > ');
 ```
 
