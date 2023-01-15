@@ -118,7 +118,7 @@ trait AsTree
      */
     public function ancestors(): Ancestors
     {
-        return new Ancestors($this->newQuery(), $this);
+        return Ancestors::of($this);
     }
 
     /**
@@ -126,7 +126,7 @@ trait AsTree
      */
     public function descendants(): Descendants
     {
-        return new Descendants($this->newQuery(), $this);
+        return Descendants::of($this);
     }
 
     /**
@@ -191,7 +191,7 @@ trait AsTree
     public function isAncestorOf(self $that): bool
     {
         return $this->getPath()->segments()->contains($that->getPathSource())
-            && $this->isNot($that);
+            && ! $this->is($that);
     }
 
     /**
@@ -273,7 +273,7 @@ trait AsTree
      */
     protected function updatePathOfSubtree(): void
     {
-        $this->newQuery()->whereDescendantOf($this)->update([
+        $this->newQuery()->whereSelfOrDescendantOf($this)->update([
             $this->getPathColumn() => $this->parent
                 ? new Expression(vsprintf("'%s' || subpath(%s, %d)", [
                     $this->parent->getPath()->getValue(),

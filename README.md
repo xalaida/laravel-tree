@@ -172,7 +172,7 @@ foreach ($category->children as $child) {
 #### Ancestors
 
 The `ancestors` relation is a custom relation that works only in "read" mode. 
-It allows getting all ancestors of the node.
+It allows getting all ancestors of the node (without the current node).
 
 Using the attribute:
 
@@ -194,20 +194,10 @@ Getting a collection with the current node and its ancestors:
 $hierarchy = $category->joinAncestors();
 ```
 
-Building breadcrumbs:
-
-```php
-echo $category->ancestors()
-    ->orderByDepthDesc()
-    ->get()
-    ->push($category)
-    ->implode('name', ' > ');
-```
-
 #### Descendants
 
 The `descendants` relation is a custom relation that works only in "read" mode.
-It allows getting all descendants of the node.
+It allows getting all descendants of the node (without the current node).
 
 Using the attribute:
 
@@ -237,16 +227,16 @@ Getting nodes by the depth level:
 $categories = Category::query()->whereDepth(3)->get(); 
 ```
 
-Getting ancestors of the node:
+Getting ancestors of the node (including the current node):
 
 ```php
-$ancestors = Category::query()->whereAncestorOf($category)->get();
+$ancestors = Category::query()->whereSelfOrAncestorOf($category)->get();
 ```
 
-Getting descendants of the node:
+Getting descendants of the node (including the current node):
 
 ```php
-$ancestors = Category::query()->whereDescendantOf($category)->get();
+$ancestors = Category::query()->whereSelfOrDescendantOf($category)->get();
 ```
 
 Ordering nodes by depth:
@@ -299,7 +289,7 @@ You can easily get the products of a category and each of its descendants using 
 ```php
 $products = Product::query()
     ->whereHas('category', function (Builder $query) use ($category) {
-        $query->whereDescendantOf($category);
+        $query->whereSelfOrDescendantOf($category);
     })
     ->paginate(25);
 ```
@@ -314,7 +304,7 @@ $products = Product::query()
             Category::query()->qualifyColumn('id')
         );
     })
-    ->whereDescendantOf($category);
+    ->whereSelfOrDescendantOf($category);
     ->paginate(25, [
         Product::query()->qualifyColumn('*')
     ]);
@@ -335,17 +325,35 @@ $science->parent()->associate($books);
 $science->save();
 ```
 
-### Building a tree
+### Other examples
 
-To build a tree, we need to call the `tree` method on the `NodeCollection`.
-This method associates nodes using the `children` relation and returns only root nodes.
+#### Building a tree
+
+To build a tree, we need to call the `tree` method on the `NodeCollection`:
 
 ```php
 $tree = Category::query()
-    ->orderByDepth()
     ->orderBy('name')
     ->get()
     ->tree();
+```
+
+This method associates nodes using the `children` relation and returns only root nodes.
+
+#### Building breadcrumbs
+
+```php
+echo $category->joinAncestors()
+    ->reverse()
+    ->implode('name', ' > ');
+```
+
+#### Deleting a subtree
+
+Delete the current node and all its descendants:
+
+```php
+$category->newQuery()->whereSelfOrDescendantOf($category)->delete();
 ```
 
 ## 📚 Useful links

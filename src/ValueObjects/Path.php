@@ -21,6 +21,8 @@ class Path
 
     /**
      * Build a path from the given segments.
+     *
+     * @param string|Path ...$segments
      */
     public static function concat(...$segments): Path
     {

@@ -15,13 +15,21 @@ use Nevadskiy\Tree\Database\BuilderMixin;
 class Descendants extends Relation
 {
     /**
+     * Make a new relation instance for the given model.
+     */
+    public static function of(Model $model): self
+    {
+        return new static($model->newQuery(), $model);
+    }
+
+    /**
      * @inheritdoc
      */
     public function addConstraints(): void
     {
         if (static::$constraints) {
             $this->query->where(function () {
-                $this->query->whereDescendantOf($this->related);
+                $this->query->whereSelfOrDescendantOf($this->related);
                 $this->query->whereKeyNot($this->related->getKey());
             });
         }
@@ -34,7 +42,7 @@ class Descendants extends Relation
     {
         $this->query->where(function (Builder $query) use ($models) {
             foreach ($models as $model) {
-                $query->orWhereDescendantOf($model);
+                $query->orWhereSelfOrDescendantOf($model);
             }
         });
     }

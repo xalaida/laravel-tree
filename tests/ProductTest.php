@@ -34,7 +34,7 @@ class ProductTest extends TestCase
 
         $products = Product::query()
             ->whereHas('category', function (Builder $query) use ($parentCategory) {
-                $query->whereDescendantOf($parentCategory);
+                $query->whereSelfOrDescendantOf($parentCategory);
             })
             ->get();
 
@@ -72,7 +72,7 @@ class ProductTest extends TestCase
                     Category::query()->qualifyColumn('id')
                 );
             })
-            ->whereDescendantOf($parentCategory)
+            ->whereSelfOrDescendantOf($parentCategory)
             ->get([
                 Product::query()->qualifyColumn('*')
             ]);
@@ -111,7 +111,7 @@ class ProductTest extends TestCase
                     'categories_alias.id'
                 );
             })
-            ->whereDescendantOf($parentCategory, 'categories_alias.path')
+            ->whereSelfOrDescendantOf($parentCategory, 'categories_alias.path')
             ->get([
                 Product::query()->qualifyColumn('*')
             ]);
