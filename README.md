@@ -194,16 +194,6 @@ Getting a collection with the current node and its ancestors:
 $hierarchy = $category->joinAncestors();
 ```
 
-Building breadcrumbs:
-
-```php
-echo $category->ancestors()
-    ->orderByDepth()
-    ->get()
-    ->push($category)
-    ->implode('name', ' > ');
-```
-
 #### Descendants
 
 The `descendants` relation is a custom relation that works only in "read" mode.
@@ -335,16 +325,37 @@ $science->parent()->associate($books);
 $science->save();
 ```
 
-### Building a tree
+### Other examples
 
-To build a tree, we need to call the `tree` method on the `NodeCollection`.
-This method associates nodes using the `children` relation and returns only root nodes.
+#### Building a tree
+
+To build a tree, we need to call the `tree` method on the `NodeCollection`:
 
 ```php
 $tree = Category::query()
     ->orderBy('name')
     ->get()
     ->tree();
+```
+
+This method associates nodes using the `children` relation and returns only root nodes.
+
+#### Building breadcrumbs
+
+```php
+echo $category->ancestors()
+    ->orderByDepth()
+    ->get()
+    ->push($category)
+    ->implode('name', ' > ');
+```
+
+#### Deleting a subtree
+
+Delete the current node and all its descendants:
+
+```php
+$category->newQuery()->whereDescendantOf($category)->delete();
 ```
 
 ## 📚 Useful links
