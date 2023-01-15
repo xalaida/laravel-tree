@@ -332,10 +332,7 @@ $science->save();
 To build a tree, we need to call the `tree` method on the `NodeCollection`:
 
 ```php
-$tree = Category::query()
-    ->orderBy('name')
-    ->get()
-    ->tree();
+$tree = Category::query()->orderBy('name')->get()->tree();
 ```
 
 This method associates nodes using the `children` relation and returns only root nodes.
@@ -343,9 +340,7 @@ This method associates nodes using the `children` relation and returns only root
 #### Building breadcrumbs
 
 ```php
-echo $category->joinAncestors()
-    ->reverse()
-    ->implode('name', ' > ');
+echo $category->joinAncestors()->reverse()->implode('name', ' > ');
 ```
 
 #### Deleting a subtree
