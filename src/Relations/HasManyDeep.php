@@ -54,9 +54,7 @@ class HasManyDeep extends HasMany
     public function addConstraints(): void
     {
         if (static::$constraints && $this->getParentKey()) {
-            $this->query->join($this->parent->getTable(), function (JoinClause $join) {
-                $join->on($this->getQualifiedForeignKeyName(), $this->getQualifiedParentKeyName());
-            });
+            $this->joinParent();
 
             $this->query->whereSelfOrDescendantOf($this->parent);
 
@@ -65,13 +63,21 @@ class HasManyDeep extends HasMany
     }
 
     /**
-     * @inheritdoc
+     * Join the parent's model table.
      */
-    public function addEagerConstraints(array $models): void
+    protected function joinParent(): void
     {
         $this->query->join($this->parent->getTable(), function (JoinClause $join) {
             $join->on($this->getQualifiedForeignKeyName(), $this->getQualifiedParentKeyName());
         });
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function addEagerConstraints(array $models): void
+    {
+        $this->joinParent();
 
         $this->query->where(function (Builder $query) use ($models) {
             foreach ($models as $model) {
@@ -125,7 +131,7 @@ class HasManyDeep extends HasMany
 
         $hash = $this->getRelationCountHash();
 
-        $query->join("{$this->parent->getTable()} AS {$hash}", function (JoinClause $join) use ($hash) {
+        $query->join("{$this->parent->getTable()} as {$hash}", function (JoinClause $join) use ($hash) {
             $join->on($this->getQualifiedParentKeyName(), "{$hash}.{$this->getLocalKeyName()}");
         });
 
