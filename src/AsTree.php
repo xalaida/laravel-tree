@@ -24,13 +24,15 @@ trait AsTree
      */
     protected static function bootAsTree(): void
     {
-        static::registerModelEvent($event = static::assignPathOnEvent(), static function (self $model) use ($event) {
+        static::registerModelEvent($event = static::getEventForAssigningPath(), static function (self $model) use ($event) {
             if ($model->shouldAssignPath()) {
                 $model->assignPath();
-            }
 
-            if ($event === 'created') {
-                $model->saveQuietly(['timestamps' => false]);
+                if ($event === 'created' && $model->hasPath()) {
+                    $model->newQuery()->whereKey($model->getKey())->toBase()->update([
+                        $model->getPathColumn() => $model->getPath()->getValue(),
+                    ]);
+                }
             }
         });
 
@@ -205,7 +207,7 @@ trait AsTree
     /**
      * Get the event when to assign the model's path.
      */
-    protected static function assignPathOnEvent(): string
+    protected static function getEventForAssigningPath(): string
     {
         $model = new static();
 
@@ -221,7 +223,7 @@ trait AsTree
      */
     protected function shouldAssignPath(): bool
     {
-        return ! array_key_exists($this->getPathColumn(), $this->getAttributes());
+        return ! $this->hasPath();
     }
 
     /**
@@ -230,6 +232,14 @@ trait AsTree
     public function assignPath(): void
     {
         $this->setAttribute($this->getPathColumn(), $this->buildPath());
+    }
+
+    /**
+     * Determine whether the model has the path attribute.
+     */
+    public function hasPath(): bool
+    {
+        return ! is_null($this->getAttribute($this->getPathColumn()));
     }
 
     /**

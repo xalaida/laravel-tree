@@ -39,11 +39,11 @@ class CategoryTest extends TestCase
     /**
      * @test
      */
-    public function it_sets_null_as_path_correctly(): void
+    public function it_assigns_path_when_nullable_path_is_provided(): void
     {
         $category = CategoryFactory::new()->create(['path' => null]);
 
-        self::assertNull($category->path);
+        self::assertEquals($category->getKey(), $category->getPath()->segments()->first());
     }
 
     /**

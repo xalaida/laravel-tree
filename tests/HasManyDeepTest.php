@@ -139,7 +139,7 @@ class HasManyDeepTest extends TestCase
     /**
      * @test
      */
-    public function it_does_not_fail_when_interacting_with_nonexistent_model(): void
+    public function it_does_not_fail_when_interacting_with_missing_model(): void
     {
         $category = new Category();
 
