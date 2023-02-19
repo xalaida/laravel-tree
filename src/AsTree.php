@@ -24,7 +24,7 @@ trait AsTree
      */
     protected static function bootAsTree(): void
     {
-        static::registerModelEvent($event = static::assignPathOnEvent(), static function (self $model) use ($event) {
+        static::registerModelEvent($event = static::getEventForAssigningPath(), static function (self $model) use ($event) {
             if ($model->shouldAssignPath()) {
                 $model->assignPath();
 
@@ -207,7 +207,7 @@ trait AsTree
     /**
      * Get the event when to assign the model's path.
      */
-    protected static function assignPathOnEvent(): string
+    protected static function getEventForAssigningPath(): string
     {
         $model = new static();
 
