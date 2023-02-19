@@ -25,16 +25,14 @@ trait AsTree
     protected static function bootAsTree(): void
     {
         static::registerModelEvent($event = static::assignPathOnEvent(), static function (self $model) use ($event) {
-            if (! $model->shouldAssignPath()) {
-                return;
-            }
+            if ($model->shouldAssignPath()) {
+                $model->assignPath();
 
-            $model->assignPath();
-
-            if ($event === 'created' && $model->hasPath()) {
-                $model->newQuery()->whereKey($model->getKey())->toBase()->update([
-                    $model->getPathColumn() => $model->getPath()->getValue(),
-                ]);
+                if ($event === 'created' && $model->hasPath()) {
+                    $model->newQuery()->whereKey($model->getKey())->toBase()->update([
+                        $model->getPathColumn() => $model->getPath()->getValue(),
+                    ]);
+                }
             }
         });
 
