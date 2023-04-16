@@ -14,7 +14,7 @@ class CreateUuidCategoriesTable extends Migration
         Schema::create('uuid_categories', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('name');
-            $table->ltree('path')->spatialIndex();
+            $table->string('path')->index();
             $table->timestamps();
         });
 
