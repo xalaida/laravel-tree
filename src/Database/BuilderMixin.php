@@ -3,6 +3,9 @@
 namespace Nevadskiy\Tree\Database;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\MySqlConnection;
+use Illuminate\Database\PostgresConnection;
+use RuntimeException;
 
 /**
  * @mixin \Illuminate\Database\Query\Builder
@@ -25,7 +28,13 @@ class BuilderMixin
     public function whereSelfOrAncestor(): callable
     {
         return function (string $column, string $path, string $boolean = 'and') {
-            return $this->where($column, BuilderMixin::ANCESTOR, $path, $boolean);
+            if ($this->getConnection() instanceof MySqlConnection) {
+                return $this->where($column, 'like', $path, $boolean); // @todo perform whereIn on each segment.
+            } if ($this->getConnection() instanceof PostgresConnection) {
+                return $this->where($column, BuilderMixin::ANCESTOR, $path, $boolean);
+            }
+
+            throw new RuntimeException();
         };
     }
 
@@ -72,7 +81,13 @@ class BuilderMixin
     public function whereSelfOrDescendant(): callable
     {
         return function (string $column, string $path, string $boolean = 'and') {
-            return $this->where($column, BuilderMixin::DESCENDANT, $path, $boolean);
+            if ($this->getConnection() instanceof MySqlConnection) {
+                return $this->where($column, 'like', "{$path}%", $boolean);
+            } if ($this->getConnection() instanceof PostgresConnection) {
+                return $this->where($column, BuilderMixin::DESCENDANT, $path, $boolean);
+            }
+
+            throw new RuntimeException();
         };
     }
 
