@@ -45,7 +45,7 @@ services:
       MYSQL_DATABASE: app
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 3s
+      interval: 5s
       timeout: 5s
       retries: 10
 
