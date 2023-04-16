@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.9'
 
 services:
   composer:
@@ -20,6 +20,8 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      mysql:
+        condition: service_healthy
     entrypoint: vendor/bin/phpunit
 
   postgres:
@@ -29,9 +31,23 @@ services:
       POSTGRES_USER: app
       POSTGRES_PASSWORD: app
     healthcheck:
-      test: [ "CMD", "pg_isready", "-U", "app", "-d", "app" ]
+      test: ["CMD", "pg_isready", "-U", "app", "-d", "app"]
       interval: 3s
       timeout: 5s
+      retries: 5
+
+  mysql:
+    image: mysql:5.7
+    environment:
+      MYSQL_ALLOW_EMPTY_PASSWORD: true
+      MYSQL_USER: app
+      MYSQL_PASSWORD: app
+      MYSQL_DATABASE: app
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 3s
+      timeout: 5s
+      retries: 10
 
   php-cs-fixer:
     build:

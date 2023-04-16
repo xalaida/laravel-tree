@@ -3,13 +3,15 @@ FROM php:7.3-cli
 
 # Update dependencies
 RUN apt-get update \
-# Install Zip
+# Install Zip extension
     && apt-get install -y libzip-dev zip \
     && docker-php-ext-install zip \
-# Install PostgreSQL
+# Install PostgreSQL extension
     && apt-get install -y libpq-dev \
     && docker-php-ext-install pdo pdo_pgsql \
-# Install PCOV
+# Install MySQL extension
+  && docker-php-ext-install pdo pdo_mysql \
+# Install PCOV extension
     && pecl install pcov && docker-php-ext-enable pcov
 
 # Install Composer
