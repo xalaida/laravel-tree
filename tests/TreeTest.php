@@ -1,11 +1,11 @@
 <?php
 
-namespace Nevadskiy\Tree\Tests\Postgres;
+namespace Nevadskiy\Tree\Tests;
 
 use Nevadskiy\Tree\Tests\Support\Factories\CategoryFactory;
 use Nevadskiy\Tree\Tests\Support\Models\Category;
 
-class TreePostgresTest extends PostgresTestCase
+class TreeTest extends TestCase
 {
     /**
      * @test

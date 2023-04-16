@@ -1,6 +1,6 @@
 <?php
 
-namespace Nevadskiy\Tree\Tests\Postgres;
+namespace Nevadskiy\Tree\Tests;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\JoinClause;
@@ -9,7 +9,7 @@ use Nevadskiy\Tree\Tests\Support\Factories\ProductFactory;
 use Nevadskiy\Tree\Tests\Support\Models\Category;
 use Nevadskiy\Tree\Tests\Support\Models\Product;
 
-class ProductPostgresTest extends PostgresTestCase
+class ProductTest extends TestCase
 {
     /**
      * @test

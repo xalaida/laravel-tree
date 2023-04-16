@@ -1,13 +1,13 @@
 <?php
 
-namespace Nevadskiy\Tree\Tests\Postgres;
+namespace Nevadskiy\Tree\Tests;
 
 use Illuminate\Database\Eloquent\Model;
 use Nevadskiy\Tree\AsTree;
 use Nevadskiy\Tree\Tests\Support\Factories\CategoryFactory;
 use Nevadskiy\Tree\Tests\Support\Traits\Uuid;
 
-class UuidCategoryTest extends PostgresTestCase
+class UuidCategoryTest extends TestCase
 {
     /**
      * @test

@@ -18,12 +18,6 @@
         <testsuite name="Package Test Suite">
             <directory>tests/</directory>
         </testsuite>
-        <testsuite name="Postgres">
-            <directory>tests/Postgres</directory>
-        </testsuite>
-        <testsuite name="Mysql">
-            <directory>tests/Mysql</directory>
-        </testsuite>
     </testsuites>
     <coverage>
         <include>
@@ -31,6 +25,7 @@
         </include>
     </coverage>
     <php>
+        <env name="DB_CONNECTION" value="mysql"/>
         <env name="DB_DATABASE" value="app"/>
         <env name="DB_USERNAME" value="app"/>
         <env name="DB_PASSWORD" value="app"/>

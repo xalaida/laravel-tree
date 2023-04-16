@@ -1,13 +1,13 @@
 <?php
 
-namespace Nevadskiy\Tree\Tests\Postgres;
+namespace Nevadskiy\Tree\Tests;
 
 use Illuminate\Database\Eloquent\Builder;
 use Nevadskiy\Tree\Tests\Support\Factories\CategoryFactory;
 use Nevadskiy\Tree\Tests\Support\Factories\ProductFactory;
 use Nevadskiy\Tree\Tests\Support\Models\Category;
 
-class HasManyDeepPostgresTest extends PostgresTestCase
+class HasManyDeepTest extends TestCase
 {
     /**
      * @test

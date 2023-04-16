@@ -1,14 +1,14 @@
 <?php
 
-namespace Nevadskiy\Tree\Tests\Mysql;
+namespace Nevadskiy\Tree\Tests;
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Nevadskiy\Tree\TreeServiceProvider;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 
-class MysqlTestCase extends OrchestraTestCase
+class TestCase extends OrchestraTestCase
 {
-    use RefreshDatabase;
+    use DatabaseTransactions;
 
     /**
      * @inheritdoc
@@ -17,16 +17,20 @@ class MysqlTestCase extends OrchestraTestCase
     {
         parent::setUp();
 
-        $this->loadMigrationsFrom(__DIR__.'/migrations');
+        if (config('database.default') === 'mysql') {
+            $this->loadMigrationsFrom(__DIR__.'/Support/Migrations/Mysql');
+        } else if (config('database.default') === 'pgsql') {
+            $this->loadMigrationsFrom(__DIR__.'/Support/Migrations/Postgres');
+        }
     }
 
     /**
-     * @inheritDoc
+     * @inheritdoc
      */
     protected function defineEnvironment($app): void
     {
-        $app['config']->set('database.default', 'mysql');
         $app['config']->set('database.connections.mysql.host', 'mysql');
+        $app['config']->set('database.connections.pgsql.host', 'postgres');
     }
 
     /**
