@@ -5,10 +5,12 @@ namespace Nevadskiy\Tree\Database;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\PostgresConnection;
+use Illuminate\Database\Query\Builder;
+use Nevadskiy\Tree\ValueObjects\Path;
 use RuntimeException;
 
 /**
- * @mixin \Illuminate\Database\Query\Builder
+ * @mixin Builder
  */
 class BuilderMixin
 {
@@ -27,9 +29,13 @@ class BuilderMixin
      */
     public function whereSelfOrAncestor(): callable
     {
-        return function (string $column, string $path, string $boolean = 'and') {
+        return function (string $column, Path $path, string $boolean = 'and') {
             if ($this->getConnection() instanceof MySqlConnection) {
-                return $this->where($column, 'like', $path, $boolean); // @todo perform whereIn on each segment.
+                return $this->where(function (Builder $query) use ($column, $path) {
+                    foreach ($path->segments() as $segment) {
+                        $query->orWhere($column, 'like', "%{$segment}");
+                    }
+                }, null, null, $boolean);
             } if ($this->getConnection() instanceof PostgresConnection) {
                 return $this->where($column, BuilderMixin::ANCESTOR, $path, $boolean);
             }
@@ -43,7 +49,7 @@ class BuilderMixin
      */
     public function orWhereSelfOrAncestor(): callable
     {
-        return function (string $column, string $path) {
+        return function (string $column, Path $path) {
             return $this->whereSelfOrAncestor($column, $path, 'or');
         };
     }

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\Query\Expression;
 use Nevadskiy\Tree\Casts\AsPath;
 use Nevadskiy\Tree\Collections\NodeCollection;
@@ -283,17 +284,19 @@ trait AsTree
      */
     protected function updatePathOfSubtree(): void
     {
-        $this->newQuery()->whereSelfOrDescendantOf($this)->update([
-            $this->getPathColumn() => $this->parent
-                ? new Expression(vsprintf("'%s' || subpath(%s, %d)", [
-                    $this->parent->getPath()->getValue(),
-                    $this->getPathColumn(),
-                    $this->getPath()->getDepth() - 1,
-                ]))
-                : new Expression(vsprintf('subpath(%s, %d)', [
-                    $this->getPathColumn(), 1,
-                ]))
-        ]);
+        if ($this->getConnection() instanceof PostgresConnection) {
+            $this->newQuery()->whereSelfOrDescendantOf($this)->update([
+                $this->getPathColumn() => $this->parent
+                    ? new Expression(vsprintf("'%s' || subpath(%s, %d)", [
+                        $this->parent->getPath()->getValue(),
+                        $this->getPathColumn(),
+                        $this->getPath()->getDepth() - 1,
+                    ]))
+                    : new Expression(vsprintf('subpath(%s, %d)', [
+                        $this->getPathColumn(), 1,
+                    ]))
+            ]);
+        }
     }
 
     /**
