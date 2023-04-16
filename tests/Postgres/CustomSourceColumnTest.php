@@ -1,12 +1,12 @@
 <?php
 
-namespace Nevadskiy\Tree\Tests;
+namespace Nevadskiy\Tree\Tests\Postgres;
 
 use Illuminate\Database\Eloquent\Model;
 use Nevadskiy\Tree\AsTree;
 use Nevadskiy\Tree\Tests\Support\Factories\CategoryFactory;
 
-class CustomSourceColumnTest extends TestCase
+class CustomSourceColumnPostgresTest extends PostgresTestCase
 {
     /**
      * @test

@@ -1,6 +1,6 @@
 <?php
 
-namespace Nevadskiy\Tree\Tests;
+namespace Nevadskiy\Tree\Tests\Postgres;
 
 use Illuminate\Database\Eloquent\Builder;
 use Nevadskiy\Tree\Exceptions\CircularReferenceException;
@@ -8,7 +8,7 @@ use Nevadskiy\Tree\Tests\Support\Factories\CategoryFactory;
 use Nevadskiy\Tree\Tests\Support\Models\Category;
 use RuntimeException;
 
-class CategoryTest extends TestCase
+class CategoryPostgresTest extends PostgresTestCase
 {
     /**
      * @test
