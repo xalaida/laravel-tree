@@ -256,17 +256,17 @@ trait AsTree
     }
 
     /**
-     * Determine if the node is moving when the model is not saved.
+     * Determine if the parent node is changing when the model is not saved.
      */
-    public function isMoving(): bool
+    public function isParentChanging(): bool
     {
         return $this->isDirty($this->getParentKeyName());
     }
 
     /**
-     * Determine if the node was moved when the model was last saved.
+     * Determine if the parent node is changed when the model is saved.
      */
-    public function wasMoved(): bool
+    public function isParentChanged(): bool
     {
         return $this->wasChanged($this->getParentKeyName());
     }
@@ -276,7 +276,7 @@ trait AsTree
      */
     protected function shouldUpdatePathOfSubtree(): bool
     {
-        return $this->wasMoved();
+        return $this->isParentChanged();
     }
 
     /**
@@ -304,7 +304,7 @@ trait AsTree
      */
     protected function shouldDetectCircularReference(): bool
     {
-        return $this->isMoving();
+        return $this->isParentChanging();
     }
 
     /**
