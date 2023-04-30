@@ -22,10 +22,12 @@ trait AsTree
 {
     /**
      * Boot the trait.
+     *
+     * @todo extract into observer.
      */
     protected static function bootAsTree(): void
     {
-        static::registerModelEvent($event = static::getEventForAssigningPath(), static function (self $model) use ($event) {
+        static::registerModelEvent($event = static::assignPathOnEvent(), static function (self $model) use ($event) {
             if ($model->shouldAssignPath()) {
                 $model->assignPath();
 
@@ -208,15 +210,27 @@ trait AsTree
     /**
      * Get the event when to assign the model's path.
      */
-    protected static function getEventForAssigningPath(): string
+    protected static function assignPathOnEvent(): string
+    {
+        if (static::assignPathDuringInsert()) {
+            return 'creating';
+        }
+
+        return 'created';
+    }
+
+    /**
+     * Determine whether the path should be assigned during insert.
+     */
+    protected static function assignPathDuringInsert(): bool
     {
         $model = new static();
 
         if ($model->getIncrementing() && $model->getPathSourceColumn() === $model->getKeyName()) {
-            return 'created';
+            return false;
         }
 
-        return 'creating';
+        return true;
     }
 
     /**
