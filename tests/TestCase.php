@@ -29,6 +29,8 @@ class TestCase extends OrchestraTestCase
      */
     protected function defineEnvironment($app): void
     {
+        $app['config']->set('database.default', 'mysql'); // @todo use dynamic connection.
+
         $app['config']->set('database.connections.mysql.host', 'mysql');
         $app['config']->set('database.connections.pgsql.host', 'postgres');
     }
