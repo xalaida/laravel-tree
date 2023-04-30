@@ -358,7 +358,7 @@ class CategoryTest extends TestCase
     /**
      * @test
      */
-    public function it_can_determine_whether_it_was_moved(): void
+    public function it_can_determine_whether_parent_is_changed(): void
     {
         if (config('database.default') === 'mysql') {
             $this->markTestSkipped('Does not work with MySQL.');
@@ -366,24 +366,24 @@ class CategoryTest extends TestCase
 
         $category = CategoryFactory::new()->create();
 
-        self::assertFalse($category->wasMoved());
+        self::assertFalse($category->isParentChanged());
 
         $anotherCategory = CategoryFactory::new()
             ->forParent($category)
             ->create();
 
-        self::assertFalse($anotherCategory->fresh()->wasMoved());
+        self::assertFalse($anotherCategory->fresh()->isParentChanged());
 
         $anotherCategory->parent()->associate(null);
         $anotherCategory->save();
 
-        self::assertTrue($anotherCategory->wasMoved());
+        self::assertTrue($anotherCategory->isParentChanged());
     }
 
     /**
      * @test
      */
-    public function it_can_determine_whether_it_is_moving(): void
+    public function it_can_determine_whether_parent_is_changing(): void
     {
         if (config('database.default') === 'mysql') {
             $this->markTestSkipped('Does not work with MySQL.');
@@ -391,21 +391,21 @@ class CategoryTest extends TestCase
 
         $category = CategoryFactory::new()->create();
 
-        self::assertFalse($category->isMoving());
+        self::assertFalse($category->isParentChanging());
 
         $anotherCategory = CategoryFactory::new()
             ->forParent($category)
             ->create();
 
-        self::assertFalse($anotherCategory->isMoving());
+        self::assertFalse($anotherCategory->isParentChanging());
 
         $anotherCategory->parent()->associate(null);
 
-        self::assertTrue($anotherCategory->isMoving());
+        self::assertTrue($anotherCategory->isParentChanging());
 
         $anotherCategory->save();
 
-        self::assertFalse($anotherCategory->isMoving());
+        self::assertFalse($anotherCategory->isParentChanging());
     }
 
     /**
