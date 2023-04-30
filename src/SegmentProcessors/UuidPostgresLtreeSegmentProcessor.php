@@ -9,6 +9,8 @@ class UuidPostgresLtreeSegmentProcessor implements SegmentProcessor
      */
     public function set(string $segment): string
     {
+        // @todo ensure only [A-Za-z0-9_] regex characters are allowed.
+
         return str_replace('-', '_', $segment);
     }
 
