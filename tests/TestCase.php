@@ -31,7 +31,7 @@ class TestCase extends OrchestraTestCase
     {
         $app['config']->set('database.default', 'mysql'); // @todo use dynamic connection.
 
-        $app['config']->set('database.connections.mysql.host', 'mysql');
+        $app['config']->set('database.connections.mysql.host', 'mysql'); // @todo improve perf
         $app['config']->set('database.connections.pgsql.host', 'postgres');
     }
 
