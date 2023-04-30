@@ -166,14 +166,15 @@ trait AsTree
      */
     public function scopeWhereDepth(Builder $query, int $depth, string $operator = '='): void
     {
+        // @todo use `root` scope when depth = 0
+
         if ($this->getConnection() instanceof PostgresConnection) {
-            $query->whereRaw(sprintf('nlevel(%s) %s ?', $this->getPathColumn(), $operator), [$depth]);
+            $query->whereRaw(vsprintf('%s %s ?', [
+                $this->compilePgsqlDepth($this->getPathColumn()), $operator
+            ]), [$depth]);
         } else if ($this->getConnection() instanceof MySqlConnection) {
-            $query->whereRaw(vsprintf("(length(%s) - length(replace(%s, '%s', ''))) + 1 %s ?", [
-                $this->getPathColumn(),
-                $this->getPathColumn(),
-                '.', // separator
-                $operator,
+            $query->whereRaw(vsprintf("%s %s ?", [
+                $this->compileMysqlDepth($this->getPathColumn()), $operator,
             ]), [$depth]);
         }
     }
@@ -186,14 +187,28 @@ trait AsTree
     protected function scopeOrderByDepth(Builder $query, string $direction = 'asc'): void
     {
         if ($this->getConnection() instanceof PostgresConnection) {
-            $query->orderBy(new Expression(sprintf('nlevel(%s)', $this->getPathColumn())), $direction);
+            $query->orderBy(new Expression($this->compilePgsqlDepth($this->getPathColumn())), $direction);
         } else if ($this->getConnection() instanceof MySqlConnection) {
-            $query->orderBy(new Expression(vsprintf("(length(%s) - length(replace(%s, '%s', ''))) + 1", [
-                $this->getPathColumn(),
-                $this->getPathColumn(),
-                '.' // separator
-            ])), $direction);
+            $query->orderBy(new Expression($this->compileMysqlDepth($this->getPathColumn())), $direction);
         }
+    }
+
+    /**
+     * Compile the PostgreSQL "depth" function for the given column.
+     */
+    protected function compilePgsqlDepth(string $column): string
+    {
+        return sprintf('nlevel(%s)', $column);
+    }
+
+    /**
+     * Compile the MySQL "depth" function for the given column.
+     */
+    protected function compileMysqlDepth(string $column, string $separator = '.'): string
+    {
+        return vsprintf("(length(%s) - length(replace(%s, '%s', ''))) + 1", [
+            $column, $column, $separator
+        ]);
     }
 
     /**
