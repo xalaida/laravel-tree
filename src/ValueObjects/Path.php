@@ -91,7 +91,7 @@ class Path
     }
 
     /**
-     * @inheritdoc
+     * Get string representation of the object.
      */
     public function __toString(): string
     {
