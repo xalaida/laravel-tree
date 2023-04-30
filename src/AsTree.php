@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\Query\Expression;
 use Nevadskiy\Tree\Casts\AsPath;
@@ -160,18 +161,39 @@ trait AsTree
 
     /**
      * Get items by the given depth level.
+     *
+     * @todo check performance on both mysql and pgsql connections.
      */
     public function scopeWhereDepth(Builder $query, int $depth, string $operator = '='): void
     {
-        $query->whereRaw(sprintf('nlevel(%s) %s ?', $this->getPathColumn(), $operator), [$depth]);
+        if ($this->getConnection() instanceof PostgresConnection) {
+            $query->whereRaw(sprintf('nlevel(%s) %s ?', $this->getPathColumn(), $operator), [$depth]);
+        } else if ($this->getConnection() instanceof MySqlConnection) {
+            $query->whereRaw(vsprintf("(length(%s) - length(replace(%s, '%s', ''))) + 1 %s ?", [
+                $this->getPathColumn(),
+                $this->getPathColumn(),
+                '.', // separator
+                $operator,
+            ]), [$depth]);
+        }
     }
 
     /**
      * Order models by the depth level.
+     *
+     * @todo check performance on both mysql and pgsql connections.
      */
     protected function scopeOrderByDepth(Builder $query, string $direction = 'asc'): void
     {
-        $query->orderBy(new Expression(sprintf('nlevel(%s)', $this->getPathColumn())), $direction);
+        if ($this->getConnection() instanceof PostgresConnection) {
+            $query->orderBy(new Expression(sprintf('nlevel(%s)', $this->getPathColumn())), $direction);
+        } else if ($this->getConnection() instanceof MySqlConnection) {
+            $query->orderBy(new Expression(vsprintf("(length(%s) - length(replace(%s, '%s', ''))) + 1", [
+                $this->getPathColumn(),
+                $this->getPathColumn(),
+                '.' // separator
+            ])), $direction);
+        }
     }
 
     /**
