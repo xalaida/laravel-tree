@@ -31,6 +31,7 @@ class BuilderMixin
     {
         return function (string $column, Path $path, string $boolean = 'and') {
             if ($this->getConnection() instanceof MySqlConnection) {
+                // @todo use whereIn for all path segments. (where path IN ["1.2.3.4", "1.2.3", "1.2", "1"]).
                 return $this->where(function (Builder $query) use ($column, $path) {
                     foreach ($path->segments() as $segment) {
                         $query->orWhere($column, 'like', "%{$segment}");
