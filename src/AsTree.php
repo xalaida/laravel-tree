@@ -47,8 +47,8 @@ trait AsTree
         });
 
         static::updated(static function (self $model) {
-            if ($model->shouldUpdateSubtreePath()) {
-                $model->updateSubtreePath();
+            if ($model->shouldRebuildSubtreePath()) {
+                $model->rebuildSubtreePath();
             }
         });
     }
@@ -308,17 +308,17 @@ trait AsTree
     }
 
     /**
-     * Determine whether the path of the node's subtree should be updated.
+     * Determine whether the path of the node's subtree should be rebuilt.
      */
-    protected function shouldUpdateSubtreePath(): bool
+    protected function shouldRebuildSubtreePath(): bool
     {
         return $this->isParentChanged();
     }
 
     /**
-     * Update the path of the node's subtree.
+     * Rebuild the path of the node's subtree.
      */
-    protected function updateSubtreePath(): void
+    protected function rebuildSubtreePath(): void
     {
         if ($this->getConnection() instanceof PostgresConnection) {
             $this->newQuery()->whereSelfOrDescendantOf($this)->update([
