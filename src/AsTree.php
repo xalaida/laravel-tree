@@ -284,11 +284,11 @@ trait AsTree
      */
     protected function buildPath(): Path
     {
-        if ($this->parent) {
-            return Path::concat($this->parent->getPath(), $this->getPathSource());
+        if ($this->isRoot()) {
+            return Path::concat($this->getPathSource());
         }
 
-        return Path::concat($this->getPathSource());
+        return Path::concat($this->parent->getPath(), $this->getPathSource());
     }
 
     /**
@@ -322,14 +322,14 @@ trait AsTree
     {
         if ($this->getConnection() instanceof PostgresConnection) {
             $this->newQuery()->whereSelfOrDescendantOf($this)->update([
-                $this->getPathColumn() => $this->parent
-                    ? new Expression(vsprintf("'%s' || subpath(%s, %d)", [
+                $this->getPathColumn() => $this->isRoot()
+                    ? new Expression(vsprintf('subpath(%s, %d)', [
+                        $this->getPathColumn(), 1,
+                    ]))
+                    : new Expression(vsprintf("'%s' || subpath(%s, %d)", [
                         $this->parent->getPath()->getValue(),
                         $this->getPathColumn(),
                         $this->getPath()->getDepth() - 1,
-                    ]))
-                    : new Expression(vsprintf('subpath(%s, %d)', [
-                        $this->getPathColumn(), 1,
                     ]))
             ]);
         }
@@ -358,7 +358,7 @@ trait AsTree
      */
     protected function hasCircularReference(): bool
     {
-        if (! $this->parent) {
+        if ($this->isRoot()) {
             return false;
         }
 
