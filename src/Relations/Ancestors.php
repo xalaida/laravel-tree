@@ -10,7 +10,7 @@ use Nevadskiy\Tree\AsTree;
 use Nevadskiy\Tree\Database\BuilderMixin;
 
 /**
- * @property AsTree $related
+ * @property AsTree related
  */
 class Ancestors extends Relation
 {
