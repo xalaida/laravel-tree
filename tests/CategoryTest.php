@@ -120,10 +120,6 @@ class CategoryTest extends TestCase
      */
     public function it_can_be_ordered_by_depth_asc(): void
     {
-        if (config('database.default') === 'mysql') {
-            $this->markTestSkipped('Does not work with MySQL.');
-        }
-
         $category = CategoryFactory::new()
             ->withAncestors(3)
             ->create();
@@ -140,10 +136,6 @@ class CategoryTest extends TestCase
      */
     public function it_can_be_ordered_by_depth_desc(): void
     {
-        if (config('database.default') === 'mysql') {
-            $this->markTestSkipped('Does not work with MySQL.');
-        }
-
         $category = CategoryFactory::new()
             ->withAncestors(3)
             ->create();
@@ -160,10 +152,6 @@ class CategoryTest extends TestCase
      */
     public function it_can_be_filtered_by_depth(): void
     {
-        if (config('database.default') === 'mysql') {
-            $this->markTestSkipped('Does not work with MySQL.');
-        }
-
         $category = CategoryFactory::new()
             ->withAncestors(2)
             ->create();
@@ -180,10 +168,6 @@ class CategoryTest extends TestCase
      */
     public function it_can_be_filtered_by_depth_using_custom_operator(): void
     {
-        if (config('database.default') === 'mysql') {
-            $this->markTestSkipped('Does not work with MySQL.');
-        }
-
         $category = CategoryFactory::new()
             ->withAncestors(2)
             ->create();
@@ -241,7 +225,6 @@ class CategoryTest extends TestCase
 
         $categories = Category::query()
             ->with('ancestors')
-            // ->orderByDepth()
             ->get();
 
         self::assertCount(3, $categories);
@@ -264,7 +247,6 @@ class CategoryTest extends TestCase
 
         $categories = Category::query()
             ->with('descendants')
-            // ->orderByDepth()
             ->get();
 
         self::assertCount(3, $categories);
@@ -413,6 +395,10 @@ class CategoryTest extends TestCase
      */
     public function it_can_filter_items_by_ancestors_using_where_has_method(): void
     {
+        if (config('database.default') === 'mysql') {
+            $this->markTestSkipped('Does not work with MySQL.');
+        }
+
         $clothing = CategoryFactory::new()->create(['name' => 'Clothing']);
 
         $accessories = CategoryFactory::new()
@@ -440,6 +426,10 @@ class CategoryTest extends TestCase
      */
     public function it_can_filter_items_by_descendants_using_where_has_method(): void
     {
+        if (config('database.default') === 'mysql') {
+            $this->markTestSkipped('Does not work with MySQL.');
+        }
+
         $clothing = CategoryFactory::new()->create(['name' => 'Clothing']);
 
         $accessories = CategoryFactory::new()
