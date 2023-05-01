@@ -100,6 +100,9 @@ class Path
 
     /**
      * The segment processor list.
+     *
+     * @todo use only for postgres.
+     * @todo extract into compilePostgresPath() function.
      */
     protected static function segmentProcessors(): array
     {

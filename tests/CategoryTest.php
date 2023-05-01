@@ -261,10 +261,6 @@ class CategoryTest extends TestCase
      */
     public function it_updates_path_of_subtree_when_parent_category_is_changed(): void
     {
-        if (config('database.default') === 'mysql') {
-            $this->markTestSkipped('Does not work with MySQL.');
-        }
-
         $category = CategoryFactory::new()
             ->withAncestors()
             ->create();
@@ -287,10 +283,6 @@ class CategoryTest extends TestCase
      */
     public function it_updates_path_of_subtree_when_category_moves_to_root(): void
     {
-        if (config('database.default') === 'mysql') {
-            $this->markTestSkipped('Does not work with MySQL.');
-        }
-
         $category = CategoryFactory::new()
             ->withAncestors(2)
             ->create();
@@ -342,10 +334,6 @@ class CategoryTest extends TestCase
      */
     public function it_can_determine_whether_parent_is_changed(): void
     {
-        if (config('database.default') === 'mysql') {
-            $this->markTestSkipped('Does not work with MySQL.');
-        }
-
         $category = CategoryFactory::new()->create();
 
         self::assertFalse($category->isParentChanged());
@@ -367,10 +355,6 @@ class CategoryTest extends TestCase
      */
     public function it_can_determine_whether_parent_is_changing(): void
     {
-        if (config('database.default') === 'mysql') {
-            $this->markTestSkipped('Does not work with MySQL.');
-        }
-
         $category = CategoryFactory::new()->create();
 
         self::assertFalse($category->isParentChanging());

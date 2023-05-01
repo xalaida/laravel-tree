@@ -338,16 +338,45 @@ trait AsTree
         if ($this->getConnection() instanceof PostgresConnection) {
             $this->newQuery()->whereSelfOrDescendantOf($this)->update([
                 $this->getPathColumn() => $this->isRoot()
-                    ? new Expression(vsprintf('subpath(%s, %d)', [
-                        $this->getPathColumn(), 1,
-                    ]))
+                    ? new Expression($this->compilePgsqlSubtreePath())
                     : new Expression(vsprintf("'%s' || subpath(%s, %d)", [
                         $this->parent->getPath()->getValue(),
                         $this->getPathColumn(),
-                        $this->getPath()->getDepth() - 1,
+                        $this->getPath()->getDepth() - 1, // @todo ensure this works correctly for level > 1
+                    ]))
+            ]);
+        } else if ($this->getConnection() instanceof MySqlConnection) {
+            $this->newQuery()->whereSelfOrDescendantOf($this)->update([
+                $this->getPathColumn() => $this->isRoot()
+                    ? new Expression($this->compileMysqlSubtreePath())
+                    : new Expression(vsprintf("CONCAT('%s', %s)", [
+                        $this->parent->getPath()->getValue() . '.',
+                        $this->compileMysqlSubtreePath()
                     ]))
             ]);
         }
+    }
+
+    /**
+     * Compile the MySQL path of the subtree.
+     */
+    protected function compileMysqlSubtreePath(): string
+    {
+        return vsprintf("substring(%s, locate('%s', %s))", [
+            $this->getPathColumn(),
+            $this->getPathSource(), // @todo use modified path source (uuid segment processor fails this part).
+            $this->getPathColumn()
+        ]);
+    }
+
+    /**
+     * Compile the PostgreSQL path of the subtree.
+     */
+    protected function compilePgsqlSubtreePath(): string
+    {
+        return vsprintf('subpath(%s, %d)', [
+            $this->getPathColumn(), 1,
+        ]);
     }
 
     /**
