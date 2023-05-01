@@ -350,7 +350,7 @@ trait AsTree
                 $this->getPathColumn() => $this->isRoot()
                     ? new Expression($this->compileMysqlSubtreePath())
                     : new Expression(vsprintf("CONCAT('%s', %s)", [
-                        $this->parent->getPath()->getValue() . '.',
+                        $this->parent->getPath()->getValue() . Path::SEPARATOR,
                         $this->compileMysqlSubtreePath()
                     ]))
             ]);
@@ -364,7 +364,7 @@ trait AsTree
     {
         return vsprintf("substring(%s, locate('%s', %s))", [
             $this->getPathColumn(),
-            $this->getPathSource(), // @todo use modified path source (uuid segment processor fails this part).
+            Path::concat($this->getPathSource())->getValue(),
             $this->getPathColumn()
         ]);
     }

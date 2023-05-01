@@ -10,7 +10,7 @@ class Path
     /**
      * The path's separator.
      */
-    protected const SEPARATOR = '.';
+    public const SEPARATOR = '.';
 
     /**
      * The path's value.
@@ -22,6 +22,7 @@ class Path
     /**
      * Build a path from the given segments.
      *
+     * @todo rename to `from` which makes more sense when using with single argument.
      * @param string|Path ...$segments
      */
     public static function concat(...$segments): Path
