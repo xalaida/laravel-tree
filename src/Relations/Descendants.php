@@ -90,6 +90,8 @@ class Descendants extends Relation
 
         $query->from("{$query->getModel()->getTable()} as descendants");
 
+        // @todo refactor with single whereColumnAncestor() method without "self".
+
         $query->whereColumnSelfOrDescendant(
             "descendants.{$this->related->getPathColumn()}",
             $this->related->qualifyColumn($this->related->getPathColumn())

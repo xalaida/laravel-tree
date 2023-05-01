@@ -47,6 +47,22 @@ class BuilderMixin
     }
 
     /**
+     * Add an ancestor where column clause to the query.
+     */
+    public function whereColumnSelfOrAncestor(): callable
+    {
+        return function (string $first, string $second, string $boolean = 'and') {
+            if ($this->getConnection() instanceof MySqlConnection) {
+                return $this->whereRaw(sprintf('find_in_set(%s, path_to_ancestor_set(%s))', $first, $second));
+            } if ($this->getConnection() instanceof PostgresConnection) {
+                return $this->whereColumn($first, BuilderMixin::ANCESTOR, $second, $boolean);
+            }
+
+            throw new RuntimeException('Driver is not supported'); // @todo
+        };
+    }
+
+    /**
      * Add an ancestor "or where" clause to the query.
      */
     public function orWhereSelfOrAncestor(): callable

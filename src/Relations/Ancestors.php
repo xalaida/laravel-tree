@@ -92,9 +92,10 @@ class Ancestors extends Relation
 
         $query->from("{$query->getModel()->getTable()} as ancestors");
 
-        $query->whereColumn(
+        // @todo refactor with single whereColumnAncestor() method without "self".
+
+        $query->whereColumnSelfOrAncestor(
             "ancestors.{$this->related->getPathColumn()}",
-            BuilderMixin::ANCESTOR,
             $this->related->qualifyColumn($this->related->getPathColumn())
         );
 
