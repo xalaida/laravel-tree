@@ -379,10 +379,6 @@ class CategoryTest extends TestCase
      */
     public function it_can_filter_items_by_ancestors_using_where_has_method(): void
     {
-        if (config('database.default') === 'mysql') {
-            $this->markTestSkipped('Does not work with MySQL.');
-        }
-
         $clothing = CategoryFactory::new()->create(['name' => 'Clothing']);
 
         $accessories = CategoryFactory::new()
@@ -395,7 +391,7 @@ class CategoryTest extends TestCase
 
         $categories = Category::query()
             ->whereHas('ancestors', function (Builder $query) {
-                $query->where('name', 'LIKE', 'Clo%');
+                $query->where('name', 'like', 'Clo%');
             })
             ->get();
 
@@ -422,7 +418,7 @@ class CategoryTest extends TestCase
 
         $categories = Category::query()
             ->whereHas('descendants', function (Builder $query) {
-                $query->where('name', 'LIKE', 'Bel%');
+                $query->where('name', 'like', 'Bel%');
             })
             ->get();
 

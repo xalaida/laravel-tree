@@ -127,7 +127,7 @@ class HasManyDeepTest extends TestCase
 
         $categories = Category::query()
             ->whereHas('products', function (Builder $query) {
-                $query->where('products.name', 'LIKE', '%watch');
+                $query->where('products.name', 'like', '%watch');
             })
             ->get();
 
