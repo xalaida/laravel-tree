@@ -124,6 +124,7 @@ class HasManyDeep extends HasMany
 
     /**
      * @inheritdoc
+     * @todo cover all cases with tests.
      */
     public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*']): Builder
     {
@@ -132,14 +133,15 @@ class HasManyDeep extends HasMany
         $hash = $this->getRelationCountHash();
 
         $query->join("{$this->parent->getTable()} as {$hash}", function (JoinClause $join) use ($hash) {
-            $join->on($this->getQualifiedParentKeyName(), "{$hash}.{$this->getLocalKeyName()}");
+            $join->on($this->getForeignKeyName(), "{$hash}.{$this->getLocalKeyName()}");
         });
 
-        $query->whereColumn(
+        $query->whereColumnSelfOrAncestor(
             $this->parent->qualifyColumn($this->parent->getPathColumn()),
-            BuilderMixin::ANCESTOR,
             "{$hash}.{$this->parent->getPathColumn()}"
         );
+
+        // @todo probably exclude "self".
 
         return $query;
     }
