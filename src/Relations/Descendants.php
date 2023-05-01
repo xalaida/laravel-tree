@@ -90,9 +90,8 @@ class Descendants extends Relation
 
         $query->from("{$query->getModel()->getTable()} as descendants");
 
-        $query->whereColumn(
+        $query->whereColumnSelfOrDescendant(
             "descendants.{$this->related->getPathColumn()}",
-            BuilderMixin::DESCENDANT,
             $this->related->qualifyColumn($this->related->getPathColumn())
         );
 

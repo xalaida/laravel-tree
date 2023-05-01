@@ -410,10 +410,6 @@ class CategoryTest extends TestCase
      */
     public function it_can_filter_items_by_descendants_using_where_has_method(): void
     {
-        if (config('database.default') === 'mysql') {
-            $this->markTestSkipped('Does not work with MySQL.');
-        }
-
         $clothing = CategoryFactory::new()->create(['name' => 'Clothing']);
 
         $accessories = CategoryFactory::new()

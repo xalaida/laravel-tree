@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Query\Expression;
 use Nevadskiy\Tree\ValueObjects\Path;
 use RuntimeException;
 
@@ -41,7 +42,7 @@ class BuilderMixin
                 return $this->where($column, BuilderMixin::ANCESTOR, $path, $boolean);
             }
 
-            throw new RuntimeException();
+            throw new RuntimeException('Driver is not supported'); // @todo
         };
     }
 
@@ -94,7 +95,23 @@ class BuilderMixin
                 return $this->where($column, BuilderMixin::DESCENDANT, $path, $boolean);
             }
 
-            throw new RuntimeException();
+            throw new RuntimeException('Driver is not supported'); // @todo
+        };
+    }
+
+    /**
+     * Add a descendant where column clause to the query.
+     */
+    public function whereColumnSelfOrDescendant(): callable
+    {
+        return function (string $first, string $second, string $boolean = 'and') {
+            if ($this->getConnection() instanceof MySqlConnection) {
+                return $this->whereColumn($first, 'like', new Expression(sprintf("concat(%s, '%%')", $second)), $boolean);
+            } if ($this->getConnection() instanceof PostgresConnection) {
+                return $this->whereColumn($first, BuilderMixin::DESCENDANT, $second, $boolean);
+            }
+
+            throw new RuntimeException('Driver is not supported'); // @todo
         };
     }
 
