@@ -12,6 +12,6 @@ class CircularReferenceException extends RuntimeException
      */
     public function __construct(Model $model)
     {
-        parent::__construct(sprintf('Circular reference detected for model "%s".', $model->getKey()));
+        parent::__construct(sprintf('Circular reference detected for model [%s].', $model->getKey()));
     }
 }
