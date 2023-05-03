@@ -2,9 +2,7 @@
 
 namespace Nevadskiy\Tree\Tests;
 
-use Illuminate\Database\Eloquent\Model;
-use Nevadskiy\Tree\AsTree;
-use Nevadskiy\Tree\Tests\Support\Factories\CategoryFactory;
+use Nevadskiy\Tree\Tests\Support\Factories\CategoryWithCustomSourceColumnFactory;
 
 class CustomSourceColumnTest extends TestCase
 {
@@ -27,21 +25,4 @@ class CustomSourceColumnTest extends TestCase
         self::assertCount(1, $parent->descendants);
         self::assertTrue($parent->descendants->first()->is($child));
     }
-}
-
-class CategoryWithCustomSourceColumn extends Model
-{
-    use AsTree;
-
-    protected $table = 'categories';
-
-    public function getPathSourceColumn(): string
-    {
-        return 'name';
-    }
-}
-
-class CategoryWithCustomSourceColumnFactory extends CategoryFactory
-{
-    protected $model = CategoryWithCustomSourceColumn::class;
 }

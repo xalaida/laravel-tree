@@ -5,6 +5,7 @@ namespace Nevadskiy\Tree\Tests;
 use Illuminate\Database\Eloquent\Builder;
 use Nevadskiy\Tree\Exceptions\CircularReferenceException;
 use Nevadskiy\Tree\Tests\Support\Factories\CategoryFactory;
+use Nevadskiy\Tree\Tests\Support\Factories\CategoryWithCustomSourceColumnFactory;
 use Nevadskiy\Tree\Tests\Support\Models\Category;
 use RuntimeException;
 
@@ -445,5 +446,22 @@ class CategoryTest extends TestCase
 
         self::assertCount(1, $categories);
         self::assertTrue($categories->contains($parent));
+    }
+
+    /**
+     * @test
+     */
+    public function it_does_not_include_categories_with_similar_id_to_its_ancestor(): void
+    {
+        $parent = CategoryWithCustomSourceColumnFactory::new()->create(['name' => '1']);
+
+        $similarParent = CategoryWithCustomSourceColumnFactory::new()->create(['name' => '11']);
+
+        $child = CategoryFactory::new()
+            ->forParent($parent)
+            ->create(['name' => '2']);
+
+        self::assertCount(1, $child->ancestors);
+        self::assertTrue($child->ancestors[0]->is($parent));
     }
 }

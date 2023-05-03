@@ -30,19 +30,14 @@ class BuilderMixin
      */
     public function whereSelfOrAncestor(): callable
     {
-        return function (string $column, Path $path, string $boolean = 'and') {
+        return function (string $column, string $path, string $boolean = 'and') {
             if ($this->getConnection() instanceof MySqlConnection) {
-                // @todo use whereIn for all path segments. (where path IN ["1.2.3.4", "1.2.3", "1.2", "1"]).
-                return $this->where(function (Builder $query) use ($column, $path) {
-                    foreach ($path->segments() as $segment) {
-                        $query->orWhere($column, 'like', "%{$segment}");
-                    }
-                }, null, null, $boolean);
+                return $this->whereRaw(sprintf('find_in_set(%s, path_to_ancestor_set(?))', $column), $path);
             } if ($this->getConnection() instanceof PostgresConnection) {
                 return $this->where($column, BuilderMixin::ANCESTOR, $path, $boolean);
             }
 
-            throw new RuntimeException('Driver is not supported'); // @todo
+            $this->throwNotSupportedException();
         };
     }
 
@@ -58,7 +53,7 @@ class BuilderMixin
                 return $this->whereColumn($first, BuilderMixin::ANCESTOR, $second, $boolean);
             }
 
-            throw new RuntimeException('Driver is not supported'); // @todo
+            $this->throwNotSupportedException();
         };
     }
 
@@ -111,7 +106,7 @@ class BuilderMixin
                 return $this->where($column, BuilderMixin::DESCENDANT, $path, $boolean);
             }
 
-            throw new RuntimeException('Driver is not supported'); // @todo
+            $this->throwNotSupportedException();
         };
     }
 
@@ -127,7 +122,7 @@ class BuilderMixin
                 return $this->whereColumn($first, BuilderMixin::DESCENDANT, $second, $boolean);
             }
 
-            throw new RuntimeException('Driver is not supported'); // @todo
+            $this->throwNotSupportedException();
         };
     }
 
@@ -166,5 +161,15 @@ class BuilderMixin
                 $model->getPath(),
             );
         };
+    }
+
+    /**
+     * Throw exception that the given database connection is not supported.
+     */
+    protected function throwNotSupportedException(): void
+    {
+        throw new RuntimeException(vsprintf('Database connection [%s] is not supported.', [
+            get_class($this->getConnection())
+        ]));
     }
 }
