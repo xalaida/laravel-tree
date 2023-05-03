@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Nevadskiy\Tree\AsTree;
-use Nevadskiy\Tree\Database\BuilderMixin;
 
 /**
  * @property AsTree related
@@ -88,23 +87,17 @@ class Ancestors extends Relation
      */
     public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*']): Builder
     {
-        $query->select($columns);
-
-        $query->from("{$query->getModel()->getTable()} as ancestors");
-
-        // @todo refactor with single whereColumnAncestor() method without "self".
-
-        $query->whereColumnSelfOrAncestor(
-            "ancestors.{$this->related->getPathColumn()}",
-            $this->related->qualifyColumn($this->related->getPathColumn())
-        );
-
-        $query->whereColumn(
-            "ancestors.{$this->related->getKeyName()}",
-            '!=',
-            $this->related->getQualifiedKeyName()
-        );
-
-        return $query;
+        return $query->select($columns)
+            ->from("{$query->getModel()->getTable()} as ancestors")
+            // @todo add a new `whereColumnAncestor()` method and use it instead.
+            ->whereColumnSelfOrAncestor(
+                "ancestors.{$this->related->getPathColumn()}",
+                $this->related->qualifyColumn($this->related->getPathColumn())
+            )
+            ->whereColumn(
+                "ancestors.{$this->related->getKeyName()}",
+                '!=',
+                $this->related->getQualifiedKeyName()
+            );
     }
 }
