@@ -4,8 +4,8 @@ namespace Nevadskiy\Tree\Tests;
 
 use Illuminate\Database\Eloquent\Model;
 use Nevadskiy\Tree\AsTree;
-use Nevadskiy\Tree\Tests\Support\Factories\CategoryFactory;
-use Nevadskiy\Tree\Tests\Support\Traits\Uuid;
+use Nevadskiy\Tree\Tests\App\Uuid;
+use Nevadskiy\Tree\Tests\Database\Factories\CategoryFactory;
 
 class UuidCategoryTest extends TestCase
 {

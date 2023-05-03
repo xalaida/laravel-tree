@@ -1,8 +1,8 @@
 <?php
 
-namespace Nevadskiy\Tree\Tests\Support\Factories;
+namespace Nevadskiy\Tree\Tests\Database\Factories;
 
-use Nevadskiy\Tree\Tests\Support\Models\CategoryWithCustomSourceColumn;
+use Nevadskiy\Tree\Tests\App\CategoryWithCustomSourceColumn;
 
 class CategoryWithCustomSourceColumnFactory extends CategoryFactory
 {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Nevadskiy\Tree\Tests\Support\Traits;
+namespace Nevadskiy\Tree\Tests\App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;

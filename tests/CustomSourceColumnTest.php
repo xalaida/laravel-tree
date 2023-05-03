@@ -2,7 +2,7 @@
 
 namespace Nevadskiy\Tree\Tests;
 
-use Nevadskiy\Tree\Tests\Support\Factories\CategoryWithCustomSourceColumnFactory;
+use Nevadskiy\Tree\Tests\Database\Factories\CategoryWithCustomSourceColumnFactory;
 
 class CustomSourceColumnTest extends TestCase
 {

@@ -15,7 +15,7 @@ class TestCase extends OrchestraTestCase
      */
     protected function defineDatabaseMigrations(): void
     {
-        $this->loadMigrationsFrom(__DIR__.'/database/migrations/'.config('database.default'));
+        $this->loadMigrationsFrom(__DIR__ . '/Database/migrations/' .config('database.default'));
     }
 
     /**

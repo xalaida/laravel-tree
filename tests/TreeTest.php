@@ -2,8 +2,8 @@
 
 namespace Nevadskiy\Tree\Tests;
 
-use Nevadskiy\Tree\Tests\Support\Factories\CategoryFactory;
-use Nevadskiy\Tree\Tests\Support\Models\Category;
+use Nevadskiy\Tree\Tests\App\Category;
+use Nevadskiy\Tree\Tests\Database\Factories\CategoryFactory;
 
 class TreeTest extends TestCase
 {
