@@ -32,7 +32,7 @@ class BuilderMixin
     {
         return function (string $column, string $path, string $boolean = 'and') {
             if ($this->getConnection() instanceof MySqlConnection) {
-                return $this->whereRaw(sprintf('find_in_set(%s, path_to_ancestor_set(?))', $column), $path);
+                return $this->whereRaw(sprintf('find_in_set(%s, path_to_ancestor_set(?))', $column), [$path], $boolean);
             }
 
             if ($this->getConnection() instanceof PostgresConnection) {
@@ -52,7 +52,7 @@ class BuilderMixin
     {
         return function (string $first, string $second, string $boolean = 'and') {
             if ($this->getConnection() instanceof MySqlConnection) {
-                return $this->whereRaw(sprintf('find_in_set(%s, path_to_ancestor_set(%s))', $first, $second));
+                return $this->whereRaw(sprintf('find_in_set(%s, path_to_ancestor_set(%s))', $first, $second), [], $boolean);
             }
 
             if ($this->getConnection() instanceof PostgresConnection) {
