@@ -13,26 +13,9 @@ class TestCase extends OrchestraTestCase
     /**
      * @inheritdoc
      */
-    protected function setUp(): void
+    protected function defineDatabaseMigrations(): void
     {
-        parent::setUp();
-
-        if (config('database.default') === 'mysql') {
-            $this->loadMigrationsFrom(__DIR__.'/Support/Migrations/Mysql');
-        } else if (config('database.default') === 'pgsql') {
-            $this->loadMigrationsFrom(__DIR__.'/Support/Migrations/Postgres');
-        }
-    }
-
-    /**
-     * @inheritdoc
-     */
-    protected function defineEnvironment($app): void
-    {
-        $app['config']->set('database.default', 'mysql'); // @todo use dynamic connection.
-
-        $app['config']->set('database.connections.mysql.host', 'mysql'); // @todo improve perf
-        $app['config']->set('database.connections.pgsql.host', 'postgres');
+        $this->loadMigrationsFrom(__DIR__.'/database/migrations/'.config('database.default'));
     }
 
     /**

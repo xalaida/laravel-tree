@@ -3,7 +3,6 @@ version: '3.9'
 services:
   composer:
     build:
-      context: ./
       dockerfile: .docker/php${PHP_VERSION:-7.3}/Dockerfile
     environment:
       COMPOSER_CACHE_DIR: /app/.cache/composer
@@ -13,45 +12,20 @@ services:
 
   phpunit:
     build:
-      context: ./
       dockerfile: .docker/php${PHP_VERSION:-7.3}/Dockerfile
     volumes:
       - ./:/app
     depends_on:
-      postgres:
-        condition: service_healthy
-      mysql:
+      database:
         condition: service_healthy
     entrypoint: vendor/bin/phpunit
 
-  postgres:
-    image: postgres:14.2-alpine
-    environment:
-      POSTGRES_DB: app
-      POSTGRES_USER: app
-      POSTGRES_PASSWORD: app
-    healthcheck:
-      test: ["CMD", "pg_isready", "-U", "app", "-d", "app"]
-      interval: 3s
-      timeout: 5s
-      retries: 5
-
-  mysql:
-    image: mysql:5.7
-    environment:
-      MYSQL_ALLOW_EMPTY_PASSWORD: true
-      MYSQL_USER: app
-      MYSQL_PASSWORD: app
-      MYSQL_DATABASE: app
-    healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
+  database:
+    build:
+      dockerfile: .docker/${DB_CONNECTION:-pgsql}/Dockerfile
 
   php-cs-fixer:
     build:
-      context: ./
       dockerfile: .docker/php${PHP_VERSION:-7.3}/Dockerfile
     volumes:
       - ./:/app
