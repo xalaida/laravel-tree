@@ -33,8 +33,6 @@ class TestCase extends OrchestraTestCase
 
         $app['config']->set('database.connections.mysql.host', 'mysql'); // @todo improve perf
         $app['config']->set('database.connections.pgsql.host', 'postgres');
-
-        // \Illuminate\Support\Facades\DB::enableQueryLog();
     }
 
     /**
