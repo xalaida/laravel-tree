@@ -2,13 +2,13 @@
 
 namespace Nevadskiy\Tree\Tests;
 
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Nevadskiy\Tree\TreeServiceProvider;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 
 class TestCase extends OrchestraTestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
     /**
      * @inheritdoc
