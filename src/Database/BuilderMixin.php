@@ -33,11 +33,15 @@ class BuilderMixin
         return function (string $column, string $path, string $boolean = 'and') {
             if ($this->getConnection() instanceof MySqlConnection) {
                 return $this->whereRaw(sprintf('find_in_set(%s, path_to_ancestor_set(?))', $column), $path);
-            } if ($this->getConnection() instanceof PostgresConnection) {
+            }
+
+            if ($this->getConnection() instanceof PostgresConnection) {
                 return $this->where($column, BuilderMixin::ANCESTOR, $path, $boolean);
             }
 
-            $this->throwNotSupportedException();
+            throw new RuntimeException(vsprintf('Database connection [%s] is not supported.', [
+                get_class($this->getConnection())
+            ]));
         };
     }
 
@@ -49,11 +53,15 @@ class BuilderMixin
         return function (string $first, string $second, string $boolean = 'and') {
             if ($this->getConnection() instanceof MySqlConnection) {
                 return $this->whereRaw(sprintf('find_in_set(%s, path_to_ancestor_set(%s))', $first, $second));
-            } if ($this->getConnection() instanceof PostgresConnection) {
+            }
+
+            if ($this->getConnection() instanceof PostgresConnection) {
                 return $this->whereColumn($first, BuilderMixin::ANCESTOR, $second, $boolean);
             }
 
-            $this->throwNotSupportedException();
+            throw new RuntimeException(vsprintf('Database connection [%s] is not supported.', [
+                get_class($this->getConnection())
+            ]));
         };
     }
 
@@ -102,11 +110,15 @@ class BuilderMixin
         return function (string $column, string $path, string $boolean = 'and') {
             if ($this->getConnection() instanceof MySqlConnection) {
                 return $this->where($column, 'like', "{$path}%", $boolean);
-            } if ($this->getConnection() instanceof PostgresConnection) {
+            }
+
+            if ($this->getConnection() instanceof PostgresConnection) {
                 return $this->where($column, BuilderMixin::DESCENDANT, $path, $boolean);
             }
 
-            $this->throwNotSupportedException();
+            throw new RuntimeException(vsprintf('Database connection [%s] is not supported.', [
+                get_class($this->getConnection())
+            ]));
         };
     }
 
@@ -118,11 +130,14 @@ class BuilderMixin
         return function (string $first, string $second, string $boolean = 'and') {
             if ($this->getConnection() instanceof MySqlConnection) {
                 return $this->whereColumn($first, 'like', new Expression(sprintf("concat(%s, '%%')", $second)), $boolean);
-            } if ($this->getConnection() instanceof PostgresConnection) {
+            }
+            if ($this->getConnection() instanceof PostgresConnection) {
                 return $this->whereColumn($first, BuilderMixin::DESCENDANT, $second, $boolean);
             }
 
-            $this->throwNotSupportedException();
+            throw new RuntimeException(vsprintf('Database connection [%s] is not supported.', [
+                get_class($this->getConnection())
+            ]));
         };
     }
 
@@ -161,15 +176,5 @@ class BuilderMixin
                 $model->getPath(),
             );
         };
-    }
-
-    /**
-     * Throw exception that the given database connection is not supported.
-     */
-    protected function throwNotSupportedException(): void
-    {
-        throw new RuntimeException(vsprintf('Database connection [%s] is not supported.', [
-            get_class($this->getConnection())
-        ]));
     }
 }
