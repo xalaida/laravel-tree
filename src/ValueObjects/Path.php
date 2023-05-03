@@ -22,10 +22,9 @@ class Path
     /**
      * Build a path from the given segments.
      *
-     * @todo rename to `from` which makes more sense when using with single argument.
      * @param string|Path ...$segments
      */
-    public static function concat(...$segments): Path
+    public static function from(...$segments): Path
     {
         return new static(
             collect($segments)

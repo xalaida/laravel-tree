@@ -300,10 +300,10 @@ trait AsTree
     protected function buildPath(): Path
     {
         if ($this->isRoot()) {
-            return Path::concat($this->getPathSource());
+            return Path::from($this->getPathSource());
         }
 
-        return Path::concat($this->parent->getPath(), $this->getPathSource());
+        return Path::from($this->parent->getPath(), $this->getPathSource());
     }
 
     /**
@@ -364,7 +364,7 @@ trait AsTree
     {
         return vsprintf("substring(%s, locate('%s', %s))", [
             $this->getPathColumn(),
-            Path::concat($this->getPathSource())->getValue(),
+            Path::from($this->getPathSource())->getValue(),
             $this->getPathColumn()
         ]);
     }
