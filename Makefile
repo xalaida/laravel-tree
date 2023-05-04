@@ -33,7 +33,7 @@ composer.uninstall:
 
 # Run PHPUnit
 phpunit:
-	docker compose run --rm phpunit --stop-on-failure
+	docker compose run --rm phpunit
 
 # Alias to run PHPUnit
 test: phpunit
