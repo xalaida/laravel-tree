@@ -30,8 +30,9 @@ class BuilderMixin
      */
     public function whereSelfOrAncestor(): callable
     {
-        return function (string $column, string $path, string $boolean = 'and') {
+        return function (string $column, Path $path, string $boolean = 'and') {
             if ($this->getConnection() instanceof MySqlConnection) {
+                // @todo use ancestorPaths() method instead.
                 return $this->whereRaw(sprintf('find_in_set(%s, path_to_ancestor_set(?))', $column), [$path], $boolean);
             }
 
@@ -107,7 +108,7 @@ class BuilderMixin
      */
     public function whereSelfOrDescendant(): callable
     {
-        return function (string $column, string $path, string $boolean = 'and') {
+        return function (string $column, Path $path, string $boolean = 'and') {
             if ($this->getConnection() instanceof MySqlConnection) {
                 return $this->where($column, 'like', "{$path}%", $boolean);
             }
@@ -129,7 +130,7 @@ class BuilderMixin
     {
         return function (string $first, string $second, string $boolean = 'and') {
             if ($this->getConnection() instanceof MySqlConnection) {
-                return $this->whereColumn($first, 'like', new Expression(sprintf("concat(%s, '%%')", $second)), $boolean);
+                return $this->whereColumn($first, 'like', new Expression("concat({$second}, '%')"), $boolean);
             }
             if ($this->getConnection() instanceof PostgresConnection) {
                 return $this->whereColumn($first, BuilderMixin::DESCENDANT, $second, $boolean);
@@ -146,7 +147,7 @@ class BuilderMixin
      */
     public function orWhereSelfOrDescendant(): callable
     {
-        return function (string $column, string $path) {
+        return function (string $column, Path $path) {
             return $this->whereSelfOrDescendant($column, $path, 'or');
         };
     }
