@@ -3,7 +3,6 @@
 namespace Nevadskiy\Tree\ValueObjects;
 
 use Illuminate\Support\Collection;
-use Nevadskiy\Tree\SegmentTransformer\UuidPostgresLtreeSegmentTransformer;
 
 class Path
 {
@@ -33,10 +32,6 @@ class Path
                         return $segment->getValue();
                     }
 
-                    foreach (static::segmentTransformer() as $transformer) {
-                        $segment = $transformer->set($segment);
-                    }
-
                     return $segment;
                 })
                 ->implode(self::SEPARATOR)
@@ -64,14 +59,7 @@ class Path
      */
     public function segments(): Collection
     {
-        return collect($this->explode())
-            ->map(function (string $segment) {
-                foreach (static::segmentTransformer() as $transformer) {
-                    $segment = $transformer->get($segment);
-                }
-
-                return $segment;
-            });
+        return collect($this->explode());
     }
 
     /**
@@ -114,18 +102,5 @@ class Path
     public function __toString(): string
     {
         return $this->getValue();
-    }
-
-    /**
-     * The segment transformer list.
-     *
-     * @todo use only for postgres.
-     * @todo extract into compilePostgresPath() function.
-     */
-    protected static function segmentTransformer(): array
-    {
-        return [
-            new UuidPostgresLtreeSegmentTransformer()
-        ];
     }
 }

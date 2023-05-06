@@ -3,6 +3,8 @@
 namespace Nevadskiy\Tree\Casts;
 
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\PostgresConnection;
 use Nevadskiy\Tree\ValueObjects\Path;
 use RuntimeException;
 
@@ -17,6 +19,11 @@ class AsPath implements CastsAttributes
             return null;
         }
 
+        // @todo apply only for uuid source column.
+        if ($this->usesPgsqlConnection($model)) {
+            $value = str_replace('_', '-', $value);
+        }
+
         return new Path($value);
     }
 
@@ -29,10 +36,24 @@ class AsPath implements CastsAttributes
             return null;
         }
 
-        if ($value instanceof Path) {
-            return $value->getValue();
+        if (! $value instanceof Path) {
+            throw new RuntimeException(sprintf('The "%s" is not a Path instance.', $key));
         }
 
-        throw new RuntimeException(sprintf('The "%s" is not a Path instance.', $key));
+        // @todo apply only for uuid source column.
+        if ($this->usesPgsqlConnection($model)) {
+            // @todo does not work with mixed separators "_" + "-".
+            return str_replace('_', '-', $value->getValue());
+        }
+
+        return $value->getValue();
+    }
+
+    /**
+     * Determine if the model uses the PostgreSQL connection.
+     */
+    protected function usesPgsqlConnection(Model $model): bool
+    {
+        return $model->getConnection() instanceof PostgresConnection;
     }
 }
