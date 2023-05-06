@@ -241,6 +241,9 @@ class BuilderMixin
         };
     }
 
+    /**
+     * Rebuild paths of the subtree according to the parent path.
+     */
     public function rebuildPaths(): callable
     {
         return function (string $column, Path $path, ?Path $parentPath = null) {
@@ -293,7 +296,7 @@ class BuilderMixin
     }
 
     /**
-     * Compile the MySQL path of the subtree.
+     * Compile the MySQL sub path function.
      */
     protected function compileMysqlSubPath(): callable
     {
@@ -312,7 +315,7 @@ class BuilderMixin
     }
 
     /**
-     * Compile the PostgreSQL path of the subtree.
+     * Compile the PostgreSQL sub path function.
      */
     protected function compilePgsqlSubPath(): callable
     {

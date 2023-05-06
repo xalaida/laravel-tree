@@ -284,7 +284,7 @@ trait AsTree
     }
 
     /**
-     * Determine whether the path of the node's subtree should be rebuilt.
+     * Determine whether the paths of the subtree should be rebuilt.
      */
     protected function shouldRebuildSubtreePaths(): bool
     {
@@ -292,7 +292,7 @@ trait AsTree
     }
 
     /**
-     * Rebuild the path of the node's subtree.
+     * Rebuild the paths of the subtree.
      */
     protected function rebuildSubtreePaths(): void
     {
@@ -301,7 +301,9 @@ trait AsTree
             ->rebuildPaths(
                 $this->getPathColumn(),
                 $this->getPath(),
-                $this->isRoot() ? null : $this->parent->getPath(),
+                $this->isRoot()
+                    ? null
+                    : $this->parent->getPath(),
             );
     }
 
