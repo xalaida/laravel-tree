@@ -6,9 +6,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\MySqlConnection;
-use Illuminate\Database\PostgresConnection;
-use Illuminate\Database\Query\Expression;
 use Nevadskiy\Tree\Casts\AsPath;
 use Nevadskiy\Tree\Collections\NodeCollection;
 use Nevadskiy\Tree\Exceptions\CircularReferenceException;
@@ -18,13 +15,12 @@ use Nevadskiy\Tree\ValueObjects\Path;
 
 /**
  * @mixin Model
+ * @property-read AsTree|null parent
  */
 trait AsTree
 {
     /**
      * Boot the trait.
-     *
-     * @todo extract into observer.
      */
     protected static function bootAsTree(): void
     {
@@ -32,6 +28,7 @@ trait AsTree
             if ($model->shouldAssignPath()) {
                 $model->assignPath();
 
+                // @todo refactor.
                 if ($event === 'created' && $model->hasPath()) {
                     $model->newQuery()->whereKey($model->getKey())->toBase()->update([
                         $model->getPathColumn() => $model->getPath()->getValue(),
@@ -47,8 +44,8 @@ trait AsTree
         });
 
         static::updated(static function (self $model) {
-            if ($model->shouldRebuildPaths()) {
-                $model->rebuildPaths();
+            if ($model->shouldRebuildSubtreePaths()) {
+                $model->rebuildSubtreePaths();
             }
         });
     }
@@ -289,7 +286,7 @@ trait AsTree
     /**
      * Determine whether the path of the node's subtree should be rebuilt.
      */
-    protected function shouldRebuildPaths(): bool
+    protected function shouldRebuildSubtreePaths(): bool
     {
         return $this->isParentChanged();
     }
@@ -297,50 +294,11 @@ trait AsTree
     /**
      * Rebuild the path of the node's subtree.
      */
-    protected function rebuildPaths(): void
+    protected function rebuildSubtreePaths(): void
     {
-        if ($this->getConnection() instanceof PostgresConnection) {
-            $this->newQuery()->whereSelfOrDescendantOf($this)->update([
-                $this->getPathColumn() => $this->isRoot()
-                    ? new Expression($this->compilePgsqlPaths())
-                    : new Expression(vsprintf("'%s' || subpath(%s, %d)", [
-                        $this->parent->getPath()->getValue(),
-                        $this->getPathColumn(),
-                        $this->getPath()->getDepth() - 1, // @todo ensure this works correctly for level > 1
-                    ]))
-            ]);
-        } else if ($this->getConnection() instanceof MySqlConnection) {
-            $this->newQuery()->whereSelfOrDescendantOf($this)->update([
-                $this->getPathColumn() => $this->isRoot()
-                    ? new Expression($this->compileMysqlPaths())
-                    : new Expression(vsprintf("CONCAT('%s', %s)", [
-                        $this->parent->getPath()->getValue() . Path::SEPARATOR,
-                        $this->compileMysqlPaths()
-                    ]))
-            ]);
-        }
-    }
-
-    /**
-     * Compile the MySQL path of the subtree.
-     */
-    protected function compileMysqlPaths(): string
-    {
-        return vsprintf("substring(%s, locate('%s', %s))", [
-            $this->getPathColumn(),
-            Path::from($this->getPathSource())->getValue(),
-            $this->getPathColumn()
-        ]);
-    }
-
-    /**
-     * Compile the PostgreSQL path of the subtree.
-     */
-    protected function compilePgsqlPaths(): string
-    {
-        return vsprintf('subpath(%s, %d)', [
-            $this->getPathColumn(), 1,
-        ]);
+        $this->newQuery()
+            ->whereSelfOrDescendantOf($this)
+            ->rebuildPaths($this->getPathColumn(), $this->isRoot() ? null : $this->parent->getPath(), $this->getPathSource());
     }
 
     /**

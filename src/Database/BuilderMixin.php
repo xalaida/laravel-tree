@@ -31,12 +31,12 @@ class BuilderMixin
     public function whereSelfOrAncestor(): callable
     {
         return function (string $column, Path $path, string $boolean = 'and') {
-            if ($this->getConnection() instanceof MySqlConnection) {
-                return $this->whereIn($column, $path->getPathSet(), $boolean);
-            }
-
             if ($this->getConnection() instanceof PostgresConnection) {
                 return $this->where($column, BuilderMixin::ANCESTOR, $path, $boolean);
+            }
+
+            if ($this->getConnection() instanceof MySqlConnection) {
+                return $this->whereIn($column, $path->getPathSet(), $boolean);
             }
 
             throw new RuntimeException(vsprintf('Database connection [%s] is not supported.', [
@@ -51,12 +51,12 @@ class BuilderMixin
     public function whereColumnSelfOrAncestor(): callable
     {
         return function (string $first, string $second, string $boolean = 'and') {
-            if ($this->getConnection() instanceof MySqlConnection) {
-                return $this->whereRaw(sprintf('find_in_set(%s, path_to_ancestor_set(%s))', $first, $second), [], $boolean);
-            }
-
             if ($this->getConnection() instanceof PostgresConnection) {
                 return $this->whereColumn($first, BuilderMixin::ANCESTOR, $second, $boolean);
+            }
+
+            if ($this->getConnection() instanceof MySqlConnection) {
+                return $this->whereRaw(sprintf('find_in_set(%s, path_to_ancestor_set(%s))', $first, $second), [], $boolean);
             }
 
             throw new RuntimeException(vsprintf('Database connection [%s] is not supported.', [
@@ -108,12 +108,12 @@ class BuilderMixin
     public function whereSelfOrDescendant(): callable
     {
         return function (string $column, Path $path, string $boolean = 'and') {
-            if ($this->getConnection() instanceof MySqlConnection) {
-                return $this->where($column, 'like', "{$path}%", $boolean);
-            }
-
             if ($this->getConnection() instanceof PostgresConnection) {
                 return $this->where($column, BuilderMixin::DESCENDANT, $path, $boolean);
+            }
+
+            if ($this->getConnection() instanceof MySqlConnection) {
+                return $this->where($column, 'like', "{$path}%", $boolean);
             }
 
             throw new RuntimeException(vsprintf('Database connection [%s] is not supported.', [
@@ -128,12 +128,12 @@ class BuilderMixin
     public function whereColumnSelfOrDescendant(): callable
     {
         return function (string $first, string $second, string $boolean = 'and') {
-            if ($this->getConnection() instanceof MySqlConnection) {
-                return $this->whereColumn($first, 'like', new Expression("concat({$second}, '%')"), $boolean);
-            }
-
             if ($this->getConnection() instanceof PostgresConnection) {
                 return $this->whereColumn($first, BuilderMixin::DESCENDANT, $second, $boolean);
+            }
+
+            if ($this->getConnection() instanceof MySqlConnection) {
+                return $this->whereColumn($first, 'like', new Expression("concat({$second}, '%')"), $boolean);
             }
 
             throw new RuntimeException(vsprintf('Database connection [%s] is not supported.', [
@@ -202,7 +202,7 @@ class BuilderMixin
     /**
      * Order records by a depth.
      */
-    protected function orderByPathDepth(): callable
+    public function orderByPathDepth(): callable
     {
         return function (string $column, string $direction = 'asc') {
             if ($this->getConnection() instanceof PostgresConnection) {
@@ -238,6 +238,89 @@ class BuilderMixin
             return new Expression(vsprintf("(length(%s) - length(replace(%s, '%s', ''))) + 1", [
                 $column, $column, $separator
             ]));
+        };
+    }
+
+    public function rebuildPaths(): callable
+    {
+        return function (string $column, ?Path $path = null, string $source = null) {
+            if ($this->getConnection() instanceof PostgresConnection) {
+                return $this->update([
+                    $column => is_null($path)
+                        ? new Expression($this->compilePgsqlSubPath($column, 1))
+                        : new Expression($this->compilePgsqlConcat(
+                            sprintf("'%s'", $path->getValue() . Path::SEPARATOR),
+                            $this->compilePgsqlSubPath($column, $path->getDepth()) // @todo ensure it works with depth > 1
+                        ))
+                ]);
+            }
+
+            if ($this->getConnection() instanceof MySqlConnection) {
+                return $this->update([
+                    $column => is_null($path)
+                        ? new Expression($this->compileMysqlSubPath($column, $source)) // @todo use depth argument.
+                        : new Expression($this->compileMysqlConcat(
+                            sprintf("'%s'", $path->getValue() . Path::SEPARATOR),
+                            $this->compileMysqlSubPath($column, $source) // @todo use depth argument.
+                        ))
+                ]);
+            }
+
+            throw new RuntimeException(vsprintf('Database connection [%s] is not supported.', [
+                get_class($this->getConnection())
+            ]));
+        };
+    }
+
+    /**
+     * Compile the PostgreSQL concat function.
+     *
+     * @todo refactor using array arguments.
+     * @todo automatically format arguments if it is string or expression.
+     */
+    protected function compilePgsqlConcat(): callable
+    {
+        return function (string $first, string $second) {
+            return vsprintf("%s || %s", [$first, $second]);
+        };
+    }
+
+    /**
+     * Compile the MySQL concat function.
+     *
+     * @todo refactor using array arguments.
+     * @todo automatically format arguments if it is string or expression.
+     */
+    protected function compileMysqlConcat(): callable
+    {
+        return function (string $first, string $second) {
+            return vsprintf("CONCAT(%s, %s)", [$first, $second]);
+        };
+    }
+
+    /**
+     * Compile the MySQL path of the subtree.
+     */
+    protected function compileMysqlSubPath(): callable
+    {
+        // @todo find dot separator by depth index.
+
+        return function (string $column, string $source) {
+            return vsprintf("substring(%s, locate('%s', %s))", [
+                $column,
+                Path::from($source)->getValue(),
+                $column
+            ]);
+        };
+    }
+
+    /**
+     * Compile the PostgreSQL path of the subtree.
+     */
+    protected function compilePgsqlSubPath(): callable
+    {
+        return function (string $column, int $depth) {
+            return vsprintf('subpath(%s, %d)', [$column, $depth]);
         };
     }
 }
