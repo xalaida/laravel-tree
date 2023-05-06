@@ -9,9 +9,6 @@ return new class () extends Migration {
      */
     public function up(): void
     {
-        // @todo create function only if not exists.
-        $this->down();
-
         DB::unprepared(<<<'SQL'
             create function path_to_ancestor_set(input varchar(255))
             returns varchar(255)
