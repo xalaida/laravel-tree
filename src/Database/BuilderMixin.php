@@ -131,6 +131,7 @@ class BuilderMixin
             if ($this->getConnection() instanceof MySqlConnection) {
                 return $this->whereColumn($first, 'like', new Expression("concat({$second}, '%')"), $boolean);
             }
+
             if ($this->getConnection() instanceof PostgresConnection) {
                 return $this->whereColumn($first, BuilderMixin::DESCENDANT, $second, $boolean);
             }
@@ -185,10 +186,36 @@ class BuilderMixin
     {
         return function (string $column, int $depth, string $operator = '=') {
             if ($this->getConnection() instanceof PostgresConnection) {
-                $this->where($this->compilePgsqlDepth($column), $operator, $depth);
-            } else if ($this->getConnection() instanceof MySqlConnection) {
-                $this->where($this->compileMysqlDepth($column), $operator, $depth);
+                return $this->where($this->compilePgsqlDepth($column), $operator, $depth);
             }
+
+            if ($this->getConnection() instanceof MySqlConnection) {
+                return $this->where($this->compileMysqlDepth($column), $operator, $depth);
+            }
+
+            throw new RuntimeException(vsprintf('Database connection [%s] is not supported.', [
+                get_class($this->getConnection())
+            ]));
+        };
+    }
+
+    /**
+     * Order records by a depth.
+     */
+    protected function orderByPathDepth(): callable
+    {
+        return function (string $column, string $direction = 'asc') {
+            if ($this->getConnection() instanceof PostgresConnection) {
+                return $this->orderBy($this->compilePgsqlDepth($column), $direction);
+            }
+
+            if ($this->getConnection() instanceof MySqlConnection) {
+                return $this->orderBy($this->compileMysqlDepth($column), $direction);
+            }
+
+            throw new RuntimeException(vsprintf('Database connection [%s] is not supported.', [
+                get_class($this->getConnection())
+            ]));
         };
     }
 

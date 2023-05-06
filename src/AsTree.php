@@ -169,34 +169,10 @@ trait AsTree
 
     /**
      * Order records by a depth.
-     *
-     * @todo check performance on both mysql and pgsql connections.
      */
     protected function scopeOrderByDepth(Builder $query, string $direction = 'asc'): void
     {
-        if ($this->getConnection() instanceof PostgresConnection) {
-            $query->orderBy(new Expression($this->compilePgsqlDepth($this->getPathColumn())), $direction);
-        } else if ($this->getConnection() instanceof MySqlConnection) {
-            $query->orderBy(new Expression($this->compileMysqlDepth($this->getPathColumn())), $direction);
-        }
-    }
-
-    /**
-     * Compile the PostgreSQL "depth" function for the given column.
-     */
-    protected function compilePgsqlDepth(string $column): string
-    {
-        return sprintf('nlevel(%s)', $column);
-    }
-
-    /**
-     * Compile the MySQL "depth" function for the given column.
-     */
-    protected function compileMysqlDepth(string $column, string $separator = '.'): string
-    {
-        return vsprintf("(length(%s) - length(replace(%s, '%s', ''))) + 1", [
-            $column, $column, $separator
-        ]);
+        $query->orderByPathDepth($this->getPathColumn(), $direction);
     }
 
     /**
