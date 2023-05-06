@@ -1,8 +1,8 @@
 <?php
 
-namespace Nevadskiy\Tree\SegmentProcessors;
+namespace Nevadskiy\Tree\SegmentTransformer;
 
-class UuidPostgresLtreeSegmentProcessor implements SegmentProcessor
+class UuidPostgresLtreeSegmentTransformer implements SegmentTransformer
 {
     /**
      * Replace dashes to match requirements of the Postgres Ltree extension.

@@ -3,7 +3,7 @@
 namespace Nevadskiy\Tree\ValueObjects;
 
 use Illuminate\Support\Collection;
-use Nevadskiy\Tree\SegmentProcessors\UuidPostgresLtreeSegmentProcessor;
+use Nevadskiy\Tree\SegmentTransformer\UuidPostgresLtreeSegmentTransformer;
 
 class Path
 {
@@ -33,8 +33,8 @@ class Path
                         return $segment->getValue();
                     }
 
-                    foreach (static::segmentProcessors() as $processor) {
-                        $segment = $processor->set($segment);
+                    foreach (static::segmentTransformer() as $transformer) {
+                        $segment = $transformer->set($segment);
                     }
 
                     return $segment;
@@ -66,8 +66,8 @@ class Path
     {
         return collect($this->explode())
             ->map(function (string $segment) {
-                foreach (static::segmentProcessors() as $processor) {
-                    $segment = $processor->get($segment);
+                foreach (static::segmentTransformer() as $transformer) {
+                    $segment = $transformer->get($segment);
                 }
 
                 return $segment;
@@ -117,15 +117,15 @@ class Path
     }
 
     /**
-     * The segment processor list.
+     * The segment transformer list.
      *
      * @todo use only for postgres.
      * @todo extract into compilePostgresPath() function.
      */
-    protected static function segmentProcessors(): array
+    protected static function segmentTransformer(): array
     {
         return [
-            new UuidPostgresLtreeSegmentProcessor()
+            new UuidPostgresLtreeSegmentTransformer()
         ];
     }
 }

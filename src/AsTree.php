@@ -47,8 +47,8 @@ trait AsTree
         });
 
         static::updated(static function (self $model) {
-            if ($model->shouldRebuildSubtreePath()) {
-                $model->rebuildSubtreePath();
+            if ($model->shouldRebuildPaths()) {
+                $model->rebuildPaths();
             }
         });
     }
@@ -325,7 +325,7 @@ trait AsTree
     /**
      * Determine whether the path of the node's subtree should be rebuilt.
      */
-    protected function shouldRebuildSubtreePath(): bool
+    protected function shouldRebuildPaths(): bool
     {
         return $this->isParentChanged();
     }
@@ -333,12 +333,12 @@ trait AsTree
     /**
      * Rebuild the path of the node's subtree.
      */
-    protected function rebuildSubtreePath(): void
+    protected function rebuildPaths(): void
     {
         if ($this->getConnection() instanceof PostgresConnection) {
             $this->newQuery()->whereSelfOrDescendantOf($this)->update([
                 $this->getPathColumn() => $this->isRoot()
-                    ? new Expression($this->compilePgsqlSubtreePath())
+                    ? new Expression($this->compilePgsqlPaths())
                     : new Expression(vsprintf("'%s' || subpath(%s, %d)", [
                         $this->parent->getPath()->getValue(),
                         $this->getPathColumn(),
@@ -348,10 +348,10 @@ trait AsTree
         } else if ($this->getConnection() instanceof MySqlConnection) {
             $this->newQuery()->whereSelfOrDescendantOf($this)->update([
                 $this->getPathColumn() => $this->isRoot()
-                    ? new Expression($this->compileMysqlSubtreePath())
+                    ? new Expression($this->compileMysqlPaths())
                     : new Expression(vsprintf("CONCAT('%s', %s)", [
                         $this->parent->getPath()->getValue() . Path::SEPARATOR,
-                        $this->compileMysqlSubtreePath()
+                        $this->compileMysqlPaths()
                     ]))
             ]);
         }
@@ -360,7 +360,7 @@ trait AsTree
     /**
      * Compile the MySQL path of the subtree.
      */
-    protected function compileMysqlSubtreePath(): string
+    protected function compileMysqlPaths(): string
     {
         return vsprintf("substring(%s, locate('%s', %s))", [
             $this->getPathColumn(),
@@ -372,7 +372,7 @@ trait AsTree
     /**
      * Compile the PostgreSQL path of the subtree.
      */
-    protected function compilePgsqlSubtreePath(): string
+    protected function compilePgsqlPaths(): string
     {
         return vsprintf('subpath(%s, %d)', [
             $this->getPathColumn(), 1,

@@ -1,8 +1,8 @@
 <?php
 
-namespace Nevadskiy\Tree\SegmentProcessors;
+namespace Nevadskiy\Tree\SegmentTransformer;
 
-interface SegmentProcessor
+interface SegmentTransformer
 {
     /**
      * Transform the path segment before saving to database.
