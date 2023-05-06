@@ -177,4 +177,40 @@ class BuilderMixin
             );
         };
     }
+
+    /**
+     * Filter records by the given depth level.
+     */
+    public function wherePathDepth(): callable
+    {
+        return function (string $column, int $depth, string $operator = '=') {
+            if ($this->getConnection() instanceof PostgresConnection) {
+                $this->where($this->compilePgsqlDepth($column), $operator, $depth);
+            } else if ($this->getConnection() instanceof MySqlConnection) {
+                $this->where($this->compileMysqlDepth($column), $operator, $depth);
+            }
+        };
+    }
+
+    /**
+     * Compile the PostgreSQL "depth" function for the given column.
+     */
+    protected function compilePgsqlDepth(): callable
+    {
+        return function (string $column) {
+            return new Expression(sprintf('nlevel(%s)', $column));
+        };
+    }
+
+    /**
+     * Compile the MySQL "depth" function for the given column.
+     */
+    protected function compileMysqlDepth(): callable
+    {
+        return function (string $column, string $separator = Path::SEPARATOR) {
+            return new Expression(vsprintf("(length(%s) - length(replace(%s, '%s', ''))) + 1", [
+                $column, $column, $separator
+            ]));
+        };
+    }
 }

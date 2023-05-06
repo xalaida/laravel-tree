@@ -144,9 +144,9 @@ trait AsTree
     }
 
     /**
-     * Get the root items.
+     * Filter records by root.
      */
-    public function scopeWhereRoot(Builder $query): void
+    protected function scopeWhereRoot(Builder $query): void
     {
         $query->whereNull($this->getParentKeyName());
     }
@@ -160,27 +160,15 @@ trait AsTree
     }
 
     /**
-     * Get items by the given depth level.
-     *
-     * @todo check performance on both mysql and pgsql connections.
+     * Filter records by the given depth level.
      */
     public function scopeWhereDepth(Builder $query, int $depth, string $operator = '='): void
     {
-        // @todo use `root` scope when depth = 0
-
-        if ($this->getConnection() instanceof PostgresConnection) {
-            $query->whereRaw(vsprintf('%s %s ?', [
-                $this->compilePgsqlDepth($this->getPathColumn()), $operator
-            ]), [$depth]);
-        } else if ($this->getConnection() instanceof MySqlConnection) {
-            $query->whereRaw(vsprintf("%s %s ?", [
-                $this->compileMysqlDepth($this->getPathColumn()), $operator,
-            ]), [$depth]);
-        }
+        $query->wherePathDepth($this->getPathColumn(), $depth, $operator);
     }
 
     /**
-     * Order models by the depth level.
+     * Order records by a depth.
      *
      * @todo check performance on both mysql and pgsql connections.
      */
@@ -212,7 +200,7 @@ trait AsTree
     }
 
     /**
-     * Order models by the depth level.
+     * Order records by a depth descending.
      */
     protected function scopeOrderByDepthDesc(Builder $query): void
     {
