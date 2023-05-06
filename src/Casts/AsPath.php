@@ -43,7 +43,7 @@ class AsPath implements CastsAttributes
         // @todo apply only for uuid source column.
         if ($this->usesPgsqlConnection($model)) {
             // @todo does not work with mixed separators "_" + "-".
-            return str_replace('_', '-', $value->getValue());
+            return str_replace('-', '_', $value->getValue());
         }
 
         return $value->getValue();
