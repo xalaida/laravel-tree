@@ -248,10 +248,10 @@ class BuilderMixin
                 return $this->update([
                     $column => is_null($parentPath)
                         ? new Expression($this->compilePgsqlSubPath($column, $path->getDepth()))
-                        : new Expression($this->compilePgsqlConcat(
+                        : new Expression($this->compilePgsqlConcat([
                             sprintf("'%s'", $parentPath->getValue() . Path::SEPARATOR),
                             $this->compilePgsqlSubPath($column, $path->getDepth())
-                        ))
+                        ]))
                 ]);
             }
 
@@ -259,10 +259,10 @@ class BuilderMixin
                 return $this->update([
                     $column => is_null($parentPath)
                         ? new Expression($this->compileMysqlSubPath($column, $path->getDepth()))
-                        : new Expression($this->compileMysqlConcat(
+                        : new Expression($this->compileMysqlConcat([
                             sprintf("'%s'", $parentPath->getValue() . Path::SEPARATOR),
                             $this->compileMysqlSubPath($column, $path->getDepth())
-                        ))
+                        ]))
                 ]);
             }
 
@@ -274,27 +274,21 @@ class BuilderMixin
 
     /**
      * Compile the PostgreSQL concat function.
-     *
-     * @todo refactor using array arguments.
-     * @todo automatically format arguments if it is string or expression.
      */
     protected function compilePgsqlConcat(): callable
     {
-        return function (string $first, string $second) {
-            return vsprintf("%s || %s", [$first, $second]);
+        return function (array $values) {
+            return implode(' || ', $values);
         };
     }
 
     /**
      * Compile the MySQL concat function.
-     *
-     * @todo refactor using array arguments.
-     * @todo automatically format arguments if it is string or expression.
      */
     protected function compileMysqlConcat(): callable
     {
-        return function (string $first, string $second) {
-            return vsprintf("CONCAT(%s, %s)", [$first, $second]);
+        return function (array $values) {
+            return sprintf("CONCAT(%s)", implode(', ', $values));
         };
     }
 
