@@ -91,6 +91,24 @@ class Path
     }
 
     /**
+     * Convert the path into path set of ancestors including self.
+     *
+     * @example ["1", "1.2", "1.2.3", "1.2.3.4"]
+     */
+    public function getPathSet(): array
+    {
+        $paths = [];
+
+        $parts = $this->explode();
+
+        for ($index = 0, $length = count($parts); $index < $length; $index++) {
+            $paths[] = implode(self::SEPARATOR, array_slice($parts, 0, $index));
+        }
+
+        return $paths;
+    }
+
+    /**
      * Get string representation of the object.
      */
     public function __toString(): string

@@ -32,8 +32,7 @@ class BuilderMixin
     {
         return function (string $column, Path $path, string $boolean = 'and') {
             if ($this->getConnection() instanceof MySqlConnection) {
-                // @todo use ancestorPaths() method instead.
-                return $this->whereRaw(sprintf('find_in_set(%s, path_to_ancestor_set(?))', $column), [$path], $boolean);
+                return $this->whereIn($column, $path->getPathSet(), $boolean);
             }
 
             if ($this->getConnection() instanceof PostgresConnection) {
