@@ -252,7 +252,7 @@ class BuilderMixin
                     $column => is_null($parentPath)
                         ? new Expression($this->compilePgsqlSubPath($column, $path->getDepth()))
                         : new Expression($this->compilePgsqlConcat([
-                            sprintf("'%s'", $parentPath->getValue() . Path::SEPARATOR),
+                            sprintf("'%s'", $parentPath->getValue()),
                             $this->compilePgsqlSubPath($column, $path->getDepth())
                         ]))
                 ]);
@@ -324,7 +324,7 @@ class BuilderMixin
                 return $column;
             }
 
-            return vsprintf('subpath(%s, %d)', [$column, $depth]);
+            return vsprintf('subpath(%s, %d)', [$column, $depth - 1]);
         };
     }
 }
