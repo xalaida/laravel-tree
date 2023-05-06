@@ -13,6 +13,8 @@ services:
   phpunit:
     build:
       dockerfile: .docker/php${PHP_VERSION:-7.3}/Dockerfile
+    env_file:
+      - .env
     volumes:
       - ./:/app
     depends_on:
