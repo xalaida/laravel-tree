@@ -263,11 +263,11 @@ class CategoryTest extends TestCase
     public function it_updates_path_of_subtree_when_parent_category_is_changed(): void
     {
         $category = CategoryFactory::new()
-            ->withAncestors()
+            ->withAncestors(2)
             ->create();
 
         $anotherCategory = CategoryFactory::new()
-            ->withAncestors()
+            ->withAncestors(2)
             ->create();
 
         $category->parent->parent()->associate($anotherCategory);
@@ -275,8 +275,8 @@ class CategoryTest extends TestCase
 
         $category->refresh();
 
-        self::assertEquals(4, $category->getPath()->getDepth());
-        self::assertEquals($anotherCategory->parent->getPathSource(), $category->getPath()->segments()[0]);
+        self::assertEquals(5, $category->getPath()->getDepth());
+        self::assertEquals($anotherCategory->parent->parent->getPathSource(), $category->getPath()->segments()[0]);
     }
 
     /**

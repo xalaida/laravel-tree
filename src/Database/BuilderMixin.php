@@ -243,25 +243,25 @@ class BuilderMixin
 
     public function rebuildPaths(): callable
     {
-        return function (string $column, ?Path $path = null, string $source = null) {
+        return function (string $column, Path $path, ?Path $parentPath = null) {
             if ($this->getConnection() instanceof PostgresConnection) {
                 return $this->update([
-                    $column => is_null($path)
-                        ? new Expression($this->compilePgsqlSubPath($column, 1))
+                    $column => is_null($parentPath)
+                        ? new Expression($this->compilePgsqlSubPath($column, $path->getDepth()))
                         : new Expression($this->compilePgsqlConcat(
-                            sprintf("'%s'", $path->getValue() . Path::SEPARATOR),
-                            $this->compilePgsqlSubPath($column, $path->getDepth()) // @todo ensure it works with depth > 1
+                            sprintf("'%s'", $parentPath->getValue() . Path::SEPARATOR),
+                            $this->compilePgsqlSubPath($column, $path->getDepth())
                         ))
                 ]);
             }
 
             if ($this->getConnection() instanceof MySqlConnection) {
                 return $this->update([
-                    $column => is_null($path)
-                        ? new Expression($this->compileMysqlSubPath($column, $source)) // @todo use depth argument.
+                    $column => is_null($parentPath)
+                        ? new Expression($this->compileMysqlSubPath($column, $path->getDepth()))
                         : new Expression($this->compileMysqlConcat(
-                            sprintf("'%s'", $path->getValue() . Path::SEPARATOR),
-                            $this->compileMysqlSubPath($column, $source) // @todo use depth argument.
+                            sprintf("'%s'", $parentPath->getValue() . Path::SEPARATOR),
+                            $this->compileMysqlSubPath($column, $path->getDepth())
                         ))
                 ]);
             }
@@ -303,13 +303,16 @@ class BuilderMixin
      */
     protected function compileMysqlSubPath(): callable
     {
-        // @todo find dot separator by depth index.
+        return function (string $column, int $depth) {
+            if ($depth === 1) {
+                return $column;
+            }
 
-        return function (string $column, string $source) {
-            return vsprintf("substring(%s, locate('%s', %s))", [
+            return vsprintf("substring(%s, length(substring_index(%s, '%s', %d)) + 2)", [
                 $column,
-                Path::from($source)->getValue(),
-                $column
+                $column,
+                Path::SEPARATOR,
+                $depth - 1
             ]);
         };
     }
@@ -320,6 +323,10 @@ class BuilderMixin
     protected function compilePgsqlSubPath(): callable
     {
         return function (string $column, int $depth) {
+            if ($depth === 1) {
+                return $column;
+            }
+
             return vsprintf('subpath(%s, %d)', [$column, $depth]);
         };
     }

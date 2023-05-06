@@ -298,7 +298,11 @@ trait AsTree
     {
         $this->newQuery()
             ->whereSelfOrDescendantOf($this)
-            ->rebuildPaths($this->getPathColumn(), $this->isRoot() ? null : $this->parent->getPath(), $this->getPathSource());
+            ->rebuildPaths(
+                $this->getPathColumn(),
+                $this->getPath(),
+                $this->isRoot() ? null : $this->parent->getPath(),
+            );
     }
 
     /**
