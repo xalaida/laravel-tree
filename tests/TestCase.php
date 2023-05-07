@@ -3,9 +3,7 @@
 namespace Nevadskiy\Tree\Tests;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use InvalidArgumentException;
 use Nevadskiy\Tree\TreeServiceProvider;
-use Orchestra\Testbench\Database\MigrateProcessor;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 
 class TestCase extends OrchestraTestCase
@@ -33,32 +31,5 @@ class TestCase extends OrchestraTestCase
         return [
             TreeServiceProvider::class,
         ];
-    }
-
-    /**
-     * Define hooks to migrate the database before each test without rollback after.
-     */
-    protected function loadMigrationsWithoutRollbackFrom($paths): void
-    {
-        $migrator = new MigrateProcessor($this, $this->resolvePackageMigrationsOptions($paths));
-        $migrator->up();
-
-        $this->resetApplicationArtisanCommands($this->app);
-    }
-
-    /**
-     * Resolve Package Migrations Artisan command options.
-     */
-    protected function resolvePackageMigrationsOptions($paths = []): array
-    {
-        $options = \is_array($paths) ? $paths : ['--path' => $paths];
-
-        if (isset($options['--realpath']) && ! \is_bool($options['--realpath'])) {
-            throw new InvalidArgumentException('Expect --realpath to be a boolean.');
-        }
-
-        $options['--realpath'] = true;
-
-        return $options;
     }
 }
