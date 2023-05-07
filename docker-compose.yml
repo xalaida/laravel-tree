@@ -15,10 +15,6 @@ services:
       dockerfile: .docker/php${PHP_VERSION:-7.3}/Dockerfile
     volumes:
       - ./:/app
-    environment:
-      DB_DATABASE: ${DB_DATABASE:-app}
-      DB_USERNAME: ${DB_USERNAME:-app}
-      DB_PASSWORD: ${DB_PASSWORD:-app}
     entrypoint: vendor/bin/phpunit
 
   php-cs-fixer:

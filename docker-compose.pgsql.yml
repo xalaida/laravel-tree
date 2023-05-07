@@ -13,9 +13,9 @@ services:
     image: postgres:14.2-alpine
     tmpfs: /var/lib/postgresql/data
     environment:
-      POSTGRES_DB: ${DB_DATABASE:-app}
-      POSTGRES_USER: ${DB_USERNAME:-app}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-app}
+      POSTGRES_DB: app
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: app
     healthcheck:
       test: pg_isready
       interval: 5s
