@@ -20,7 +20,7 @@ class TestCase extends OrchestraTestCase
      */
     protected function defineDatabaseMigrations(): void
     {
-         $this->loadMigrationsWithoutRollbackFrom(__DIR__ . '/Database/migrations/' . config('database.default'));
+        $this->loadMigrationsWithoutRollbackFrom(__DIR__ . '/Database/migrations/' . config('database.default'));
     }
 
     /**
