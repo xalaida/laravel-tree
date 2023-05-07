@@ -62,12 +62,14 @@ jobs:
     runs-on: ubuntu-latest
 
     services:
-      postgres:
+      pgsql:
         image: postgres:14.2
         env:
           POSTGRES_DB: app
           POSTGRES_USER: app
           POSTGRES_PASSWORD: app
+        ports:
+          - 5432:5432
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -107,8 +109,8 @@ jobs:
         run: vendor/bin/phpunit
         env:
           DB_CONNECTION: pgsql
-          DB_HOST: postgres
-          DB_PORT: 5432
+          DB_HOST: 127.0.0.1
+          DB_PORT: ${{ job.services.pgsql.ports[5432] }}
 
 #  coverage:
 #    name: Analyze code coverage
