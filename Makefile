@@ -6,7 +6,11 @@ DB_CONNECTION ?= pgsql
 COMPOSE ?= -f docker-compose.yml -f docker-compose.${DB_CONNECTION}.yml
 
 # Install the app
-install: build composer.install
+install: env build composer.install
+
+# Copy file with environment variables
+env:
+	cp .env.dist .env
 
 # Start docker containers
 up:
