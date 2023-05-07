@@ -38,7 +38,7 @@ class TestCase extends OrchestraTestCase
     /**
      * Define hooks to migrate the database before each test without rollback after.
      */
-    private function loadMigrationsWithoutRollbackFrom($paths): void
+    protected function loadMigrationsWithoutRollbackFrom($paths): void
     {
         $migrator = new MigrateProcessor($this, $this->resolvePackageMigrationsOptions($paths));
         $migrator->up();
@@ -49,7 +49,7 @@ class TestCase extends OrchestraTestCase
     /**
      * Resolve Package Migrations Artisan command options.
      */
-    private function resolvePackageMigrationsOptions($paths = []): array
+    protected function resolvePackageMigrationsOptions($paths = []): array
     {
         $options = \is_array($paths) ? $paths : ['--path' => $paths];
 
