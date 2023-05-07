@@ -28,16 +28,10 @@ Fork and clone the project:
 git clone https://github.com/nevadskiy/laravel-tree.git
 ```
 
-Build docker containers:
+Install the project:
 
 ```bash
-docker compose build
-```
-
-Install the composer dependencies:
-
-```bash
-docker compose run --rm composer install
+make install
 ```
 
 ## Running Tests
@@ -45,7 +39,7 @@ docker compose run --rm composer install
 To run tests, execute the following command:
 
 ```bash
-docker compose run --rm phpunit
+make test
 ```
 
 ## Code Style
