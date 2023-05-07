@@ -29,9 +29,6 @@ jobs:
           - php: '8.2'
             dependencies: 'lowest'
 
-    env:
-      DB_CONNECTION: mysql
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -54,6 +51,10 @@ jobs:
 
       - name: Run PHPUnit
         run: vendor/bin/phpunit
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: localhost
+          DB_PORT: ${{ job.services.mysql.ports[3306] }}
 
 #  coverage:
 #    name: Analyze code coverage
