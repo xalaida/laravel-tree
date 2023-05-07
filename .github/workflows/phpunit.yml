@@ -3,6 +3,62 @@ name: PHPUnit
 on: [push, pull_request]
 
 jobs:
+  pgsql_test:
+    name: Run PHPUnit on PHP ${{ matrix.php }} and PostgreSQL with ${{ matrix.dependencies }} dependencies
+
+    runs-on: ubuntu-latest
+
+    services:
+      pgsql:
+        image: postgres:14.2
+        env:
+          POSTGRES_DB: app
+          POSTGRES_USER: app
+          POSTGRES_PASSWORD: app
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['7.3', '7.4', '8.0', '8.1', '8.2']
+        dependencies: ['lowest', 'highest']
+        exclude:
+          - php: '8.2'
+            dependencies: 'lowest'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: pdo, pdo_pgsql
+          tools: composer:v2
+          coverage: none
+
+      - name: Install Composer dependencies with the highest version
+        if: matrix.dependencies == 'highest'
+        run: composer update --no-interaction --no-progress
+
+      - name: Install Composer dependencies with the lowest stable version
+        if: matrix.dependencies == 'lowest'
+        run: composer update --no-interaction --no-progress --prefer-lowest --prefer-stable
+
+      - name: Run PHPUnit
+        run: vendor/bin/phpunit
+        env:
+          DB_CONNECTION: pgsql
+          DB_HOST: 127.0.0.1
+          DB_PORT: ${{ job.services.pgsql.ports[5432] }}
+
   mysql_test:
     name: Run PHPUnit on PHP ${{ matrix.php }} and MySQL with ${{ matrix.dependencies }} dependencies
 
@@ -60,8 +116,8 @@ jobs:
           DB_HOST: 127.0.0.1
           DB_PORT: ${{ job.services.mysql.ports[3306] }}
 
-  pgsql_test:
-    name: Run PHPUnit on PHP ${{ matrix.php }} and PostgreSQL with ${{ matrix.dependencies }} dependencies
+  coverage:
+    name: Analyze code coverage
 
     runs-on: ubuntu-latest
 
@@ -80,15 +136,6 @@ jobs:
           --health-timeout 5s
           --health-retries 5
 
-    strategy:
-      fail-fast: false
-      matrix:
-        php: ['7.3', '7.4', '8.0', '8.1', '8.2']
-        dependencies: ['lowest', 'highest']
-        exclude:
-          - php: '8.2'
-            dependencies: 'lowest'
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -96,46 +143,20 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php }}
+          php-version: 7.3
           extensions: pdo, pdo_pgsql
           tools: composer:v2
-          coverage: none
+          coverage: pcov
 
-      - name: Install Composer dependencies with the highest version
-        if: matrix.dependencies == 'highest'
+      - name: Install Composer dependencies
         run: composer update --no-interaction --no-progress
 
-      - name: Install Composer dependencies with the lowest stable version
-        if: matrix.dependencies == 'lowest'
-        run: composer update --no-interaction --no-progress --prefer-lowest --prefer-stable
-
-      - name: Run PHPUnit
-        run: vendor/bin/phpunit
+      - name: Run PHPUnit with a coverage analysis
+        run: vendor/bin/phpunit --coverage-clover coverage.xml
         env:
           DB_CONNECTION: pgsql
           DB_HOST: 127.0.0.1
           DB_PORT: ${{ job.services.pgsql.ports[5432] }}
 
-#  coverage:
-#    name: Analyze code coverage
-#
-#    runs-on: ubuntu-latest
-#
-#    env:
-#      PHP_VERSION: 7.3
-#
-#    steps:
-#      - name: Checkout code
-#        uses: actions/checkout@v2
-#
-#      - name: Build containers
-#        run: docker compose build
-#
-#      - name: Install Composer dependencies
-#        run: docker compose run composer update --no-interaction --no-progress
-#
-#      - name: Run PHPUnit with a coverage analysis
-#        run: docker compose run phpunit --coverage-clover coverage.xml
-#
-#      - name: Upload the coverage report
-#        uses: codecov/codecov-action@v3
+      - name: Upload the coverage report
+        uses: codecov/codecov-action@v3
