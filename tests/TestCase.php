@@ -4,6 +4,7 @@ namespace Nevadskiy\Tree\Tests;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Nevadskiy\Tree\TreeServiceProvider;
+use Orchestra\Testbench\Database\MigrateProcessor;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 
 class TestCase extends OrchestraTestCase
@@ -32,4 +33,16 @@ class TestCase extends OrchestraTestCase
             TreeServiceProvider::class,
         ];
     }
+
+    /**
+     * Define hooks to migrate the database before each test without rollback after.
+     */
+    private function loadMigrationsWithoutRollbackFrom($paths): void
+    {
+        $migrator = new MigrateProcessor($this, $this->resolvePackageMigrationsOptions($paths));
+        $migrator->up();
+
+        $this->resetApplicationArtisanCommands($this->app);
+    }
+
 }
