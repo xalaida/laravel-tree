@@ -17,10 +17,10 @@ services:
       - .env
     volumes:
       - ./:/app
+    entrypoint: vendor/bin/phpunit
     depends_on:
       database:
         condition: service_healthy
-    entrypoint: vendor/bin/phpunit
 
   database:
     build:
