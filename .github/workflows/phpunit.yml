@@ -3,10 +3,22 @@ name: PHPUnit
 on: [ push, pull_request ]
 
 jobs:
-  test:
-    name: Run PHPUnit on PHP ${{ matrix.php }} with ${{ matrix.dependencies }} dependencies
+  mysql_test:
+    name: Run PHPUnit on PHP ${{ matrix.php }} and MySQL with ${{ matrix.dependencies }} dependencies
 
     runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_USER: app
+          MYSQL_PASSWORD: app
+          MYSQL_DATABASE: app
+        ports:
+          - 33306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
 
     strategy:
       fail-fast: false
@@ -17,47 +29,49 @@ jobs:
           - php: '8.2'
             dependencies: 'lowest'
 
-    env:
-      PHP_VERSION: ${{ matrix.php }}
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Build containers
-        run: docker compose build
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: pdo, pdo_mysql
+          tools: composer:v2
+          coverage: none
 
       - name: Install Composer dependencies with the highest version
         if: matrix.dependencies == 'highest'
-        run: docker compose run composer update --no-interaction --no-progress
+        run: composer update --no-interaction --no-progress
 
       - name: Install Composer dependencies with the lowest stable version
         if: matrix.dependencies == 'lowest'
-        run: docker compose run composer update --no-interaction --no-progress --prefer-lowest --prefer-stable
+        run: composer update --no-interaction --no-progress --prefer-lowest --prefer-stable
 
       - name: Run PHPUnit
-        run: docker compose run phpunit
+        run: vendor/bin/phpunit
 
-  coverage:
-    name: Analyze code coverage
-
-    runs-on: ubuntu-latest
-
-    env:
-      PHP_VERSION: 7.3
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Build containers
-        run: docker compose build
-
-      - name: Install Composer dependencies
-        run: docker compose run composer update --no-interaction --no-progress
-
-      - name: Run PHPUnit with a coverage analysis
-        run: docker compose run phpunit --coverage-clover coverage.xml
-
-      - name: Upload the coverage report
-        uses: codecov/codecov-action@v3
+#  coverage:
+#    name: Analyze code coverage
+#
+#    runs-on: ubuntu-latest
+#
+#    env:
+#      PHP_VERSION: 7.3
+#
+#    steps:
+#      - name: Checkout code
+#        uses: actions/checkout@v2
+#
+#      - name: Build containers
+#        run: docker compose build
+#
+#      - name: Install Composer dependencies
+#        run: docker compose run composer update --no-interaction --no-progress
+#
+#      - name: Run PHPUnit with a coverage analysis
+#        run: docker compose run phpunit --coverage-clover coverage.xml
+#
+#      - name: Upload the coverage report
+#        uses: codecov/codecov-action@v3
