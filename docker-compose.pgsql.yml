@@ -3,8 +3,8 @@ version: '3.9'
 services:
   phpunit:
     environment:
-      DB_CONNECTION: pgsql
-      DB_HOST: pgsql
+      DB_CONNECTION: ${DB_CONNECTION:-pgsql}
+      DB_HOST: ${DB_HOST:-pgsql}
     depends_on:
       pgsql:
         condition: service_healthy
@@ -13,9 +13,9 @@ services:
     image: postgres:14.2-alpine
     tmpfs: /var/lib/postgresql/data
     environment:
-      POSTGRES_DB: app
-      POSTGRES_USER: app
-      POSTGRES_PASSWORD: app
+      POSTGRES_DB: ${DB_DATABASE:-app}
+      POSTGRES_USER: ${DB_USERNAME:-app}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-app}
     healthcheck:
       test: pg_isready
       interval: 5s

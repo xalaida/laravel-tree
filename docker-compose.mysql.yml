@@ -3,8 +3,8 @@ version: '3.9'
 services:
   phpunit:
     environment:
-      DB_CONNECTION: mysql
-      DB_HOST: mysql
+      DB_CONNECTION: ${DB_CONNECTION:-mysql}
+      DB_HOST: ${DB_HOST:-mysql}
     depends_on:
       mysql:
         condition: service_healthy
@@ -14,9 +14,9 @@ services:
     tmpfs: /var/lib/mysql
     environment:
       MYSQL_ALLOW_EMPTY_PASSWORD: true
-      MYSQL_DATABASE: app
-      MYSQL_USER: app
-      MYSQL_PASSWORD: app
+      MYSQL_DATABASE: ${DB_DATABASE:-app}
+      MYSQL_USER: ${DB_USERNAME:-app}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-app}
     healthcheck:
       test: mysql --user=$${MYSQL_USER} --password=$${MYSQL_PASSWORD} --silent --execute 'SHOW DATABASES;'
       interval: 10s

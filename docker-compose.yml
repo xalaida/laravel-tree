@@ -13,18 +13,13 @@ services:
   phpunit:
     build:
       dockerfile: .docker/php${PHP_VERSION:-7.3}/Dockerfile
-    env_file:
-      - .env
     volumes:
       - ./:/app
+    environment:
+      DB_DATABASE: ${DB_DATABASE:-app}
+      DB_USERNAME: ${DB_USERNAME:-app}
+      DB_PASSWORD: ${DB_PASSWORD:-app}
     entrypoint: vendor/bin/phpunit
-    depends_on:
-      database:
-        condition: service_healthy
-
-  database:
-    build:
-      dockerfile: .docker/${DB_CONNECTION:-pgsql}/Dockerfile
 
   php-cs-fixer:
     build:
