@@ -41,8 +41,6 @@ class TreeServiceProvider extends ServiceProvider
      */
     private function registerLtreeType(): void
     {
-        // @todo register type using database config.
-
         Grammar::macro('typeLtree', function () {
             return 'ltree';
         });
