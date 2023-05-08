@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 use Nevadskiy\Tree\Casts\AsPath;
 use Nevadskiy\Tree\Collections\NodeCollection;
 use Nevadskiy\Tree\Exceptions\CircularReferenceException;
@@ -25,16 +26,7 @@ trait AsTree
     protected static function bootAsTree(): void
     {
         static::registerModelEvent($event = static::assignPathOnEvent(), static function (self $model) use ($event) {
-            if ($model->shouldAssignPath()) {
-                $model->assignPath();
-
-                // @todo refactor.
-                if ($event === 'created' && $model->hasPath()) {
-                    $model->newQuery()->whereKey($model->getKey())->toBase()->update([
-                        $model->getPathColumn() => $model->getPath()->getValue(),
-                    ]);
-                }
-            }
+            call_user_func([$model, 'assignPathWhen'.Str::ucfirst($event)]);
         });
 
         static::updating(static function (self $model) {
@@ -210,7 +202,7 @@ trait AsTree
      */
     protected static function assignPathOnEvent(): string
     {
-        if (static::assignPathDuringInsert()) {
+        if (static::shouldAssignPathDuringInsert()) {
             return 'creating';
         }
 
@@ -220,7 +212,7 @@ trait AsTree
     /**
      * Determine whether the path should be assigned during insert.
      */
-    protected static function assignPathDuringInsert(): bool
+    protected static function shouldAssignPathDuringInsert(): bool
     {
         $model = new static();
 
@@ -229,6 +221,27 @@ trait AsTree
         }
 
         return true;
+    }
+
+    /**
+     * Assign a path to the model when it is created.
+     */
+    protected function assignPathWhenCreated(): void
+    {
+        if ($this->shouldAssignPath()) {
+            $this->assignPath();
+            $this->saveQuietly();
+        }
+    }
+
+    /**
+     * Assign a path to the model when it is creating.
+     */
+    protected function assignPathWhenCreating(): void
+    {
+        if ($this->shouldAssignPath()) {
+            $this->assignPath();
+        }
     }
 
     /**
