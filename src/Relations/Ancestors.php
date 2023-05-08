@@ -89,7 +89,6 @@ class Ancestors extends Relation
     {
         return $query->select($columns)
             ->from("{$query->getModel()->getTable()} as ancestors")
-            // @todo add a new `whereColumnAncestor()` method and use it instead.
             ->whereColumnSelfOrAncestor(
                 "ancestors.{$this->related->getPathColumn()}",
                 $this->related->qualifyColumn($this->related->getPathColumn())

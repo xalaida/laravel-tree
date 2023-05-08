@@ -87,7 +87,6 @@ class Descendants extends Relation
     {
         return $query->select($columns)
             ->from("{$query->getModel()->getTable()} as descendants")
-            // @todo add a new `whereColumnDescendant()` method and use it instead.
             ->whereColumnSelfOrDescendant(
                 "descendants.{$this->related->getPathColumn()}",
                 $this->related->qualifyColumn($this->related->getPathColumn())
