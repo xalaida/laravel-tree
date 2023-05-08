@@ -5,6 +5,7 @@ namespace Nevadskiy\Tree\Casts;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\PostgresConnection;
+use Illuminate\Support\Str;
 use Nevadskiy\Tree\ValueObjects\Path;
 use RuntimeException;
 
@@ -19,9 +20,8 @@ class AsPath implements CastsAttributes
             return null;
         }
 
-        // @todo apply only for uuid source column.
         if ($this->usesPgsqlConnection($model)) {
-            $value = str_replace('_', '-', $value);
+            $value = $this->transformPgsqlPathFromDatabase($value);
         }
 
         return new Path($value);
@@ -40,14 +40,13 @@ class AsPath implements CastsAttributes
             throw new RuntimeException(sprintf('The "%s" is not a Path instance.', $key));
         }
 
-        // @todo apply only for uuid source column.
+        $path = $value->getValue();
+
         if ($this->usesPgsqlConnection($model)) {
-            // @todo does not work with mixed separators "_" + "-".
-            // @todo ensure only [A-Za-z0-9_] regex characters are allowed.
-            return str_replace('-', '_', $value->getValue());
+            $path = $this->transformPgsqlPathToDatabase($path);
         }
 
-        return $value->getValue();
+        return $path;
     }
 
     /**
@@ -56,5 +55,25 @@ class AsPath implements CastsAttributes
     protected function usesPgsqlConnection(Model $model): bool
     {
         return $model->getConnection() instanceof PostgresConnection;
+    }
+
+    /**
+     * Transform the PostreSQL path to database.
+     */
+    protected function transformPgsqlPathToDatabase(string $path): string
+    {
+        if (Str::containsAll($path, ['-', '_'])) {
+            throw new RuntimeException('The path cannot have mixed "-" and "_" characters.');
+        }
+
+        return Str::replace('-', '_', $path);
+    }
+
+    /**
+     * Transform the PostreSQL path value from database.
+     */
+    protected function transformPgsqlPathFromDatabase(string $path): string
+    {
+        return Str::replace('_', '-', $path);
     }
 }
