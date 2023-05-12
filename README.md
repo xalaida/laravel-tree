@@ -11,11 +11,6 @@
 
 - Move subtree using a single query
 
-## ✅ Requirements
-
-- Laravel 8+
-- PostgreSQL and with "ltree" extension
-
 ## 🔌 Installation
 
 Install the package via composer:
