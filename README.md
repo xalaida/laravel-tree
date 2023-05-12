@@ -92,7 +92,7 @@ return new class extends Migration
 };
 ```
 
-Now create the `Category` model.
+Now create the `Category` model:
 
 ```php
 <?php
@@ -118,7 +118,7 @@ The `path` attribute is assigned to all models that use the `AsTree` trait **aut
 
 ### Inserting models
 
-A root node can be saved to the database very easily without extra effort:
+A root node can be saved to the database very easily without extra efforts:
 
 ```php
 $root = new Category();
@@ -286,17 +286,7 @@ $products = $category->products()->paginate(20);
 
 You can easily get the products of a category and each of its descendants using a query builder.
 
-1st way:
-
-```php
-$products = Product::query()
-    ->whereHas('category', function (Builder $query) use ($category) {
-        $query->whereSelfOrDescendantOf($category);
-    })
-    ->paginate(25);
-```
-
-2nd way (faster, but requires an extra join):
+1st way (recommended):
 
 ```php
 $products = Product::query()
@@ -310,6 +300,16 @@ $products = Product::query()
     ->paginate(25, [
         Product::query()->qualifyColumn('*')
     ]);
+```
+
+2nd way (slower):
+
+```php
+$products = Product::query()
+    ->whereHas('category', function (Builder $query) use ($category) {
+        $query->whereSelfOrDescendantOf($category);
+    })
+    ->paginate(25);
 ```
 
 ### Moving nodes
