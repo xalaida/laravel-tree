@@ -291,7 +291,7 @@ class BuilderMixin
     protected function compileMysqlConcat(): callable
     {
         return function (array $values) {
-            return sprintf("CONCAT(%s)", implode(', ', $values));
+            return sprintf("concat(%s)", implode(', ', $values));
         };
     }
 
