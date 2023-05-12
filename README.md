@@ -286,14 +286,11 @@ You can easily get the products of a category and each of its descendants using 
 ```php
 $products = Product::query()
     ->join('categories', function (JoinClause $join) {
-        $join->on(
-            Product::query()->qualifyColumn('category_id'),
-            Category::query()->qualifyColumn('id')
-        );
+        $join->on(Product::qualifyColumn('category_id'), Category::qualifyColumn('id'));
     })
     ->whereSelfOrDescendantOf($category);
     ->paginate(25, [
-        Product::query()->qualifyColumn('*')
+        Product::qualifyColumn('*')
     ]);
 ```
 
