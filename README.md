@@ -46,7 +46,7 @@ The `categories` database table in this scenario will look like this:
 | 3  | Mechanics      |        2 | 1.2.3 |
 | 4  | Thermodynamics |        2 | 1.2.4 |
 
-Now you can easily get all descendants of the node using the following query:
+You can easily get all descendants of the node using the following query:
 
 ```SQL
 SELECT * FROM categories WHERE path LIKE '1.%'
@@ -54,18 +54,14 @@ SELECT * FROM categories WHERE path LIKE '1.%'
 
 ### PostgreSQL Ltree extension
 
-PostgreSQL has a specific column type for that purpose called [ltree](https://www.postgresql.org/docs/current/ltree.html).
-In combination with GiST index that allows executing lightweight and performant queries across an entire tree.
-Also, PostgreSQL provides extensive facilities for searching through label trees.
+Using the [PostgreSQL ltree](https://www.postgresql.org/docs/current/ltree.html) extension we can go even further. This extension provides an additional `ltree` field type specifically for purposes such as a path in a hierarchy.
+In combination with a GiST index it allows executing lightweight and performant queries across an entire tree.
 
-Here is a simple example of how it works: 1st category "Books" is a parent of 2nd category "Science".
+Now the SQL query will look like this:
 
-The database table in this scenario will look like this:
-
-| id   | name     | parent_id | path |
-|:-----|:---------|----------:|-----:|
-| 1    | Books    |      null |    1 |
-| 2    | Science  |         1 |  1.2 |
+```SQL
+SELECT * FROM categories WHERE path ~ '1.*'
+```
 
 ## 🔨 Configuration
 
@@ -162,8 +158,7 @@ return new class extends Migration
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->ltree('path')->nullable()->spatialIndex(); // For PostgreSQL: create a "path" column with a "ltree" type and a GiST index.
-            // For MySQL: $table->string('path')->nullable()->index();
+            $table->string('path')->nullable()->index();
             $table->timestamps();
         });
 
@@ -188,7 +183,7 @@ return new class extends Migration
 
 ### Path attribute
 
-The `path` attribute is assigned to all models that use the `AsTree` trait **automatically** based on the `parent`, so you do not need to manually set it.
+The `path` attribute will be assigned automatically based on the parent to all models that use the `AsTree` trait, so you don't need to set it manually.
 
 ### Inserting models
 
