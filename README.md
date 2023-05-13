@@ -27,19 +27,30 @@ composer require nevadskiy/laravel-tree
 
 [//]: # (todo)
 
-## ✨ Description
+## ✨ How it works
 
-When working with hierarchical data structures in your application, you can typically store the structure using a self-referencing parent_id column. This approach works well for many use cases, but it can become challenging when you need to make complex queries on the data, such as finding all descendants of a given node.
-
-To store hierarchical data structures in our application we can simply use the self-referencing `parent_id` column, and it will work fine in most cases.
-However, when you have to make queries for such data, for example, finding all descendants of the node, things get more complicated.
+When working with hierarchical data structures in your application, you can typically store the structure using a self-referencing `parent_id` column. 
+This approach works well for many use cases, but it can become challenging when you need to make complex queries on the data, such as finding all descendants of a given node.
 
 ### Materialized path
 
-The package utilizes a "materialized path" pattern to represent the hierarchy of your data. This pattern involves storing the full path of each node in the hierarchy as a string, with each node's ancestors represented by a series of IDs separated by a delimiter.
+One of the simples and effective solutions is a "materialized path" pattern.
+This pattern involves storing the full path of each node in the hierarchy in a separate `path` column as a string, with each node's ancestors represented by a series of IDs separated by a delimiter.
 
-There is a simple solution to add an extra column to the table to save the path of the node in the hierarchy.
-It's called a "materialized path" pattern and allows querying records more easily and efficiently.
+The `categories` database table in this scenario will look like this:
+
+| id | name           | parent_id |  path |
+|:---|:---------------|----------:|------:|
+| 1  | Science        |      null |     1 |
+| 2  | Physics        |         1 |   1.2 |
+| 3  | Mechanics      |        2 | 1.2.3 |
+| 4  | Thermodynamics |        2 | 1.2.4 |
+
+Now you can easily get all descendants of the node using the following query:
+
+```SQL
+SELECT * FROM categories WHERE path LIKE '1.%'
+```
 
 ### PostgreSQL Ltree extension
 
