@@ -29,8 +29,10 @@ composer require nevadskiy/laravel-tree
 
 ## ✨ Description
 
+When working with hierarchical data structures in your application, you can typically store the structure using a self-referencing parent_id column. This approach works well for many use cases, but it can become challenging when you need to make complex queries on the data, such as finding all descendants of a given node.
+
 To store hierarchical data structures in our application we can simply use the self-referencing `parent_id` column, and it will work fine in most cases.
-However, when you have to make queries for such data, things get more complicated.
+However, when you have to make queries for such data, for example, finding all descendants of the node, things get more complicated.
 
 ### Materialized path
 
@@ -38,6 +40,8 @@ The package utilizes a "materialized path" pattern to represent the hierarchy of
 
 There is a simple solution to add an extra column to the table to save the path of the node in the hierarchy.
 It's called a "materialized path" pattern and allows querying records more easily and efficiently.
+
+### PostgreSQL Ltree extension
 
 PostgreSQL has a specific column type for that purpose called [ltree](https://www.postgresql.org/docs/current/ltree.html).
 In combination with GiST index that allows executing lightweight and performant queries across an entire tree.
