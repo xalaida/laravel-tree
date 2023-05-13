@@ -7,6 +7,10 @@
 [![Latest Stable Version](https://img.shields.io/packagist/v/nevadskiy/laravel-tree)](https://packagist.org/packages/nevadskiy/laravel-tree)
 [![License](https://img.shields.io/github/license/nevadskiy/laravel-tree)](https://packagist.org/packages/nevadskiy/laravel-tree)
 
+It is a powerful package that provides a simple solution for creating hierarchical structures for your Eloquent models.
+The package utilizes a "materialized path" pattern to represent the hierarchy of your data.
+It can be used for a wide range of use cases such as managing categories, nested comments, and more.
+
 ## 🍬 Features
 
 - Move subtree using a single query
@@ -19,16 +23,18 @@ Install the package via composer:
 composer require nevadskiy/laravel-tree
 ````
 
-Publish package migrations to create "ltree" extension (optional):
+[//]: # (## Demo)
 
-```bash
-php artisan vendor:publish --tag=tree-migrations
-```
+[//]: # (todo)
 
-## ✨ Introduction
+## ✨ Description
 
 To store hierarchical data structures in our application we can simply use the self-referencing `parent_id` column, and it will work fine in most cases.
 However, when you have to make queries for such data, things get more complicated.
+
+### Materialized path
+
+The package utilizes a "materialized path" pattern to represent the hierarchy of your data. This pattern involves storing the full path of each node in the hierarchy as a string, with each node's ancestors represented by a series of IDs separated by a delimiter.
 
 There is a simple solution to add an extra column to the table to save the path of the node in the hierarchy.
 It's called a "materialized path" pattern and allows querying records more easily and efficiently.
@@ -48,9 +54,37 @@ The database table in this scenario will look like this:
 
 ## 🔨 Configuration
 
-Let's configure the package for nested categories.
+[//]: # (todo add info about `parent_id` column)
 
-Create a migration for the `categories` table:
+All you have to do is to add a `AsTree` trait to the model and add a `path` column to the model's table.
+
+Let's configure a `Category` model:
+
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Nevadskiy\Tree\AsTree;
+
+class Category extends Model
+{
+    use AsTree;
+}
+```
+
+Now add a `path` column to the corresponding migration according to your database connection:
+
+#### Using PostgreSQL database
+
+Add a `path` column to the table with a `ltree` type:
+
+```php
+$table->ltree('path')->nullable()->spatialIndex();
+```
+
+The migration file may look like this:
 
 ```php
 <?php
@@ -87,23 +121,53 @@ return new class extends Migration
 };
 ```
 
-Now create the `Category` model:
+Sometimes the Ltree extension may be disabled in PostgreSQL. To enable it, you can publish and run a package migration:
+
+[//]: # (todo rename tag)
+
+```bash
+php artisan vendor:publish --tag=tree-migrations
+```
+
+#### Using MySQL database
+
+Create a new migration for the `categories` table:
 
 ```php
 <?php
 
-namespace App\Models;
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
-use Illuminate\Database\Eloquent\Model;
-use Nevadskiy\Tree\AsTree;
-
-class Category extends Model
+return new class extends Migration
 {
-    use AsTree;
-}
-```
+    public function up(): void
+    {
+        Schema::create('categories', function (Blueprint $table) {
+            $table->id();
+            $table->string('name');
+            $table->ltree('path')->nullable()->spatialIndex(); // For PostgreSQL: create a "path" column with a "ltree" type and a GiST index.
+            // For MySQL: $table->string('path')->nullable()->index();
+            $table->timestamps();
+        });
 
-> Note that the Category model uses the `AsTree` trait.
+        // Add a self-referencing "parent_id" column with a "foreign key" constraint using a separate database query.
+        Schema::table('categories', function (Blueprint $table) {
+            $table->foreignId('parent_id')
+                ->nullable()
+                ->index()
+                ->constrained('categories')
+                ->cascadeOnDelete();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::dropIfExists('categories');
+    }
+};
+```
 
 ## 🚊 Usage
 
