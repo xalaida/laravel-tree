@@ -87,7 +87,7 @@ class Category extends Model
 }
 ```
 
-Next, create a migration for the model. The `path` column definition depends on your database connection:
+Next, create a migration for the model. The definition of the `path` column depends on your database connection.
 
 #### Using PostgreSQL database
 
@@ -195,7 +195,7 @@ $root->name = 'Books';
 $root->save();
 ```
 
-To insert a child model, you only need to assign the `parent_id` attribute or use the `parent` relation like this:
+To insert a child model, you only need to assign the `parent_id` attribute or use the `parent` or `children` relation:
 
 ```php
 $child = new Category;
