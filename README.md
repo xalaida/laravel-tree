@@ -56,7 +56,7 @@ SELECT * FROM categories WHERE path LIKE '1.%'
 
 #### PostgreSQL Ltree extension
 
-Using the [PostgreSQL ltree](https://www.postgresql.org/docs/current/ltree.html) extension we can go even further. This extension provides an additional `ltree` field type specifically for purposes such as a path in a hierarchy.
+Using the [PostgreSQL ltree](https://www.postgresql.org/docs/current/ltree.html) extension we can go even further. This extension provides an additional `ltree` column type designed specifically for this purpose.
 In combination with a GiST index it allows executing lightweight and performant queries across an entire tree.
 
 Now the SQL query will look like this:
