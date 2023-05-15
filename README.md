@@ -32,7 +32,7 @@ composer require nevadskiy/laravel-tree
 
 When working with hierarchical data structures in your application, storing the structure using a self-referencing `parent_id` column is a common approach.  
 While it works well for many use cases, it can become challenging when you need to make complex queries, such as finding all descendants of a given node.
-The [materialized path](#materialized-path) pattern provides a simple and effective solution.
+One of the simples and effective solutions is the [materialized path](#materialized-path) pattern.
 
 ### Materialized path
 
