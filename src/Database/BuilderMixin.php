@@ -12,6 +12,8 @@ use RuntimeException;
 
 /**
  * @mixin Builder
+ * @todo refactor by using separate builders.
+ * @todo add missing methods.
  */
 class BuilderMixin
 {
@@ -26,7 +28,7 @@ class BuilderMixin
     public const DESCENDANT = '<@';
 
     /**
-     * Add an ancestor where clause to the query.
+     * Add a self-or-ancestor where clause to the query.
      */
     public function whereSelfOrAncestor(): callable
     {
@@ -46,7 +48,7 @@ class BuilderMixin
     }
 
     /**
-     * Add an ancestor where column clause to the query.
+     * Add a self-or-ancestor where column clause to the query.
      */
     public function whereColumnSelfOrAncestor(): callable
     {
@@ -66,7 +68,7 @@ class BuilderMixin
     }
 
     /**
-     * Add an ancestor "or where" clause to the query.
+     * Add a self-or-ancestor "or where" clause to the query.
      */
     public function orWhereSelfOrAncestor(): callable
     {
@@ -76,7 +78,7 @@ class BuilderMixin
     }
 
     /**
-     * Add an ancestor where clause to the query from the given model.
+     * Add a self-or-ancestor where clause to the query from the given model.
      */
     public function whereSelfOrAncestorOf(): callable
     {
@@ -90,7 +92,7 @@ class BuilderMixin
     }
 
     /**
-     * Add an ancestor "or where" clause to the query from the given model.
+     * Add a self-or-ancestor "or where" clause to the query from the given model.
      */
     public function orWhereSelfOrAncestorOf(): callable
     {
@@ -103,7 +105,7 @@ class BuilderMixin
     }
 
     /**
-     * Add a descendant where clause to the query.
+     * Add a self-or-descendant where clause to the query.
      */
     public function whereSelfOrDescendant(): callable
     {
@@ -113,10 +115,9 @@ class BuilderMixin
             }
 
             if ($this->getConnection() instanceof MySqlConnection) {
-                // @todo refactor by using separate methods for self and descendants.
                 return $this->whereNested(function (Builder $query) use ($column, $path) {
                     $query->where($column, '=', $path);
-                    $query->orWhere($column, 'like', "{$path}.%");
+                    $query->orWhereDescendant($column, $path);
                 }, $boolean);
             }
 
@@ -127,7 +128,37 @@ class BuilderMixin
     }
 
     /**
-     * Add a descendant where column clause to the query.
+     * Add a descendant where clause to the query.
+     */
+    public function whereDescendant(): callable
+    {
+        return function (string $column, Path $path, string $boolean = 'and') {
+            if ($this->getConnection() instanceof PostgresConnection) {
+                return $this->where($column, '~', "{$path}.*", $boolean);
+            }
+
+            if ($this->getConnection() instanceof MySqlConnection) {
+                return $this->where($column, 'like', "{$path}.%", $boolean);
+            }
+
+            throw new RuntimeException(vsprintf('Database connection [%s] is not supported.', [
+                get_class($this->getConnection())
+            ]));
+        };
+    }
+
+    /**
+     * Add a descendant "or where" clause to the query.
+     */
+    public function orWhereDescendant(): callable
+    {
+        return function (string $column, Path $path) {
+            return $this->whereDescendant($column, $path, 'or');
+        };
+    }
+
+    /**
+     * Add a self-or-descendant where column clause to the query.
      */
     public function whereColumnSelfOrDescendant(): callable
     {
@@ -147,7 +178,7 @@ class BuilderMixin
     }
 
     /**
-     * Add a descendant "or where" clause to the query.
+     * Add a self-or-descendant "or where" clause to the query.
      */
     public function orWhereSelfOrDescendant(): callable
     {
@@ -157,7 +188,7 @@ class BuilderMixin
     }
 
     /**
-     * Add a descendant where clause to the query from the given model.
+     * Add a self-or-descendant where clause to the query from the given model.
      */
     public function whereSelfOrDescendantOf(): callable
     {
@@ -171,7 +202,7 @@ class BuilderMixin
     }
 
     /**
-     * Add a descendant "or where" clause to the query from the given model.
+     * Add a self-or-descendant "or where" clause to the query from the given model.
      */
     public function orWhereSelfOrDescendantOf(): callable
     {
@@ -184,7 +215,7 @@ class BuilderMixin
     }
 
     /**
-     * Filter records by the given depth level.
+     * Add a "depth" where clause to the query from the given model.
      */
     public function wherePathDepth(): callable
     {
