@@ -113,7 +113,11 @@ class BuilderMixin
             }
 
             if ($this->getConnection() instanceof MySqlConnection) {
-                return $this->where($column, 'like', "{$path}%", $boolean); // @todo potential bug when "1.2.31" is descendant for parent "1.2.3".
+                // @todo refactor by using separate methods for self and descendants.
+                return $this->whereNested(function (Builder $query) use ($column, $path) {
+                    $query->where($column, '=', $path);
+                    $query->orWhere($column, 'like', "{$path}.%");
+                }, $boolean);
             }
 
             throw new RuntimeException(vsprintf('Database connection [%s] is not supported.', [

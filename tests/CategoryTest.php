@@ -119,6 +119,24 @@ class CategoryTest extends TestCase
     /**
      * @test
      */
+    public function it_handles_correctly_similar_paths_in_descendants(): void
+    {
+        $parent = CategoryWithCustomSourceColumnFactory::new()->create(['name' => 'a']);
+
+        $child = CategoryWithCustomSourceColumnFactory::new()
+            ->forParent($parent)
+            ->create(['name' => 'b']);
+
+        $anotherChild = CategoryWithCustomSourceColumnFactory::new()
+            ->forParent($parent)
+            ->create(['name' => 'bc']);
+
+        self::assertCount(0, $child->descendants);
+    }
+
+    /**
+     * @test
+     */
     public function it_can_be_ordered_by_depth_asc(): void
     {
         $category = CategoryFactory::new()
