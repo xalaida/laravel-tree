@@ -441,3 +441,6 @@ The MIT License (MIT). Please see [LICENSE](LICENSE.md) for more information.
 [//]: # (@todo doc custom query where['path', '~', '*.1.*])
 [//]: # (@todo refactor with separate builders SimplePathBuilder, LtreePathBuilder)
 [//]: # (@todo split tests into more specific test cases)
+[//]: # (@todo add test case with all build methods)
+[//]: # (@todo add method `is` to relations that performs checks: $this->ancestors[]->is[$that])
+[//]: # (@todo add method `is` to relations that performs checks: $this->descendants[]->is[$that])

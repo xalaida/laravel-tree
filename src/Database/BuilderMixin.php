@@ -28,6 +28,28 @@ class BuilderMixin
     public const DESCENDANT = '<@';
 
     /**
+     * Add an ancestor where clause to the query.
+     *
+     * @todo handle case when root.
+     */
+    public function whereAncestor(): callable
+    {
+        return function (string $column, Path $path, string $boolean = 'and') {
+            if ($this->getConnection() instanceof PostgresConnection) {
+                return $this->where($column, '~', "*.{$path}", $boolean);
+            }
+
+            if ($this->getConnection() instanceof MySqlConnection) {
+                return $this->whereIn($column, $path->getAncestorSet(), $boolean);
+            }
+
+            throw new RuntimeException(vsprintf('Database connection [%s] is not supported.', [
+                get_class($this->getConnection())
+            ]));
+        };
+    }
+
+    /**
      * Add a self-or-ancestor where clause to the query.
      */
     public function whereSelfOrAncestor(): callable

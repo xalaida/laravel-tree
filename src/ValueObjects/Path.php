@@ -86,15 +86,27 @@ class Path
      */
     public function getPathSet(): array
     {
-        $paths = [];
+        $output = [];
 
         $parts = $this->explode();
 
         for ($index = 0, $length = count($parts); $index < $length; $index++) {
-            $paths[] = implode(self::SEPARATOR, array_slice($parts, 0, $index));
+            $output[] = implode(self::SEPARATOR, array_slice($parts, 0, $index));
         }
 
-        return $paths;
+        return $output;
+    }
+
+    /**
+     * Convert the path into path set of ancestors excluding self.
+     */
+    public function getAncestorSet(): array
+    {
+        $output = $this->getPathSet();
+
+        array_pop($output);
+
+        return $output;
     }
 
     /**
