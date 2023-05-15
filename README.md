@@ -440,3 +440,4 @@ The MIT License (MIT). Please see [LICENSE](LICENSE.md) for more information.
 [//]: # (@todo doc postgres uuid and dashes)
 [//]: # (@todo doc custom query where['path', '~', '*.1.*])
 [//]: # (@todo refactor with separate builders SimplePathBuilder, LtreePathBuilder)
+[//]: # (@todo split tests into more specific test cases)

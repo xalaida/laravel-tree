@@ -81,6 +81,7 @@ class Path
     /**
      * Convert the path into path set of ancestors including self.
      *
+     * @todo rename
      * @example ["1", "1.2", "1.2.3", "1.2.3.4"]
      */
     public function getPathSet(): array
