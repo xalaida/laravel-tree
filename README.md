@@ -7,8 +7,8 @@
 [![Latest Stable Version](https://img.shields.io/packagist/v/nevadskiy/laravel-tree)](https://packagist.org/packages/nevadskiy/laravel-tree)
 [![License](https://img.shields.io/github/license/nevadskiy/laravel-tree)](https://packagist.org/packages/nevadskiy/laravel-tree)
 
-It is a powerful package that provides a simple solution for creating hierarchical structures for your Eloquent models.
-The package utilizes a "materialized path" pattern to represent the hierarchy of your data.
+It is a powerful solution that enabled you to create hierarchical structures for your Eloquent models.
+It leverages the "materialized path" pattern to represent the hierarchy of your data.
 It can be used for a wide range of use cases such as managing categories, nested comments, and more.
 
 ## 🍬 Features
@@ -18,7 +18,7 @@ It can be used for a wide range of use cases such as managing categories, nested
 
 ## 🔌 Installation
 
-Install the package via composer:
+Install the package via Composer:
 
 ```bash
 composer require nevadskiy/laravel-tree
@@ -30,30 +30,31 @@ composer require nevadskiy/laravel-tree
 
 ## ✨ How it works
 
-When working with hierarchical data structures in your application, you can typically store the structure using a self-referencing `parent_id` column. 
-This approach works well for many use cases, but it can become challenging when you need to make complex queries on the data, such as finding all descendants of a given node.
+When working with hierarchical data structures in your application, storing the structure using a self-referencing `parent_id` column is a common approach.  
+While it works well for many use cases, it can become challenging when you need to make complex queries, such as finding all descendants of a given node.
+The [materialized path](#materialized-path) pattern provides a simple and effective solution.
 
 ### Materialized path
 
-One of the simples and effective solutions is a "materialized path" pattern.
-This pattern involves storing the full path of each node in the hierarchy in a separate `path` column as a string, with each node's ancestors represented by a series of IDs separated by a delimiter.
+The "materialized pattern" involves storing the full path of each node in the hierarchy in a separate `path` column as a string. 
+The ancestors of each node are represented by a series of IDs separated by a delimiter.
 
-The `categories` database table in this scenario will look like this:
+For example, the categories database table might look like this:
 
 | id | name           | parent_id |  path |
 |:---|:---------------|----------:|------:|
 | 1  | Science        |      null |     1 |
 | 2  | Physics        |         1 |   1.2 |
-| 3  | Mechanics      |        2 | 1.2.3 |
-| 4  | Thermodynamics |        2 | 1.2.4 |
+| 3  | Mechanics      |         2 | 1.2.3 |
+| 4  | Thermodynamics |         2 | 1.2.4 |
 
-You can easily get all descendants of the node using the following query:
+With this structure, you can easily retrieve all descendants of a node using a SQL query:
 
 ```SQL
 SELECT * FROM categories WHERE path LIKE '1.%'
 ```
 
-### PostgreSQL Ltree extension
+#### PostgreSQL Ltree extension
 
 Using the [PostgreSQL ltree](https://www.postgresql.org/docs/current/ltree.html) extension we can go even further. This extension provides an additional `ltree` field type specifically for purposes such as a path in a hierarchy.
 In combination with a GiST index it allows executing lightweight and performant queries across an entire tree.
@@ -70,7 +71,7 @@ SELECT * FROM categories WHERE path ~ '1.*'
 
 All you have to do is to add a `AsTree` trait to the model and add a `path` column to the model's table.
 
-Let's configure a `Category` model:
+Let's get started by configuring a `Category` model:
 
 ```php
 <?php
@@ -86,17 +87,17 @@ class Category extends Model
 }
 ```
 
-Now add a `path` column to the corresponding migration according to your database connection:
+Next, create a migration for the model. The `path` column definition depends on your database connection:
 
 #### Using PostgreSQL database
 
-Add a `path` column to the table with a `ltree` type:
+To add a `path` column with the `ltree` type and a GiST index, use the following code:
 
 ```php
 $table->ltree('path')->nullable()->spatialIndex();
 ```
 
-The migration file may look like this:
+The complete migration file may look like this:
 
 ```php
 <?php
@@ -182,13 +183,11 @@ return new class extends Migration
 
 ## 🚊 Usage
 
-The package automatically handles all manipulations with the `path` column based on the parent, so you do not need to set it manually.
-
-The only thing you need to do is include the `AsTree` trait to the model and operate only with `parent` and `children` relations as usual.
+Once you have configured your model, the package automatically handles all manipulations with the `path` column based on the parent, so you do not need to set it manually.
 
 ### Inserting models
 
-A root node can be saved to the database very easily without extra efforts:
+To insert a root node, simply save the model to the database as usual:
 
 ```php
 $root = new Category();
