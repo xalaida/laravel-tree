@@ -13,6 +13,7 @@ It can be used for a wide range of use cases such as managing categories, nested
 
 ## 🍬 Features
 
+[//]: # (@todo)
 - Move subtree using a single query
 
 ## 🔌 Installation
@@ -181,9 +182,9 @@ return new class extends Migration
 
 ## 🚊 Usage
 
-### Path attribute
+The package automatically handles all manipulations with the `path` column based on the parent, so you do not need to set it manually.
 
-The `path` attribute will be assigned automatically based on the parent to all models that use the `AsTree` trait, so you don't need to set it manually.
+The only thing you need to do is include the `AsTree` trait to the model and operate only with `parent` and `children` relations as usual.
 
 ### Inserting models
 
@@ -395,6 +396,8 @@ $science->save();
 
 ### Other examples
 
+[//]: # (@todo add list with all available builder methods)
+
 #### Building a tree
 
 To build a tree, we need to call the `tree` method on the `NodeCollection`:
@@ -432,3 +435,8 @@ Thank you for considering contributing. Please see [CONTRIBUTING](.github/CONTRI
 ## 📜 License
 
 The MIT License (MIT). Please see [LICENSE](LICENSE.md) for more information.
+
+[//]: # (@todo doc ordering)
+[//]: # (@todo doc available build methods)
+[//]: # (@todo doc postgres uuid and dashes)
+[//]: # (@todo doc custom query where('path', '~', '*.1.*))
