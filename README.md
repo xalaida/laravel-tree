@@ -13,8 +13,9 @@ It can be used for a wide range of use cases such as managing categories, nested
 
 ## 🍬 Features
 
-[//]: # (@todo)
+- Getting all descendants of the node using a single query
 - Move subtree using a single query
+- The `path` attribute is automatically handled behind the scenes 
 
 ## 🔌 Installation
 
@@ -23,10 +24,6 @@ Install the package via Composer:
 ```bash
 composer require nevadskiy/laravel-tree
 ````
-
-[//]: # (## Demo)
-
-[//]: # (todo)
 
 ## ✨ How it works
 
@@ -383,21 +380,19 @@ $products = Product::query()
 ### Moving nodes
 
 When you move a node, the `path` column of the node and each of its descendants have to be updated as well.
-Luckily the package does this automatically using a single query when it detects that the `parent_id` column has been updated.
+Fortunately, the package does this automatically using a single query every time it sees that the `parent_id` column has been updated.
 
-So basically to move a node with its subtree you need to update the `parent` node of the current node:
+So basically to move a node along with its subtree, you need to update the `parent` node of the current node:
 
 ```php
-$books = Category::query()->where('name', 'Books')->firstOrFail();
 $science = Category::query()->where('name', 'Science')->firstOrFail();
+$physics = Category::query()->where('name', 'Physics')->firstOrFail();
 
-$science->parent()->associate($books);
-$science->save();
+$physics->parent()->associate($science);
+$physics->save();
 ```
 
 ### Other examples
-
-[//]: # (@todo add list with all available builder methods)
 
 #### Building a tree
 
@@ -446,3 +441,4 @@ The MIT License (MIT). Please see [LICENSE](LICENSE.md) for more information.
 [//]: # (@todo add test case with all build methods)
 [//]: # (@todo add method `is` to relations that performs checks: $this->ancestors[]->is[$that])
 [//]: # (@todo add method `is` to relations that performs checks: $this->descendants[]->is[$that])
+[//]: # (@todo doc list with all available builder methods)
