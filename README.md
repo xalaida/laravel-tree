@@ -185,15 +185,15 @@ return new class extends Migration
 
 ## 🚊 Usage
 
-Once you have configured your model, the package automatically handles all manipulations with the `path` column based on the parent, so you do not need to set it manually.
+Once you have configured your model, the package **automatically** handles all manipulations with the `path` attribute based on the parent, so you do not need to set it manually.
 
 ### Inserting models
 
-To insert a root node, simply save the model to the database as usual:
+To insert a root node, simply save the model to the database:
 
 ```php
 $root = new Category();
-$root->name = 'Books';
+$root->name = 'Science';
 $root->save();
 ```
 
@@ -201,12 +201,12 @@ To insert a child model, you only need to assign the `parent_id` attribute or us
 
 ```php
 $child = new Category;
-$child->name = 'Science';
+$child->name = 'Physics';
 $child->parent()->associate($root);
 $child->save();
 ```
 
-As you can see, it works as with regular Eloquent models.
+As you can see, it works just as regular Eloquent models.
 
 ### Relations
 
@@ -217,14 +217,14 @@ The `AsTree` trait provides the following relations:
 - [`ancestors`](#ancestors) (read-only)
 - [`descendants`](#descendants) (read-only)
 
-The `parent` and `children` relations use default Laravel relations BelongsTo and HasMany.
+The `parent` and `children` relations use default Laravel `BelongsTo` and `HasMany` relation classes.
 
 The `ancestors` and `descendants` can be used only in the "read" mode, which means methods like `make` or `create` are not available. 
 So to save related nodes you need to use the `parent` or `children` relation.
 
 #### Parent
 
-The `parent` relation uses the default Eloquent BelongsTo relation that needs the `parent_id` column as a foreign key.
+The `parent` relation uses the default Eloquent `BelongsTo` relation class that needs the `parent_id` column as a foreign key.
 It allows getting a parent of the node.
 
 ```php
@@ -233,7 +233,7 @@ echo $category->parent->name;
 
 #### Children
 
-The `children` relation uses a default Eloquent HasMany relation and is a reverse relation to the `parent`.
+The `children` relation uses a default Eloquent `HasMany` relation class and is a reverse relation to the `parent`.
 It allows getting all children of the node.
 
 ```php
@@ -309,7 +309,7 @@ $ancestors = Category::query()->whereSelfOrAncestorOf($category)->get();
 Getting descendants of the node (including the current node):
 
 ```php
-$ancestors = Category::query()->whereSelfOrDescendantOf($category)->get();
+$descendants = Category::query()->whereSelfOrDescendantOf($category)->get();
 ```
 
 Ordering nodes by depth:
@@ -364,8 +364,8 @@ $products = Product::query()
     ->join('categories', function (JoinClause $join) {
         $join->on(Product::qualifyColumn('category_id'), Category::qualifyColumn('id'));
     })
-    ->whereSelfOrDescendantOf($category);
-    ->paginate(25, [
+    ->whereSelfOrDescendantOf($category)
+    ->paginate(24, [
         Product::qualifyColumn('*')
     ]);
 ```
@@ -377,7 +377,7 @@ $products = Product::query()
     ->whereHas('category', function (Builder $query) use ($category) {
         $query->whereSelfOrDescendantOf($category);
     })
-    ->paginate(25);
+    ->paginate(24);
 ```
 
 ### Moving nodes
