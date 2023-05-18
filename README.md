@@ -69,7 +69,7 @@ SELECT * FROM categories WHERE path ~ '1.*'
 
 [//]: # (todo add info about `parent_id` column)
 
-All you have to do is to add a `AsTree` trait to the model and add a `path` column to the model's table.
+All you have to do is to add a `AsTree` trait to the model and add a `path` column alongside the self-referencing `parent_id` column to the model's table.
 
 Let's get started by configuring a `Category` model:
 
@@ -113,11 +113,10 @@ return new class extends Migration
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->ltree('path')->nullable()->spatialIndex(); // Create a "path" column with a "ltree" type and a GiST index.
+            $table->ltree('path')->nullable()->spatialIndex();
             $table->timestamps();
         });
 
-        // Add a self-referencing "parent_id" column with a "foreign key" constraint using a separate database query.
         Schema::table('categories', function (Blueprint $table) {
             $table->foreignId('parent_id')
                 ->nullable()
@@ -136,15 +135,19 @@ return new class extends Migration
 
 Sometimes the Ltree extension may be disabled in PostgreSQL. To enable it, you can publish and run a package migration:
 
-[//]: # (todo rename tag)
-
 ```bash
-php artisan vendor:publish --tag=tree-migrations
+php artisan vendor:publish --tag=pgsql-ltree-migration
 ```
 
 #### Using MySQL database
 
-Create a new migration for the `categories` table:
+To add a string `path` column with and an index, use the following code:
+
+```php
+$table->string('path')->nullable()->index();;
+```
+
+The complete migration file may look like this:
 
 ```php
 <?php
@@ -164,7 +167,6 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // Add a self-referencing "parent_id" column with a "foreign key" constraint using a separate database query.
         Schema::table('categories', function (Blueprint $table) {
             $table->foreignId('parent_id')
                 ->nullable()
