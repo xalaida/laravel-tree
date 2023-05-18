@@ -7,8 +7,8 @@
 [![Latest Stable Version](https://img.shields.io/packagist/v/nevadskiy/laravel-tree)](https://packagist.org/packages/nevadskiy/laravel-tree)
 [![License](https://img.shields.io/github/license/nevadskiy/laravel-tree)](https://packagist.org/packages/nevadskiy/laravel-tree)
 
-It is a powerful solution that enabled you to create hierarchical structures for your Eloquent models.
-It leverages the "materialized path" pattern to represent the hierarchy of your data.
+The package provides you with a simple solution that allows you to effortlessly create hierarchical structures for your Eloquent models.
+It leverages the [materialized path](#materialized-path) pattern to represent the hierarchy of your data.
 It can be used for a wide range of use cases such as managing categories, nested comments, and more.
 
 ## 🍬 Features
