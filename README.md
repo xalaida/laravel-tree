@@ -402,3 +402,4 @@ The MIT License (MIT). Please see [LICENSE](LICENSE.md) for more information.
 [//]: # (@todo add method `is` to relations that performs checks: $this->ancestors[]->is[$that])
 [//]: # (@todo add method `is` to relations that performs checks: $this->descendants[]->is[$that])
 [//]: # (@todo doc list with all available builder methods)
+[//]: # (@todo use model observer similar how Scout does it)
