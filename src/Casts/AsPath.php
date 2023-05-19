@@ -58,7 +58,7 @@ class AsPath implements CastsAttributes
     }
 
     /**
-     * Transform the PostreSQL path to database.
+     * Transform the PostgreSQL path to database.
      */
     protected function transformPgsqlPathToDatabase(string $path): string
     {
@@ -70,7 +70,7 @@ class AsPath implements CastsAttributes
     }
 
     /**
-     * Transform the PostreSQL path value from database.
+     * Transform the PostgreSQL path value from database.
      */
     protected function transformPgsqlPathFromDatabase(string $path): string
     {
