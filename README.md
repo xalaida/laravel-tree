@@ -359,12 +359,10 @@ You can easily get the products of a category and each of its descendants using 
 ```php
 $products = Product::query()
     ->join('categories', function (JoinClause $join) {
-        $join->on(Product::qualifyColumn('category_id'), Category::qualifyColumn('id'));
+        $join->on('products.category_id', 'categories.id');
     })
     ->whereSelfOrDescendantOf($category)
-    ->paginate(24, [
-        Product::qualifyColumn('*')
-    ]);
+    ->paginate(24, ['products.*']);
 ```
 
 2nd way (slower):
