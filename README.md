@@ -11,12 +11,6 @@ The package provides you with a simple solution that allows you to effortlessly 
 It leverages the [materialized path](#materialized-path) pattern to represent the hierarchy of your data.
 It can be used for a wide range of use cases such as managing categories, nested comments, and more.
 
-## 🍬 Features
-
-- Getting all descendants of the node using a single query
-- Move subtree using a single query
-- The `path` attribute is automatically handled behind the scenes 
-
 ## 🔌 Installation
 
 Install the package via Composer:
