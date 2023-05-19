@@ -64,8 +64,6 @@ SELECT * FROM categories WHERE path ~ '1.*'
 
 ## 🔨 Configuration
 
-[//]: # (todo add info about `parent_id` column)
-
 All you have to do is to add a `AsTree` trait to the model and add a `path` column alongside the self-referencing `parent_id` column to the model's table.
 
 Let's get started by configuring a `Category` model:
@@ -142,42 +140,6 @@ To add a string `path` column with and an index, use the following code:
 
 ```php
 $table->string('path')->nullable()->index();;
-```
-
-The complete migration file may look like this:
-
-```php
-<?php
-
-use Illuminate\Database\Migrations\Migration;
-use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
-
-return new class extends Migration
-{
-    public function up(): void
-    {
-        Schema::create('categories', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->string('path')->nullable()->index();
-            $table->timestamps();
-        });
-
-        Schema::table('categories', function (Blueprint $table) {
-            $table->foreignId('parent_id')
-                ->nullable()
-                ->index()
-                ->constrained('categories')
-                ->cascadeOnDelete();
-        });
-    }
-
-    public function down(): void
-    {
-        Schema::dropIfExists('categories');
-    }
-};
 ```
 
 ## 🚊 Usage
