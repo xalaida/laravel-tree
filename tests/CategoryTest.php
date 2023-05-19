@@ -4,8 +4,9 @@ namespace Nevadskiy\Tree\Tests;
 
 use Illuminate\Database\Eloquent\Builder;
 use Nevadskiy\Tree\Exceptions\CircularReferenceException;
-use Nevadskiy\Tree\Tests\Support\Factories\CategoryFactory;
-use Nevadskiy\Tree\Tests\Support\Models\Category;
+use Nevadskiy\Tree\Tests\App\Category;
+use Nevadskiy\Tree\Tests\Database\Factories\CategoryFactory;
+use Nevadskiy\Tree\Tests\Database\Factories\CategoryWithCustomSourceColumnFactory;
 use RuntimeException;
 
 class CategoryTest extends TestCase
@@ -118,6 +119,24 @@ class CategoryTest extends TestCase
     /**
      * @test
      */
+    public function it_handles_correctly_similar_paths_in_descendants(): void
+    {
+        $parent = CategoryWithCustomSourceColumnFactory::new()->create(['name' => 'a']);
+
+        $child = CategoryWithCustomSourceColumnFactory::new()
+            ->forParent($parent)
+            ->create(['name' => 'b']);
+
+        $anotherChild = CategoryWithCustomSourceColumnFactory::new()
+            ->forParent($parent)
+            ->create(['name' => 'bc']);
+
+        self::assertCount(0, $child->descendants);
+    }
+
+    /**
+     * @test
+     */
     public function it_can_be_ordered_by_depth_asc(): void
     {
         $category = CategoryFactory::new()
@@ -225,7 +244,6 @@ class CategoryTest extends TestCase
 
         $categories = Category::query()
             ->with('ancestors')
-            ->orderByDepth()
             ->get();
 
         self::assertCount(3, $categories);
@@ -248,7 +266,6 @@ class CategoryTest extends TestCase
 
         $categories = Category::query()
             ->with('descendants')
-            ->orderByDepth()
             ->get();
 
         self::assertCount(3, $categories);
@@ -264,11 +281,11 @@ class CategoryTest extends TestCase
     public function it_updates_path_of_subtree_when_parent_category_is_changed(): void
     {
         $category = CategoryFactory::new()
-            ->withAncestors()
+            ->withAncestors(2)
             ->create();
 
         $anotherCategory = CategoryFactory::new()
-            ->withAncestors()
+            ->withAncestors(2)
             ->create();
 
         $category->parent->parent()->associate($anotherCategory);
@@ -276,8 +293,8 @@ class CategoryTest extends TestCase
 
         $category->refresh();
 
-        self::assertEquals(4, $category->getPath()->getDepth());
-        self::assertEquals($anotherCategory->parent->getPathSource(), $category->getPath()->segments()[0]);
+        self::assertEquals(5, $category->getPath()->getDepth());
+        self::assertEquals($anotherCategory->parent->parent->getPathSource(), $category->getPath()->segments()[0]);
     }
 
     /**
@@ -334,46 +351,46 @@ class CategoryTest extends TestCase
     /**
      * @test
      */
-    public function it_can_determine_whether_it_was_moved(): void
+    public function it_can_determine_whether_parent_is_changed(): void
     {
         $category = CategoryFactory::new()->create();
 
-        self::assertFalse($category->wasMoved());
+        self::assertFalse($category->isParentChanged());
 
         $anotherCategory = CategoryFactory::new()
             ->forParent($category)
             ->create();
 
-        self::assertFalse($anotherCategory->fresh()->wasMoved());
+        self::assertFalse($anotherCategory->fresh()->isParentChanged());
 
         $anotherCategory->parent()->associate(null);
         $anotherCategory->save();
 
-        self::assertTrue($anotherCategory->wasMoved());
+        self::assertTrue($anotherCategory->isParentChanged());
     }
 
     /**
      * @test
      */
-    public function it_can_determine_whether_it_is_moving(): void
+    public function it_can_determine_whether_parent_is_changing(): void
     {
         $category = CategoryFactory::new()->create();
 
-        self::assertFalse($category->isMoving());
+        self::assertFalse($category->isParentChanging());
 
         $anotherCategory = CategoryFactory::new()
             ->forParent($category)
             ->create();
 
-        self::assertFalse($anotherCategory->isMoving());
+        self::assertFalse($anotherCategory->isParentChanging());
 
         $anotherCategory->parent()->associate(null);
 
-        self::assertTrue($anotherCategory->isMoving());
+        self::assertTrue($anotherCategory->isParentChanging());
 
         $anotherCategory->save();
 
-        self::assertFalse($anotherCategory->isMoving());
+        self::assertFalse($anotherCategory->isParentChanging());
     }
 
     /**
@@ -393,7 +410,7 @@ class CategoryTest extends TestCase
 
         $categories = Category::query()
             ->whereHas('ancestors', function (Builder $query) {
-                $query->where('name', 'LIKE', 'Clo%');
+                $query->where('name', 'like', 'Clo%');
             })
             ->get();
 
@@ -420,7 +437,7 @@ class CategoryTest extends TestCase
 
         $categories = Category::query()
             ->whereHas('descendants', function (Builder $query) {
-                $query->where('name', 'LIKE', 'Bel%');
+                $query->where('name', 'like', 'Bel%');
             })
             ->get();
 
@@ -447,5 +464,22 @@ class CategoryTest extends TestCase
 
         self::assertCount(1, $categories);
         self::assertTrue($categories->contains($parent));
+    }
+
+    /**
+     * @test
+     */
+    public function it_does_not_include_categories_with_similar_id_to_its_ancestor(): void
+    {
+        $parent = CategoryWithCustomSourceColumnFactory::new()->create(['name' => '1']);
+
+        $similarParent = CategoryWithCustomSourceColumnFactory::new()->create(['name' => '11']);
+
+        $child = CategoryFactory::new()
+            ->forParent($parent)
+            ->create(['name' => '2']);
+
+        self::assertCount(1, $child->ancestors);
+        self::assertTrue($child->ancestors[0]->is($parent));
     }
 }

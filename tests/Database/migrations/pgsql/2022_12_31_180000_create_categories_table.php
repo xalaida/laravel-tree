@@ -4,25 +4,24 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateUuidCategoriesTable extends Migration
-{
+return new class () extends Migration {
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::create('uuid_categories', function (Blueprint $table) {
-            $table->uuid('id')->primary();
+        Schema::create('categories', function (Blueprint $table) {
+            $table->id();
             $table->string('name');
-            $table->ltree('path')->spatialIndex();
+            $table->ltree('path')->nullable()->spatialIndex();
             $table->timestamps();
         });
 
-        Schema::table('uuid_categories', function (Blueprint $table) {
-            $table->foreignUuid('parent_id')
+        Schema::table('categories', function (Blueprint $table) {
+            $table->foreignId('parent_id')
                 ->nullable()
                 ->index()
-                ->constrained('uuid_categories')
+                ->constrained('categories')
                 ->cascadeOnDelete();
         });
     }
@@ -32,6 +31,6 @@ class CreateUuidCategoriesTable extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('uuid_categories');
+        Schema::dropIfExists('categories');
     }
-}
+};

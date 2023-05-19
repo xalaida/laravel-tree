@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Query\Expression;
+use Illuminate\Support\Str;
 use Nevadskiy\Tree\Casts\AsPath;
 use Nevadskiy\Tree\Collections\NodeCollection;
 use Nevadskiy\Tree\Exceptions\CircularReferenceException;
@@ -16,6 +16,7 @@ use Nevadskiy\Tree\ValueObjects\Path;
 
 /**
  * @mixin Model
+ * @property-read AsTree|null parent
  */
 trait AsTree
 {
@@ -24,16 +25,8 @@ trait AsTree
      */
     protected static function bootAsTree(): void
     {
-        static::registerModelEvent($event = static::getEventForAssigningPath(), static function (self $model) use ($event) {
-            if ($model->shouldAssignPath()) {
-                $model->assignPath();
-
-                if ($event === 'created' && $model->hasPath()) {
-                    $model->newQuery()->whereKey($model->getKey())->toBase()->update([
-                        $model->getPathColumn() => $model->getPath()->getValue(),
-                    ]);
-                }
-            }
+        static::registerModelEvent($event = static::assignPathOnEvent(), static function (self $model) use ($event) {
+            call_user_func([$model, 'assignPathWhen'.Str::ucfirst($event)]);
         });
 
         static::updating(static function (self $model) {
@@ -43,8 +36,8 @@ trait AsTree
         });
 
         static::updated(static function (self $model) {
-            if ($model->shouldUpdatePathOfSubtree()) {
-                $model->updatePathOfSubtree();
+            if ($model->shouldRebuildSubtreePaths()) {
+                $model->rebuildSubtreePaths();
             }
         });
     }
@@ -140,9 +133,9 @@ trait AsTree
     }
 
     /**
-     * Get the root items.
+     * Filter records by root.
      */
-    public function scopeWhereRoot(Builder $query): void
+    protected function scopeWhereRoot(Builder $query): void
     {
         $query->whereNull($this->getParentKeyName());
     }
@@ -156,23 +149,23 @@ trait AsTree
     }
 
     /**
-     * Get items by the given depth level.
+     * Filter records by the given depth level.
      */
     public function scopeWhereDepth(Builder $query, int $depth, string $operator = '='): void
     {
-        $query->whereRaw(sprintf('nlevel(%s) %s ?', $this->getPathColumn(), $operator), [$depth]);
+        $query->wherePathDepth($this->getPathColumn(), $depth, $operator);
     }
 
     /**
-     * Order models by the depth level.
+     * Order records by a depth.
      */
     protected function scopeOrderByDepth(Builder $query, string $direction = 'asc'): void
     {
-        $query->orderBy(new Expression(sprintf('nlevel(%s)', $this->getPathColumn())), $direction);
+        $query->orderByPathDepth($this->getPathColumn(), $direction);
     }
 
     /**
-     * Order models by the depth level.
+     * Order records by a depth descending.
      */
     protected function scopeOrderByDepthDesc(Builder $query): void
     {
@@ -207,15 +200,48 @@ trait AsTree
     /**
      * Get the event when to assign the model's path.
      */
-    protected static function getEventForAssigningPath(): string
+    protected static function assignPathOnEvent(): string
+    {
+        if (static::shouldAssignPathDuringInsert()) {
+            return 'creating';
+        }
+
+        return 'created';
+    }
+
+    /**
+     * Determine whether the path should be assigned during insert.
+     */
+    protected static function shouldAssignPathDuringInsert(): bool
     {
         $model = new static();
 
         if ($model->getIncrementing() && $model->getPathSourceColumn() === $model->getKeyName()) {
-            return 'created';
+            return false;
         }
 
-        return 'creating';
+        return true;
+    }
+
+    /**
+     * Assign a path to the model when it is created.
+     */
+    protected function assignPathWhenCreated(): void
+    {
+        if ($this->shouldAssignPath()) {
+            $this->assignPath();
+            $this->saveQuietly();
+        }
+    }
+
+    /**
+     * Assign a path to the model when it is creating.
+     */
+    protected function assignPathWhenCreating(): void
+    {
+        if ($this->shouldAssignPath()) {
+            $this->assignPath();
+        }
     }
 
     /**
@@ -247,53 +273,51 @@ trait AsTree
      */
     protected function buildPath(): Path
     {
-        if ($this->parent) {
-            return Path::concat($this->parent->getPath(), $this->getPathSource());
+        if ($this->isRoot()) {
+            return Path::from($this->getPathSource());
         }
 
-        return Path::concat($this->getPathSource());
+        return Path::from($this->parent->getPath(), $this->getPathSource());
     }
 
     /**
-     * Determine if the node is moving when the model is not saved.
+     * Determine if the parent node is changing when the model is not saved.
      */
-    public function isMoving(): bool
+    public function isParentChanging(): bool
     {
         return $this->isDirty($this->getParentKeyName());
     }
 
     /**
-     * Determine if the node was moved when the model was last saved.
+     * Determine if the parent node is changed when the model is saved.
      */
-    public function wasMoved(): bool
+    public function isParentChanged(): bool
     {
         return $this->wasChanged($this->getParentKeyName());
     }
 
     /**
-     * Determine whether the path of the node's subtree should be updated.
+     * Determine whether the paths of the subtree should be rebuilt.
      */
-    protected function shouldUpdatePathOfSubtree(): bool
+    protected function shouldRebuildSubtreePaths(): bool
     {
-        return $this->wasMoved();
+        return $this->isParentChanged();
     }
 
     /**
-     * Update the path of the node's subtree.
+     * Rebuild the paths of the subtree.
      */
-    protected function updatePathOfSubtree(): void
+    protected function rebuildSubtreePaths(): void
     {
-        $this->newQuery()->whereSelfOrDescendantOf($this)->update([
-            $this->getPathColumn() => $this->parent
-                ? new Expression(vsprintf("'%s' || subpath(%s, %d)", [
-                    $this->parent->getPath()->getValue(),
-                    $this->getPathColumn(),
-                    $this->getPath()->getDepth() - 1,
-                ]))
-                : new Expression(vsprintf('subpath(%s, %d)', [
-                    $this->getPathColumn(), 1,
-                ]))
-        ]);
+        $this->newQuery()
+            ->whereSelfOrDescendantOf($this)
+            ->rebuildPaths(
+                $this->getPathColumn(),
+                $this->getPath(),
+                $this->isRoot()
+                    ? null
+                    : $this->parent->getPath(),
+            );
     }
 
     /**
@@ -301,7 +325,7 @@ trait AsTree
      */
     protected function shouldDetectCircularReference(): bool
     {
-        return $this->isMoving();
+        return $this->isParentChanging();
     }
 
     /**
@@ -319,7 +343,7 @@ trait AsTree
      */
     protected function hasCircularReference(): bool
     {
-        if (! $this->parent) {
+        if ($this->isRoot()) {
             return false;
         }
 

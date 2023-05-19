@@ -1,11 +1,11 @@
 <?php
 
-namespace Nevadskiy\Tree\Tests\Support\Factories;
+namespace Nevadskiy\Tree\Tests\Database\Factories;
 
-use Illuminate\Database\Eloquent\Model;
-use Nevadskiy\Tree\Tests\Support\Models\Category;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Nevadskiy\Tree\Tests\Support\Models\Product;
+use Illuminate\Database\Eloquent\Model;
+use Nevadskiy\Tree\Tests\App\Category;
+use Nevadskiy\Tree\Tests\App\Product;
 
 class ProductFactory extends Factory
 {

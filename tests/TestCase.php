@@ -13,11 +13,14 @@ class TestCase extends OrchestraTestCase
     /**
      * @inheritdoc
      */
-    protected function setUp(): void
-    {
-        parent::setUp();
+    protected $loadEnvironmentVariables = true;
 
-        $this->loadMigrationsFrom(__DIR__.'/Support/migrations');
+    /**
+     * @inheritdoc
+     */
+    protected function defineDatabaseMigrations(): void
+    {
+        $this->loadMigrationsWithoutRollbackFrom(__DIR__ . '/Database/migrations/' . config('database.default'));
     }
 
     /**

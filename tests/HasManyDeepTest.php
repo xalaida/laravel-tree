@@ -3,9 +3,9 @@
 namespace Nevadskiy\Tree\Tests;
 
 use Illuminate\Database\Eloquent\Builder;
-use Nevadskiy\Tree\Tests\Support\Factories\CategoryFactory;
-use Nevadskiy\Tree\Tests\Support\Factories\ProductFactory;
-use Nevadskiy\Tree\Tests\Support\Models\Category;
+use Nevadskiy\Tree\Tests\App\Category;
+use Nevadskiy\Tree\Tests\Database\Factories\CategoryFactory;
+use Nevadskiy\Tree\Tests\Database\Factories\ProductFactory;
 
 class HasManyDeepTest extends TestCase
 {
@@ -127,7 +127,7 @@ class HasManyDeepTest extends TestCase
 
         $categories = Category::query()
             ->whereHas('products', function (Builder $query) {
-                $query->where('products.name', 'LIKE', '%watch');
+                $query->where('products.name', 'like', '%watch');
             })
             ->get();
 

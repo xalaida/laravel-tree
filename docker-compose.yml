@@ -1,9 +1,8 @@
-version: '3.8'
+version: '3.9'
 
 services:
   composer:
     build:
-      context: ./
       dockerfile: .docker/php${PHP_VERSION:-7.3}/Dockerfile
     environment:
       COMPOSER_CACHE_DIR: /app/.cache/composer
@@ -13,29 +12,13 @@ services:
 
   phpunit:
     build:
-      context: ./
       dockerfile: .docker/php${PHP_VERSION:-7.3}/Dockerfile
     volumes:
       - ./:/app
-    depends_on:
-      postgres:
-        condition: service_healthy
     entrypoint: vendor/bin/phpunit
-
-  postgres:
-    image: postgres:14.2-alpine
-    environment:
-      POSTGRES_DB: app
-      POSTGRES_USER: app
-      POSTGRES_PASSWORD: app
-    healthcheck:
-      test: [ "CMD", "pg_isready", "-U", "app", "-d", "app" ]
-      interval: 3s
-      timeout: 5s
 
   php-cs-fixer:
     build:
-      context: ./
       dockerfile: .docker/php${PHP_VERSION:-7.3}/Dockerfile
     volumes:
       - ./:/app

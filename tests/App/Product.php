@@ -1,6 +1,6 @@
 <?php
 
-namespace Nevadskiy\Tree\Tests\Support\Models;
+namespace Nevadskiy\Tree\Tests\App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;

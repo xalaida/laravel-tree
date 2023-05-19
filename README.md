@@ -1,3 +1,5 @@
+[![Stand With Ukraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/banner-direct-single.svg)](https://stand-with-ukraine.pp.ua)
+
 # 🌳 Tree-like structure for Eloquent models
 
 [![PHPUnit](https://img.shields.io/github/actions/workflow/status/nevadskiy/laravel-tree/phpunit.yml?branch=master)](https://packagist.org/packages/nevadskiy/laravel-tree)
@@ -5,53 +7,86 @@
 [![Latest Stable Version](https://img.shields.io/packagist/v/nevadskiy/laravel-tree)](https://packagist.org/packages/nevadskiy/laravel-tree)
 [![License](https://img.shields.io/github/license/nevadskiy/laravel-tree)](https://packagist.org/packages/nevadskiy/laravel-tree)
 
-[![Stand With Ukraine](https://raw.githubusercontent.com/vshymanskyy/StandWithUkraine/main/banner-direct-single.svg)](https://stand-with-ukraine.pp.ua)
-
-## ✅ Requirements
-
-- Laravel 8+
-- PostgreSQL and with "ltree" extension
+The package provides you with a simple solution that allows you to effortlessly create hierarchical structures for your Eloquent models.
+It leverages the [materialized path](#materialized-path) pattern to represent the hierarchy of your data.
+It can be used for a wide range of use cases such as managing categories, nested comments, and more.
 
 ## 🔌 Installation
 
-Install the package via composer:
+Install the package via Composer:
 
 ```bash
 composer require nevadskiy/laravel-tree
 ````
 
-Publish package migrations to create "ltree" extension (optional):
+## ✨ How it works
 
-```bash
-php artisan vendor:publish --tag=tree-migrations
+When working with hierarchical data structures in your application, storing the structure using a self-referencing `parent_id` column is a common approach.  
+While it works well for many use cases, it can become challenging when you need to make complex queries, such as finding all descendants of a given node.
+One of the simples and effective solutions is the [materialized path](#materialized-path) pattern.
+
+### Materialized path
+
+The "materialized pattern" involves storing the full path of each node in the hierarchy in a separate `path` column as a string. 
+The ancestors of each node are represented by a series of IDs separated by a delimiter.
+
+For example, the categories database table might look like this:
+
+| id | name           | parent_id |  path |
+|:---|:---------------|----------:|------:|
+| 1  | Science        |      null |     1 |
+| 2  | Physics        |         1 |   1.2 |
+| 3  | Mechanics      |         2 | 1.2.3 |
+| 4  | Thermodynamics |         2 | 1.2.4 |
+
+With this structure, you can easily retrieve all descendants of a node using a SQL query:
+
+```SQL
+SELECT * FROM categories WHERE path LIKE '1.%'
 ```
 
-## ✨ Introduction
+#### PostgreSQL Ltree extension
 
-To store hierarchical data structures in our application we can simply use the self-referencing `parent_id` column, and it will work fine in most cases.
-However, when you have to make queries for such data, things get more complicated.
+Using the [PostgreSQL ltree](https://www.postgresql.org/docs/current/ltree.html) extension we can go even further. This extension provides an additional `ltree` column type designed specifically for this purpose.
+In combination with a GiST index it allows executing lightweight and performant queries across an entire tree.
 
-There is a simple solution to add an extra column to the table to save the path of the node in the hierarchy.
-It's called a "materialized path" pattern and allows querying records more easily and efficiently.
+Now the SQL query will look like this:
 
-PostgreSQL has a specific column type for that purpose called [ltree](https://www.postgresql.org/docs/current/ltree.html).
-In combination with GiST index that allows executing lightweight and performant queries across an entire tree.
-Also, PostgreSQL provides extensive facilities for searching through label trees.
-
-Here is a simple example of how it works: 1st category "Books" is a parent of 2nd category "Science".
-
-The database table in this scenario will look like this:
-
-| id   | name     | parent_id | path |
-|:-----|:---------|----------:|-----:|
-| 1    | Books    |      null |    1 |
-| 2    | Science  |         1 |  1.2 |
+```SQL
+SELECT * FROM categories WHERE path ~ '1.*'
+```
 
 ## 🔨 Configuration
 
-Let's configure the package for nested categories.
+All you have to do is to add a `AsTree` trait to the model and add a `path` column alongside the self-referencing `parent_id` column to the model's table.
 
-Create a migration for the `categories` table:
+Let's get started by configuring a `Category` model:
+
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Nevadskiy\Tree\AsTree;
+
+class Category extends Model
+{
+    use AsTree;
+}
+```
+
+Next, create a migration for the model. The definition of the `path` column depends on your database connection.
+
+#### Using PostgreSQL database
+
+To add a `path` column with the `ltree` type and a GiST index, use the following code:
+
+```php
+$table->ltree('path')->nullable()->spatialIndex();
+```
+
+The complete migration file may look like this:
 
 ```php
 <?php
@@ -67,11 +102,10 @@ return new class extends Migration
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->ltree('path')->nullable()->spatialIndex(); // Create a "path" column with a "ltree" type and a GiST index.
+            $table->ltree('path')->nullable()->spatialIndex();
             $table->timestamps();
         });
 
-        // Add a self-referencing "parent_id" column with a "foreign key" constraint using a separate database query.
         Schema::table('categories', function (Blueprint $table) {
             $table->foreignId('parent_id')
                 ->nullable()
@@ -88,50 +122,44 @@ return new class extends Migration
 };
 ```
 
-Now create the `Category` model.
+Sometimes the Ltree extension may be disabled in PostgreSQL. To enable it, you can publish and run a package migration:
 
-```php
-<?php
-
-namespace App\Models;
-
-use Illuminate\Database\Eloquent\Model;
-use Nevadskiy\Tree\AsTree;
-
-class Category extends Model
-{
-    use AsTree;
-}
+```bash
+php artisan vendor:publish --tag=pgsql-ltree-migration
 ```
 
-> Note that the Category model uses the `AsTree` trait.
+#### Using MySQL database
+
+To add a string `path` column with and an index, use the following code:
+
+```php
+$table->string('path')->nullable()->index();;
+```
 
 ## 🚊 Usage
 
-### Path attribute
-
-The `path` attribute is assigned to all models that use the `AsTree` trait **automatically** based on the `parent`, so you do not need to manually set it.
+Once you have configured your model, the package **automatically** handles all manipulations with the `path` attribute based on the parent, so you do not need to set it manually.
 
 ### Inserting models
 
-A root node can be saved to the database very easily without extra effort:
+To insert a root node, simply save the model to the database:
 
 ```php
 $root = new Category();
-$root->name = 'Books';
+$root->name = 'Science';
 $root->save();
 ```
 
-To insert a child model, you only need to assign the `parent_id` attribute or use the `parent` relation like this:
+To insert a child model, you only need to assign the `parent_id` attribute or use the `parent` or `children` relation:
 
 ```php
 $child = new Category;
-$child->name = 'Science';
+$child->name = 'Physics';
 $child->parent()->associate($root);
 $child->save();
 ```
 
-As you can see, it works as with regular Eloquent models.
+As you can see, it works just as regular Eloquent models.
 
 ### Relations
 
@@ -142,14 +170,14 @@ The `AsTree` trait provides the following relations:
 - [`ancestors`](#ancestors) (read-only)
 - [`descendants`](#descendants) (read-only)
 
-The `parent` and `children` relations use default Laravel relations BelongsTo and HasMany.
+The `parent` and `children` relations use default Laravel `BelongsTo` and `HasMany` relation classes.
 
 The `ancestors` and `descendants` can be used only in the "read" mode, which means methods like `make` or `create` are not available. 
 So to save related nodes you need to use the `parent` or `children` relation.
 
 #### Parent
 
-The `parent` relation uses the default Eloquent BelongsTo relation that needs the `parent_id` column as a foreign key.
+The `parent` relation uses the default Eloquent `BelongsTo` relation class that needs the `parent_id` column as a foreign key.
 It allows getting a parent of the node.
 
 ```php
@@ -158,7 +186,7 @@ echo $category->parent->name;
 
 #### Children
 
-The `children` relation uses a default Eloquent HasMany relation and is a reverse relation to the `parent`.
+The `children` relation uses a default Eloquent `HasMany` relation class and is a reverse relation to the `parent`.
 It allows getting all children of the node.
 
 ```php
@@ -234,7 +262,7 @@ $ancestors = Category::query()->whereSelfOrAncestorOf($category)->get();
 Getting descendants of the node (including the current node):
 
 ```php
-$ancestors = Category::query()->whereSelfOrDescendantOf($category)->get();
+$descendants = Category::query()->whereSelfOrDescendantOf($category)->get();
 ```
 
 Ordering nodes by depth:
@@ -282,45 +310,40 @@ $products = $category->products()->paginate(20);
 
 You can easily get the products of a category and each of its descendants using a query builder.
 
-1st way:
+1st way (recommended):
+
+```php
+$products = Product::query()
+    ->join('categories', function (JoinClause $join) {
+        $join->on('products.category_id', 'categories.id');
+    })
+    ->whereSelfOrDescendantOf($category)
+    ->paginate(24, ['products.*']);
+```
+
+2nd way (slower):
 
 ```php
 $products = Product::query()
     ->whereHas('category', function (Builder $query) use ($category) {
         $query->whereSelfOrDescendantOf($category);
     })
-    ->paginate(25);
-```
-
-2nd way (faster, but requires an extra join):
-
-```php
-$products = Product::query()
-    ->join('categories', function (JoinClause $join) {
-        $join->on(
-            Product::query()->qualifyColumn('category_id'),
-            Category::query()->qualifyColumn('id')
-        );
-    })
-    ->whereSelfOrDescendantOf($category);
-    ->paginate(25, [
-        Product::query()->qualifyColumn('*')
-    ]);
+    ->paginate(24);
 ```
 
 ### Moving nodes
 
 When you move a node, the `path` column of the node and each of its descendants have to be updated as well.
-Luckily the package does this automatically using a single query when it detects that the `parent_id` column has been updated.
+Fortunately, the package does this automatically using a single query every time it sees that the `parent_id` column has been updated.
 
-So basically to move a node with its subtree you need to update the `parent` node of the current node:
+So basically to move a node along with its subtree, you need to update the `parent` node of the current node:
 
 ```php
-$books = Category::query()->where('name', 'Books')->firstOrFail();
 $science = Category::query()->where('name', 'Science')->firstOrFail();
+$physics = Category::query()->where('name', 'Physics')->firstOrFail();
 
-$science->parent()->associate($books);
-$science->save();
+$physics->parent()->associate($science);
+$physics->save();
 ```
 
 ### Other examples
@@ -362,3 +385,15 @@ Thank you for considering contributing. Please see [CONTRIBUTING](.github/CONTRI
 ## 📜 License
 
 The MIT License (MIT). Please see [LICENSE](LICENSE.md) for more information.
+
+[//]: # (@todo doc ordering)
+[//]: # (@todo doc available build methods)
+[//]: # (@todo doc postgres uuid and dashes)
+[//]: # (@todo doc custom query where['path', '~', '*.1.*])
+[//]: # (@todo refactor with separate builders SimplePathBuilder, LtreePathBuilder)
+[//]: # (@todo split tests into more specific test cases)
+[//]: # (@todo add test case with all build methods)
+[//]: # (@todo add method `is` to relations that performs checks: $this->ancestors[]->is[$that])
+[//]: # (@todo add method `is` to relations that performs checks: $this->descendants[]->is[$that])
+[//]: # (@todo doc list with all available builder methods)
+[//]: # (@todo use model observer similar how Scout does it)

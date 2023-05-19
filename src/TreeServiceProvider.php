@@ -61,6 +61,6 @@ class TreeServiceProvider extends ServiceProvider
      */
     private function publishMigrations(): void
     {
-        $this->publishes([__DIR__.'/../database/migrations/' => database_path('migrations')], 'tree-migrations');
+        $this->publishes([__DIR__.'/../database/migrations' => database_path('migrations')], 'pgsql-ltree-migration');
     }
 }

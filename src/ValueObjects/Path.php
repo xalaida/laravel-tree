@@ -3,14 +3,13 @@
 namespace Nevadskiy\Tree\ValueObjects;
 
 use Illuminate\Support\Collection;
-use Nevadskiy\Tree\SegmentProcessors\UuidPostgresLtreeSegmentProcessor;
 
 class Path
 {
     /**
      * The path's separator.
      */
-    protected const SEPARATOR = '.';
+    public const SEPARATOR = '.';
 
     /**
      * The path's value.
@@ -24,17 +23,13 @@ class Path
      *
      * @param string|Path ...$segments
      */
-    public static function concat(...$segments): Path
+    public static function from(...$segments): Path
     {
         return new static(
             collect($segments)
                 ->map(function ($segment) {
                     if ($segment instanceof Path) {
                         return $segment->getValue();
-                    }
-
-                    foreach (static::segmentProcessors() as $processor) {
-                        $segment = $processor->set($segment);
                     }
 
                     return $segment;
@@ -64,14 +59,7 @@ class Path
      */
     public function segments(): Collection
     {
-        return collect($this->explode())
-            ->map(function (string $segment) {
-                foreach (static::segmentProcessors() as $processor) {
-                    $segment = $processor->get($segment);
-                }
-
-                return $segment;
-            });
+        return collect($this->explode());
     }
 
     /**
@@ -91,20 +79,41 @@ class Path
     }
 
     /**
-     * @inheritdoc
+     * Convert the path into path set of ancestors including self.
+     *
+     * @todo rename
+     * @example ["1", "1.2", "1.2.3", "1.2.3.4"]
+     */
+    public function getPathSet(): array
+    {
+        $output = [];
+
+        $parts = $this->explode();
+
+        for ($index = 0, $length = count($parts); $index < $length; $index++) {
+            $output[] = implode(self::SEPARATOR, array_slice($parts, 0, $index));
+        }
+
+        return $output;
+    }
+
+    /**
+     * Convert the path into path set of ancestors excluding self.
+     */
+    public function getAncestorSet(): array
+    {
+        $output = $this->getPathSet();
+
+        array_pop($output);
+
+        return $output;
+    }
+
+    /**
+     * Get string representation of the object.
      */
     public function __toString(): string
     {
         return $this->getValue();
-    }
-
-    /**
-     * The segment processor list.
-     */
-    protected static function segmentProcessors(): array
-    {
-        return [
-            new UuidPostgresLtreeSegmentProcessor()
-        ];
     }
 }

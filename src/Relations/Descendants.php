@@ -7,10 +7,9 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Nevadskiy\Tree\AsTree;
-use Nevadskiy\Tree\Database\BuilderMixin;
 
 /**
- * @property AsTree $related
+ * @property AsTree related
  */
 class Descendants extends Relation
 {
@@ -86,22 +85,16 @@ class Descendants extends Relation
      */
     public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*']): Builder
     {
-        $query->select($columns);
-
-        $query->from("{$query->getModel()->getTable()} as descendants");
-
-        $query->whereColumn(
-            "descendants.{$this->related->getPathColumn()}",
-            BuilderMixin::DESCENDANT,
-            $this->related->qualifyColumn($this->related->getPathColumn())
-        );
-
-        $query->whereColumn(
-            "descendants.{$this->related->getKeyName()}",
-            '!=',
-            $this->related->getQualifiedKeyName()
-        );
-
-        return $query;
+        return $query->select($columns)
+            ->from("{$query->getModel()->getTable()} as descendants")
+            ->whereColumnSelfOrDescendant(
+                "descendants.{$this->related->getPathColumn()}",
+                $this->related->qualifyColumn($this->related->getPathColumn())
+            )
+            ->whereColumn(
+                "descendants.{$this->related->getKeyName()}",
+                '!=',
+                $this->related->getQualifiedKeyName()
+            );
     }
 }
