@@ -59,7 +59,7 @@ class Path
      */
     public function segments(): Collection
     {
-        return collect($this->explode());
+        return collect($this->split());
     }
 
     /**
@@ -67,42 +67,43 @@ class Path
      */
     public function getDepth(): int
     {
-        return count($this->explode());
+        return count($this->split());
     }
 
     /**
-     * Explode a path to segments.
+     * Split a path to segments.
      */
-    protected function explode(): array
+    protected function split(): array
     {
         return explode(self::SEPARATOR, $this->getValue());
     }
 
     /**
-     * Convert the path into path set of ancestors including self.
+     * Split the path into a separate set of paths of ancestor nodes including self.
      *
-     * @todo rename
      * @example ["1", "1.2", "1.2.3", "1.2.3.4"]
      */
-    public function getPathSet(): array
+    public function splitIntoSelfOrAncestors(): array
     {
         $output = [];
 
-        $parts = $this->explode();
+        $parts = $this->split();
 
         for ($index = 0, $length = count($parts); $index < $length; $index++) {
-            $output[] = implode(self::SEPARATOR, array_slice($parts, 0, $index));
+            $output[] = implode(self::SEPARATOR, array_slice($parts, 0, $index + 1));
         }
 
         return $output;
     }
 
     /**
-     * Convert the path into path set of ancestors excluding self.
+     * Split the path into a separate path set of paths of ancestor nodes.
+     *
+     * @example ["1", "1.2", "1.2.3"]
      */
-    public function getAncestorSet(): array
+    public function splitIntoAncestors(): array
     {
-        $output = $this->getPathSet();
+        $output = $this->splitIntoSelfOrAncestors();
 
         array_pop($output);
 

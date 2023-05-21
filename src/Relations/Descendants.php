@@ -40,7 +40,7 @@ class Descendants extends Relation
     {
         $this->query->where(function (Builder $query) use ($models) {
             foreach ($models as $model) {
-                $query->orWhereSelfOrDescendantOf($model);
+                $query->orWhereDescendant($model->getPathColumn(), $model->getPath());
             }
         });
     }
@@ -86,6 +86,7 @@ class Descendants extends Relation
     {
         return $query->select($columns)
             ->from("{$query->getModel()->getTable()} as descendants")
+            // @todo use whereColumnDescendant method instead.
             ->whereColumnSelfOrDescendant(
                 "descendants.{$this->related->getPathColumn()}",
                 $this->related->qualifyColumn($this->related->getPathColumn())

@@ -28,9 +28,7 @@ class Ancestors extends Relation
     {
         if (static::$constraints) {
             $this->query->where(function () {
-                // @todo rewrite using whereAnscestorOf method.
-                $this->query->whereSelfOrAncestorOf($this->related);
-                $this->query->whereKeyNot($this->related->getKey());
+                $this->query->whereAncestor($this->related->getPathColumn(), $this->related->getPath());
             });
         }
     }
@@ -42,8 +40,7 @@ class Ancestors extends Relation
     {
         $this->query->where(function (Builder $query) use ($models) {
             foreach ($models as $model) {
-                // @todo rewrite using whereAnscestorOf method.
-                $query->orWhereSelfOrAncestorOf($model);
+                $query->orWhereAncestor($model->getPathColumn(), $model->getPath());
             }
         });
     }
@@ -91,6 +88,7 @@ class Ancestors extends Relation
     {
         return $query->select($columns)
             ->from("{$query->getModel()->getTable()} as ancestors")
+            // @todo use whereColumnAncestor method instead.
             ->whereColumnSelfOrAncestor(
                 "ancestors.{$this->related->getPathColumn()}",
                 $this->related->qualifyColumn($this->related->getPathColumn())

@@ -40,12 +40,22 @@ class BuilderMixin
             }
 
             if ($this->getConnection() instanceof MySqlConnection) {
-                return $this->whereIn($column, $path->getAncestorSet(), $boolean);
+                return $this->whereIn($column, $path->splitIntoAncestors(), $boolean);
             }
 
             throw new RuntimeException(vsprintf('Database connection [%s] is not supported.', [
                 get_class($this->getConnection())
             ]));
+        };
+    }
+
+    /**
+     * Add an ancestor "or where" clause to the query.
+     */
+    public function orWhereAncestor(): callable
+    {
+        return function (string $column, Path $path) {
+            return $this->whereAncestor($column, $path, 'or');
         };
     }
 
@@ -60,7 +70,7 @@ class BuilderMixin
             }
 
             if ($this->getConnection() instanceof MySqlConnection) {
-                return $this->whereIn($column, $path->getPathSet(), $boolean);
+                return $this->whereIn($column, $path->splitIntoSelfOrAncestors(), $boolean);
             }
 
             throw new RuntimeException(vsprintf('Database connection [%s] is not supported.', [
@@ -80,6 +90,7 @@ class BuilderMixin
             }
 
             if ($this->getConnection() instanceof MySqlConnection) {
+                // split_path_into_self_or_ancestors
                 return $this->whereRaw(sprintf('find_in_set(%s, path_to_ancestor_set(%s))', $first, $second), [], $boolean);
             }
 
