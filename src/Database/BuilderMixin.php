@@ -36,7 +36,7 @@ class BuilderMixin
     {
         return function (string $column, Path $path, string $boolean = 'and') {
             if ($this->getConnection() instanceof PostgresConnection) {
-                return $this->where($column, '~', "*.{$path}", $boolean);
+                return $this->where($column, '~', "*.{$path->getValue()}", $boolean);
             }
 
             if ($this->getConnection() instanceof MySqlConnection) {
@@ -56,7 +56,7 @@ class BuilderMixin
     {
         return function (string $column, Path $path, string $boolean = 'and') {
             if ($this->getConnection() instanceof PostgresConnection) {
-                return $this->where($column, BuilderMixin::ANCESTOR, $path, $boolean);
+                return $this->where($column, BuilderMixin::ANCESTOR, $path->getValue(), $boolean);
             }
 
             if ($this->getConnection() instanceof MySqlConnection) {
@@ -133,12 +133,12 @@ class BuilderMixin
     {
         return function (string $column, Path $path, string $boolean = 'and') {
             if ($this->getConnection() instanceof PostgresConnection) {
-                return $this->where($column, BuilderMixin::DESCENDANT, $path, $boolean);
+                return $this->where($column, BuilderMixin::DESCENDANT, $path->getValue(), $boolean);
             }
 
             if ($this->getConnection() instanceof MySqlConnection) {
                 return $this->whereNested(function (Builder $query) use ($column, $path) {
-                    $query->where($column, '=', $path);
+                    $query->where($column, '=', $path->getValue());
                     $query->orWhereDescendant($column, $path);
                 }, $boolean);
             }
@@ -156,11 +156,11 @@ class BuilderMixin
     {
         return function (string $column, Path $path, string $boolean = 'and') {
             if ($this->getConnection() instanceof PostgresConnection) {
-                return $this->where($column, '~', "{$path}.*", $boolean);
+                return $this->where($column, '~', "{$path->getValue()}.*", $boolean);
             }
 
             if ($this->getConnection() instanceof MySqlConnection) {
-                return $this->where($column, 'like', "{$path}.%", $boolean);
+                return $this->where($column, 'like', "{$path->getValue()}.%", $boolean);
             }
 
             throw new RuntimeException(vsprintf('Database connection [%s] is not supported.', [
