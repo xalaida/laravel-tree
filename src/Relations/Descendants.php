@@ -28,8 +28,7 @@ class Descendants extends Relation
     {
         if (static::$constraints) {
             $this->query->where(function () {
-                $this->query->whereSelfOrDescendantOf($this->related);
-                $this->query->whereKeyNot($this->related->getKey());
+                $this->query->whereDescendant($this->related->getPathColumn(), $this->related->getPath());
             });
         }
     }
