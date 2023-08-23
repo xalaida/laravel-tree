@@ -133,7 +133,7 @@ php artisan vendor:publish --tag=pgsql-ltree-migration
 To add a string `path` column with and an index, use the following code:
 
 ```php
-$table->string('path')->nullable()->index();;
+$table->string('path')->nullable()->index();
 ```
 
 ## 🚊 Usage
