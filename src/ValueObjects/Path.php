@@ -90,7 +90,7 @@ class Path
 
         $parts = $this->explode();
 
-        for ($index = 0, $length = count($parts); $index < $length; $index++) {
+        for ($index = 1, $length = count($parts); $index <= $length; $index++) {
             $output[] = implode(self::SEPARATOR, array_slice($parts, 0, $index));
         }
 
