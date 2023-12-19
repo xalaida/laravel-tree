@@ -482,4 +482,19 @@ class CategoryTest extends TestCase
         self::assertCount(1, $child->ancestors);
         self::assertTrue($child->ancestors[0]->is($parent));
     }
+
+    /**
+     * @test
+     */
+    public function it_does_include_self_using_where_self_or_ancestor_of_method(): void
+    {
+        $category = CategoryFactory::new()
+            ->withAncestors(2)
+            ->create();
+
+        $ancestors = Category::query()->whereSelfOrAncestorOf($category)->get();
+
+        self::assertCount(3, $ancestors);
+        $this->assertTrue($ancestors->contains($category->getKeyName(), $category->getKey()));
+    }
 }
