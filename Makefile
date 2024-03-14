@@ -4,6 +4,7 @@
 # Define default values for environment variables
 DB_CONNECTION ?= pgsql
 COMPOSE ?= -f docker-compose.yml -f docker-compose.${DB_CONNECTION}.yml
+PHPUNIT_RUN ?= phpunit -c ${PHPUNIT_CONFIG_FILE}
 
 # Install the app
 install: env build composer.install
@@ -44,30 +45,30 @@ composer.uninstall:
 
 # Run PHPUnit
 phpunit:
-	docker compose ${COMPOSE} run --rm phpunit
+	docker compose ${COMPOSE} run --rm ${PHPUNIT_RUN}
 
 # Alias to run PHPUnit
 test: phpunit
 
 # Run PHPUnit with MySQL service
 test.mysql:
-	docker compose -f docker-compose.yml -f docker-compose.mysql.yml run --rm phpunit
+	docker compose -f docker-compose.yml -f docker-compose.mysql.yml run --rm ${PHPUNIT_RUN}
 
 # Run PHPUnit with PostgreSQL service
 test.pgsql:
-	docker compose -f docker-compose.yml -f docker-compose.pgsql.yml run --rm phpunit
+	docker compose -f docker-compose.yml -f docker-compose.pgsql.yml run --rm ${PHPUNIT_RUN}
 
 # Run PHPUnit with a coverage analysis using an HTML output
 phpunit.coverage.html:
-	docker compose ${COMPOSE} run --rm phpunit --coverage-html tests/.report
+	docker compose ${COMPOSE} run --rm ${PHPUNIT_RUN} --coverage-html tests/.report
 
 # Run PHPUnit with a coverage analysis using a plain text output
 phpunit.coverage.text:
-	docker compose ${COMPOSE} run --rm phpunit --coverage-text
+	docker compose ${COMPOSE} run --rm ${PHPUNIT_RUN} --coverage-text
 
 # Run PHPUnit with a coverage analysis using a Clover's XML output
 phpunit.coverage.clover:
-	docker compose ${COMPOSE} run --rm phpunit --coverage-clover tests/.report/clover.xml
+	docker compose ${COMPOSE} run --rm ${PHPUNIT_RUN} --coverage-clover tests/.report/clover.xml
 
 # Run PHPUnit with a coverage analysis
 phpunit.coverage: phpunit.coverage.text

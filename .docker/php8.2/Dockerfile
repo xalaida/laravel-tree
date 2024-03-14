@@ -8,7 +8,9 @@ RUN apt-get update \
   && docker-php-ext-install zip \
 # Install PostgreSQL
   && apt-get install -y libpq-dev \
-  && docker-php-ext-install pdo pdo_pgsql
+  && docker-php-ext-install pdo pdo_pgsql \
+# Install PCOV extension
+  && pecl install pcov && docker-php-ext-enable pcov
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
