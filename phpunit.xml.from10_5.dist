@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        bootstrap="vendor/autoload.php"
+        backupGlobals="false"
+        backupStaticProperties="false"
+        colors="true"
+        processIsolation="false"
+        stopOnError="true"
+        stopOnNotice="true"
+        stopOnWarning="true"
+        stopOnFailure="true"
+        cacheDirectory=".cache"
+        xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/10.5/phpunit.xsd"
+>
+  <testsuites>
+    <testsuite name="Package Test Suite">
+      <directory>tests/</directory>
+    </testsuite>
+  </testsuites>
+  <php>
+    <env name="DB_DATABASE" value="app"/>
+    <env name="DB_USERNAME" value="app"/>
+    <env name="DB_PASSWORD" value="app"/>
+  </php>
+  <source>
+    <include>
+      <directory suffix=".php">src/</directory>
+    </include>
+  </source>
+</phpunit>
