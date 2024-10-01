@@ -5,6 +5,7 @@ namespace Nevadskiy\Tree\Database;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\PostgresConnection;
+use Illuminate\Database\SQLiteConnection;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\Expression;
 use Nevadskiy\Tree\ValueObjects\Path;
@@ -43,6 +44,10 @@ class BuilderMixin
                 return $this->whereIn($column, $path->getAncestorSet(), $boolean);
             }
 
+            if ($this->getConnection() instanceof SQLiteConnection) {
+                return $this->whereIn($column, $path->getAncestorSet(), $boolean);
+            }
+
             throw new RuntimeException(vsprintf('Database connection [%s] is not supported.', [
                 get_class($this->getConnection())
             ]));
@@ -60,6 +65,10 @@ class BuilderMixin
             }
 
             if ($this->getConnection() instanceof MySqlConnection) {
+                return $this->whereIn($column, $path->getPathSet(), $boolean);
+            }
+
+            if ($this->getConnection() instanceof SQLiteConnection) {
                 return $this->whereIn($column, $path->getPathSet(), $boolean);
             }
 
@@ -81,6 +90,12 @@ class BuilderMixin
 
             if ($this->getConnection() instanceof MySqlConnection) {
                 return $this->whereRaw(sprintf('find_in_set(%s, path_to_ancestor_set(%s))', $first, $second), [], $boolean);
+            }
+
+            if ($this->getConnection() instanceof SQLiteConnection) {
+                return $this->whereRaw(
+                    "$second LIKE '$first' || $second LIKE '$first,%' || $second LIKE '%,$first,%' || $second LIKE '%,$first'"
+                );
             }
 
             throw new RuntimeException(vsprintf('Database connection [%s] is not supported.', [
@@ -143,6 +158,13 @@ class BuilderMixin
                 }, $boolean);
             }
 
+            if ($this->getConnection() instanceof SQLiteConnection) {
+                return $this->whereNested(function (Builder $query) use ($column, $path) {
+                    $query->where($column, '=', $path);
+                    $query->orWhereDescendant($column, $path);
+                }, $boolean);
+            }
+
             throw new RuntimeException(vsprintf('Database connection [%s] is not supported.', [
                 get_class($this->getConnection())
             ]));
@@ -160,6 +182,10 @@ class BuilderMixin
             }
 
             if ($this->getConnection() instanceof MySqlConnection) {
+                return $this->where($column, 'like', "{$path}.%", $boolean);
+            }
+
+            if ($this->getConnection() instanceof SQLiteConnection) {
                 return $this->where($column, 'like', "{$path}.%", $boolean);
             }
 
@@ -190,6 +216,10 @@ class BuilderMixin
             }
 
             if ($this->getConnection() instanceof MySqlConnection) {
+                return $this->whereColumn($first, 'like', new Expression("concat({$second}, '%')"), $boolean);
+            }
+
+            if ($this->getConnection() instanceof SQLiteConnection) {
                 return $this->whereColumn($first, 'like', new Expression("concat({$second}, '%')"), $boolean);
             }
 
@@ -250,6 +280,10 @@ class BuilderMixin
                 return $this->where($this->compileMysqlDepth($column), $operator, $depth);
             }
 
+            if ($this->getConnection() instanceof SQLiteConnection) {
+                return $this->where($this->compileSqliteDepth($column), $operator, $depth);
+            }
+
             throw new RuntimeException(vsprintf('Database connection [%s] is not supported.', [
                 get_class($this->getConnection())
             ]));
@@ -268,6 +302,10 @@ class BuilderMixin
 
             if ($this->getConnection() instanceof MySqlConnection) {
                 return $this->orderBy($this->compileMysqlDepth($column), $direction);
+            }
+
+            if ($this->getConnection() instanceof SQLiteConnection) {
+                return $this->orderBy($this->compileSqliteDepth($column), $direction);
             }
 
             throw new RuntimeException(vsprintf('Database connection [%s] is not supported.', [
@@ -299,6 +337,14 @@ class BuilderMixin
     }
 
     /**
+     * Compile the MySQL "depth" function for the given column.
+     */
+    protected function compileSqliteDepth(): callable
+    {
+        return $this->compileMysqlDepth();
+    }
+
+    /**
      * Rebuild paths of the subtree according to the parent path.
      */
     public function rebuildPaths(): callable
@@ -326,6 +372,17 @@ class BuilderMixin
                 ]);
             }
 
+            if ($this->getConnection() instanceof SQLiteConnection) {
+                return $this->update([
+                    $column => is_null($parentPath)
+                        ? new Expression($this->compileSqliteSubPath($column, $path->getDepth()))
+                        : new Expression($this->compileSqliteConcat([
+                            sprintf("'%s'", $parentPath->getValue() . Path::SEPARATOR),
+                            $this->compileSqliteSubPath($column, $path->getDepth())
+                        ]))
+                ]);
+            }
+
             throw new RuntimeException(vsprintf('Database connection [%s] is not supported.', [
                 get_class($this->getConnection())
             ]));
@@ -346,6 +403,16 @@ class BuilderMixin
      * Compile the MySQL concat function.
      */
     protected function compileMysqlConcat(): callable
+    {
+        return function (array $values) {
+            return sprintf("concat(%s)", implode(', ', $values));
+        };
+    }
+
+    /**
+     * Compile the SQLite concat function.
+     */
+    protected function compileSqliteConcat(): callable
     {
         return function (array $values) {
             return sprintf("concat(%s)", implode(', ', $values));
@@ -382,6 +449,34 @@ class BuilderMixin
             }
 
             return vsprintf('subpath(%s, %d)', [$column, $depth - 1]);
+        };
+    }
+
+    /**
+     * Compile the Sqlite sub path function.
+     */
+    protected function compileSqliteSubPath(): callable
+    {
+        return function (string $column, int $depth) {
+            if ($depth === 1) {
+                return $column;
+            }
+
+            $query = "WITH RECURSIVE positions(pos, count) AS (
+                            SELECT instr(%s, '%s') AS pos, 1
+                            UNION ALL
+                            SELECT instr(%s, '%s', pos + 1), count + 1
+                            FROM positions
+                            WHERE count < %d
+                        )
+                        SELECT substr(%s, (SELECT pos FROM positions ORDER BY count DESC LIMIT 1) + 1)";
+
+            return vsprintf($query, [
+                $column, Path::SEPARATOR,
+                $column, Path::SEPARATOR,
+                $depth - 1,
+                $column
+            ]);
         };
     }
 }
