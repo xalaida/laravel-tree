@@ -21,13 +21,13 @@ composer require nevadskiy/laravel-tree
 
 ## ✨ How it works
 
-When working with hierarchical data structures in your application, storing the structure using a self-referencing `parent_id` column is a common approach.  
+When working with hierarchical data structures in your application, storing the structure using a self-referencing `parent_id` column is a common approach.
 While it works well for many use cases, it can become challenging when you need to make complex queries, such as finding all descendants of a given node.
 One of the simples and effective solutions is the [materialized path](#materialized-path) pattern.
 
 ### Materialized path
 
-The "materialized pattern" involves storing the full path of each node in the hierarchy in a separate `path` column as a string. 
+The "materialized pattern" involves storing the full path of each node in the hierarchy in a separate `path` column as a string.
 The ancestors of each node are represented by a series of IDs separated by a delimiter.
 
 For example, the categories database table might look like this:
@@ -128,7 +128,7 @@ Sometimes the Ltree extension may be disabled in PostgreSQL. To enable it, you c
 php artisan vendor:publish --tag=pgsql-ltree-migration
 ```
 
-#### Using MySQL database
+#### Using MySQL or SQLite database
 
 To add a string `path` column with and an index, use the following code:
 
@@ -172,7 +172,7 @@ The `AsTree` trait provides the following relations:
 
 The `parent` and `children` relations use default Laravel `BelongsTo` and `HasMany` relation classes.
 
-The `ancestors` and `descendants` can be used only in the "read" mode, which means methods like `make` or `create` are not available. 
+The `ancestors` and `descendants` can be used only in the "read" mode, which means methods like `make` or `create` are not available.
 So to save related nodes you need to use the `parent` or `children` relation.
 
 #### Parent
@@ -197,7 +197,7 @@ foreach ($category->children as $child) {
 
 #### Ancestors
 
-The `ancestors` relation is a custom relation that works only in "read" mode. 
+The `ancestors` relation is a custom relation that works only in "read" mode.
 It allows getting all ancestors of the node (without the current node).
 
 Using the attribute:
@@ -244,13 +244,13 @@ $ancestors = $category->descendants()->get();
 Getting root nodes:
 
 ```php
-$roots = Category::query()->root()->get(); 
+$roots = Category::query()->root()->get();
 ```
 
 Getting nodes by the depth level:
 
 ```php
-$categories = Category::query()->whereDepth(3)->get(); 
+$categories = Category::query()->whereDepth(3)->get();
 ```
 
 Getting ancestors of the node (including the current node):
