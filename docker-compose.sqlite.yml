@@ -1,0 +1,7 @@
+version: '3.9'
+
+services:
+  phpunit:
+    environment:
+      DB_CONNECTION: sqlite
+      DB_DATABASE: ':memory:'

@@ -93,9 +93,7 @@ class BuilderMixin
             }
 
             if ($this->getConnection() instanceof SQLiteConnection) {
-                return $this->whereRaw(
-                    "$second LIKE '$first' || $second LIKE '$first,%' || $second LIKE '%,$first,%' || $second LIKE '%,$first'"
-                );
+                return $this->whereRaw(sprintf("instr('.' || %s || '.', '.' || %s || '.') > 0", $second, $first), [], $boolean);
             }
 
             throw new RuntimeException(vsprintf('Database connection [%s] is not supported.', [
@@ -220,7 +218,7 @@ class BuilderMixin
             }
 
             if ($this->getConnection() instanceof SQLiteConnection) {
-                return $this->whereColumn($first, 'like', new Expression("concat({$second}, '%')"), $boolean);
+                return $this->whereColumn($first, 'like', new Expression("{$second} || '%'"), $boolean);
             }
 
             throw new RuntimeException(vsprintf('Database connection [%s] is not supported.', [
@@ -415,7 +413,7 @@ class BuilderMixin
     protected function compileSqliteConcat(): callable
     {
         return function (array $values) {
-            return sprintf("concat(%s)", implode(', ', $values));
+            return implode(' || ', $values);
         };
     }
 
@@ -453,7 +451,7 @@ class BuilderMixin
     }
 
     /**
-     * Compile the Sqlite sub path function.
+     * Compile the SQLite sub path function.
      */
     protected function compileSqliteSubPath(): callable
     {
@@ -462,20 +460,11 @@ class BuilderMixin
                 return $column;
             }
 
-            $query = "WITH RECURSIVE positions(pos, count) AS (
-                            SELECT instr(%s, '%s') AS pos, 1
-                            UNION ALL
-                            SELECT instr(%s, '%s', pos + 1), count + 1
-                            FROM positions
-                            WHERE count < %d
-                        )
-                        SELECT substr(%s, (SELECT pos FROM positions ORDER BY count DESC LIMIT 1) + 1)";
-
-            return vsprintf($query, [
-                $column, Path::SEPARATOR,
-                $column, Path::SEPARATOR,
-                $depth - 1,
-                $column
+            return vsprintf("substr(%s, length(substring_index(%s, '%s', %d)) + 2)", [
+                $column,
+                $column,
+                Path::SEPARATOR,
+                $depth - 1
             ]);
         };
     }
