@@ -335,11 +335,15 @@ class BuilderMixin
     }
 
     /**
-     * Compile the MySQL "depth" function for the given column.
+     * Compile the SQLite "depth" function for the given column.
      */
     protected function compileSqliteDepth(): callable
     {
-        return $this->compileMysqlDepth();
+        return function (string $column, string $separator = Path::SEPARATOR) {
+            return new Expression(vsprintf("(length(%s) - length(replace(%s, '%s', ''))) + 1", [
+                $column, $column, $separator
+            ]));
+        };
     }
 
     /**
