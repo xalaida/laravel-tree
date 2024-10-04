@@ -117,6 +117,46 @@ jobs:
           DB_PORT: ${{ job.services.mysql.ports[3306] }}
           DB_COLLATION: utf8mb4_unicode_ci
 
+  sqlite_test:
+    name: Run PHPUnit on PHP ${{ matrix.php }} and SQLite with ${{ matrix.dependencies }} dependencies
+
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['7.3', '7.4', '8.0', '8.1', '8.2']
+        dependencies: ['lowest', 'highest']
+        exclude:
+          - php: '8.2'
+            dependencies: 'lowest'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: pdo, pdo_sqlite
+          tools: composer:v2
+          coverage: none
+
+      - name: Install Composer dependencies with the highest version
+        if: matrix.dependencies == 'highest'
+        run: composer update --no-interaction --no-progress
+
+      - name: Install Composer dependencies with the lowest stable version
+        if: matrix.dependencies == 'lowest'
+        run: composer update --no-interaction --no-progress --prefer-lowest --prefer-stable
+
+      - name: Run PHPUnit
+        run: vendor/bin/phpunit
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: ':memory:'
+
   coverage:
     name: Analyze code coverage
 

@@ -13,8 +13,7 @@ return new class () extends Migration {
             DB::connection()->getPdo()->sqliteCreateFunction('substring_index', function ($string, $delimiter, $count) {
                 if ($count > 0) {
                     return implode($delimiter, array_slice(explode($delimiter, $string), 0, $count));
-                }
-                elseif ($count < 0) {
+                } elseif ($count < 0) {
                     return implode($delimiter, array_slice(explode($delimiter, $string), $count));
                 }
                 return '';
