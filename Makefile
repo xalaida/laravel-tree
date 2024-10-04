@@ -58,6 +58,10 @@ test.mysql:
 test.pgsql:
 	docker compose -f docker-compose.yml -f docker-compose.pgsql.yml run --rm ${PHPUNIT_RUN}
 
+# Run PHPUnit with SQLite service
+test.sqlite:
+	docker compose -f docker-compose.yml -f docker-compose.sqlite.yml run --rm ${PHPUNIT_RUN}
+
 # Run PHPUnit with a coverage analysis using an HTML output
 phpunit.coverage.html:
 	docker compose ${COMPOSE} run --rm ${PHPUNIT_RUN} --coverage-html tests/.report
