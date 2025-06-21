@@ -3,9 +3,10 @@
 namespace Nevadskiy\Tree;
 
 use Illuminate\Database\Grammar;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Query\Builder;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Database\Schema\Blueprint;
 use Nevadskiy\Tree\Database\BuilderMixin;
 
 class TreeServiceProvider extends ServiceProvider
@@ -26,6 +27,7 @@ class TreeServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->publishMigrations();
+        $this->registerSQLiteFunctions();
     }
 
     /**
@@ -54,6 +56,23 @@ class TreeServiceProvider extends ServiceProvider
         Blueprint::macro('ltree', function (string $name) {
             return $this->addColumn('ltree', $name);
         });
+    }
+
+    /**
+     * Register the functions for SQLite driver.
+     */
+    private function registerSQLiteFunctions(): void
+    {
+        if (DB::getDriverName() === 'sqlite') {
+            DB::connection()->getPdo()->sqliteCreateFunction('substring_index', function ($string, $delimiter, $count) {
+                if ($count > 0) {
+                    return implode($delimiter, array_slice(explode($delimiter, $string), 0, $count));
+                } elseif ($count < 0) {
+                    return implode($delimiter, array_slice(explode($delimiter, $string), $count));
+                }
+                return '';
+            });
+        }
     }
 
     /**
