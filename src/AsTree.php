@@ -214,7 +214,7 @@ trait AsTree
      */
     protected static function shouldAssignPathDuringInsert(): bool
     {
-        $model = new static();
+        $model = (new \ReflectionClass(static::class))->newInstanceWithoutConstructor();
 
         if ($model->getIncrementing() && $model->getPathSourceColumn() === $model->getKeyName()) {
             return false;
